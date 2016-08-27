@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "420728598029",
+    "firebase_url": "https://fir-caique.firebaseio.com",
+    "project_id": "firebase-caique",
+    "storage_bucket": "firebase-caique.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420728598029:android:1d37be1c0f77fd37",
+        "android_client_info": {
+          "package_name": "v6.caique"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420728598029-pht8q8ku8bh42g8rj89cf7d0um14jkmv.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "420728598029-dv7g77lff4v9cpisacm1elj1rhu0i4no.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABZdemnqXcY3WgprMUFGigRTYTLdS2wak"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
