@@ -7,9 +7,19 @@ import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIIDService";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "Created instance!");
+    }
 
     @Override
     public void onTokenRefresh() {
@@ -23,7 +33,15 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         sendRegistrationToServer(refreshedToken);
     }
 
+    private AtomicInteger msgId = new AtomicInteger();
+
     private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(msgId.incrementAndGet()))
+                .addData("phone_number", "0031642170000")
+                .build());
+
+        Log.d(TAG, "Sent to server");
     }
 }
