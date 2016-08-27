@@ -15,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -43,6 +45,25 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        RequestUpdate();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RequestUpdate();
+    }
+
+    private void RequestUpdate()
+    {
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .addData("request", "all")
+                .build());
+
+        Log.d("RequestUpdate", "Requested!");
     }
 
     @Override

@@ -33,7 +33,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         sendRegistrationToServer(refreshedToken);
     }
 
-    private AtomicInteger msgId = new AtomicInteger();
+    public static AtomicInteger msgId = new AtomicInteger();
 
     private void sendRegistrationToServer(String token) {
         FirebaseMessaging fm = FirebaseMessaging.getInstance();

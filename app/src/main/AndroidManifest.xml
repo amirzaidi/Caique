@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <uses-permission android:name="android.permission.INTERNET" />
+        <!--<uses-permission android:name="android.permission.INTERNET" />
         <uses-permission android:name="android.permission.WAKE_LOCK" />
         <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
@@ -27,19 +27,7 @@
             android:name="v6.caique.permission.C2D_MESSAGE"
             android:protectionLevel="signature" />
 
-        <uses-permission android:name="v6.caique.persmission.C2D_MESSAGE" />
-
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="v6.caique" />
-            </intent-filter>
-        </receiver>
+        <uses-permission android:name="v6.caique.persmission.C2D_MESSAGE" />-->
 
         <service
             android:name=".MyFirebaseMessagingService"
