@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -21,8 +22,11 @@ import com.google.firebase.messaging.RemoteMessage;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static MainActivity Instance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Instance = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -47,12 +51,27 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         RequestUpdate();
+
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                String value = getIntent().getExtras().get(key).toString();
+                Log.d("MainActivityCreate", "Key: " + key + " Value: " + value);
+            }
+        }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("1");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         RequestUpdate();
+    }
+
+    public void updateText(String Text)
+    {
+        TextView Layout = (TextView) findViewById(R.id.hello_world);
+        Layout.setText(Text);
     }
 
     private void RequestUpdate()

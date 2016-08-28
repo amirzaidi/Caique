@@ -10,18 +10,19 @@ import android.util.Log;
 import android.net.Uri;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
         // TODO(developer): Handle FCM messages here.
@@ -36,8 +37,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            Log.d(TAG, "Message Id: " + remoteMessage.getData().get("id"));
-            sendNotification(remoteMessage.getData().get("id"), remoteMessage.getNotification().getBody().toString());
+            if (remoteMessage.getData().get("id") == null)
+            {
+                MainActivity.Instance.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.Instance.updateText(remoteMessage.getNotification().getBody());
+                    }
+                });
+            }
+            else
+            {
+                Log.d(TAG, "Message Id: " + remoteMessage.getData().get("id"));
+                sendNotification(remoteMessage.getData().get("id"), remoteMessage.getNotification().getBody());
+            }
         }
 
     }
@@ -60,7 +73,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancelAll();
+        //notificationManager.cancelAll();
         notificationManager.notify(Integer.parseInt(Id), notificationBuilder.build());
     }
 }
