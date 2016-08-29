@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Instance != null) {
+            Instance.finish();
+        }
         Instance = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -50,12 +53,16 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        RequestUpdate();
+        //RequestUpdate();
 
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
                 String value = getIntent().getExtras().get(key).toString();
                 Log.d("MainActivityCreate", "Key: " + key + " Value: " + value);
+                if (key.equals("test"))
+                {
+                    updateText(value);
+                }
             }
         }
 
@@ -65,13 +72,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        RequestUpdate();
+        //RequestUpdate();
     }
 
     public void updateText(String Text)
     {
         TextView Layout = (TextView) findViewById(R.id.hello_world);
         Layout.setText(Text);
+        Log.d("UpdateText", Text);
     }
 
     private void RequestUpdate()

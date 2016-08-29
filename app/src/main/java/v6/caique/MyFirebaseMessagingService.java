@@ -25,6 +25,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+        Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
+
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: " + remoteMessage.getFrom());
@@ -36,28 +38,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
+            Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            if (remoteMessage.getData().get("id") == null)
-            {
-                MainActivity.Instance.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainActivity.Instance.updateText(remoteMessage.getNotification().getBody());
-                    }
-                });
-            }
-            else
-            {
-                Log.d(TAG, "Message Id: " + remoteMessage.getData().get("id"));
-                sendNotification(remoteMessage.getData().get("id"), remoteMessage.getNotification().getBody());
-            }
+            //sendNotification(remoteMessage.getMessageId(), remoteMessage.getNotification().getBody());
+        }
+        else if (remoteMessage.getData() != null && MainActivity.Instance != null) {
+            MainActivity.Instance.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.Instance.updateText(remoteMessage.getData().get("test"));
+                }
+            });
         }
     }
 
-    private void sendNotification(String Id, String messageBody) {
+    /*private void sendNotification(String Id, String messageBody) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -74,5 +72,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         //notificationManager.cancelAll();
         notificationManager.notify(Integer.parseInt(Id), notificationBuilder.build());
-    }
+    }*/
 }
