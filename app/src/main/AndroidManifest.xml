@@ -19,18 +19,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-        <uses-permission android:name="android.permission.INTERNET" />
-        <uses-permission android:name="android.permission.WAKE_LOCK" />
-        <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
-        <permission
-            android:name="v6.caique.permission.C2D_MESSAGE"
-            android:protectionLevel="signature" />
-
-        <uses-permission android:name="v6.caique.persmission.C2D_MESSAGE" />
-        -->
-
         <service
             android:name=".MyFirebaseMessagingService"
             android:enabled="true"
