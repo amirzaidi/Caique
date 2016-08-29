@@ -48,7 +48,11 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".NotificationActivity"></activity>
+        <activity android:name=".NotificationActivity" />
+        <activity
+            android:name=".TestAmir"
+            android:label="@string/title_activity_test_amir"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
