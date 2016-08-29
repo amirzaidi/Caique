@@ -59,8 +59,7 @@ public class MainActivity extends AppCompatActivity
             for (String key : getIntent().getExtras().keySet()) {
                 String value = getIntent().getExtras().get(key).toString();
                 Log.d("MainActivityCreate", "Key: " + key + " Value: " + value);
-                if (key.equals("test"))
-                {
+                if (key.equals("test")) {
                     updateText(value);
                 }
             }
