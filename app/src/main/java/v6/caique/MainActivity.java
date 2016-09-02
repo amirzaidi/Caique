@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
         if (Instance != null) {
             Instance.finish();
         }
+        //testedit
         Instance = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
