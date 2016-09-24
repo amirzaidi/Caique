@@ -34,8 +34,6 @@ public class SendServerMessage extends AppCompatActivity {
     public void SendMessage(View view){
 
         SendMessageToServer();
-        Intent EndCurrentActivity = new Intent(this, MainActivity.class);
-        startActivity(EndCurrentActivity);
         this.finish();
 
     }
