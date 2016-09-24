@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        FirebaseMessaging.getInstance().subscribeToTopic("1");
+        new SubscribeTask().execute(1);
     }
 
     @Override
