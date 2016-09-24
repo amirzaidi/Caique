@@ -1,5 +1,6 @@
 package v6.caique;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -77,9 +78,12 @@ public class MainActivity extends AppCompatActivity
 
     public void updateText(String Text)
     {
-        TextView Layout = (TextView) findViewById(R.id.hello_world);
-        Layout.setText(Text);
-        Log.d("UpdateText", Text);
+        if(Text != null)
+        {
+            TextView Layout = (TextView) findViewById(R.id.hello_world);
+            Layout.setText(Text);
+            Log.d("UpdateText", Text);
+        }
     }
 
     private void RequestUpdate()
@@ -149,5 +153,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void OpenActivity(View view)
+    {
+        Intent newActivity = new Intent(this, SendServerMessage.class);
+        startActivity(newActivity);
     }
 }
