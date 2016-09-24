@@ -9,15 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="v6.caique.SendServerMessage">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/send_message_to_server"
-        android:id="@+id/button2"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="SendMessage"/>
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,7 +57,16 @@
         android:id="@+id/Text"
         android:hint="@string/text"
         android:layout_below="@+id/Date"
-        android:layout_alignEnd="@+id/button2"
-        android:layout_alignStart="@+id/Date" />
+        android:layout_alignStart="@+id/Date"
+        android:layout_alignEnd="@+id/Date" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send_message_to_server"
+        android:id="@+id/button2"
+        android:onClick="SendMessage"
+        android:layout_below="@+id/Text"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
