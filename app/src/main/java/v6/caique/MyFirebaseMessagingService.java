@@ -21,9 +21,12 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
+
+    private static AtomicInteger Id = new AtomicInteger(0);
 
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
@@ -38,6 +41,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            sendNotification(Id.getAndIncrement(), remoteMessage.getMessageId(), remoteMessage.getData().toString());
         }
 
         // Check if message contains a notification payload.
@@ -57,25 +61,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
 
-    /*private void sendNotification(String Id, String messageBody) {
+    private void sendNotification(Integer Id, String messageTitle, String messageBody) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_play_dark)
-                .setContentTitle("FCM Message")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //notificationManager.cancelAll();
-        notificationManager.notify(Integer.parseInt(Id), notificationBuilder.build());
-    }*/
+        notificationManager.notify(Id, notificationBuilder.build());
+    }
 }

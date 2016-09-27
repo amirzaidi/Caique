@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
             }
         }*/
 
-        //new SubscribeTask().execute(1);
+        new SubscribeTask().execute(1);
     }
 
     /*@Override
