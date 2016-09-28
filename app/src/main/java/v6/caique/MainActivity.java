@@ -50,6 +50,25 @@ public class MainActivity extends AppCompatActivity
 
         Instance = this;
         super.onCreate(savedInstanceState);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
+                .build();
+
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        //Close app
+                    }
+                } /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, 1);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -72,60 +91,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //RequestUpdate();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
-                .build();
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        //Close app
-                    }
-                } /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, 1);
-
-        /*
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                String value = getIntent().getExtras().get(key).toString();
-                Log.d("MainActivityCreate", "Key: " + key + " Value: " + value);
-                if (key.equals("test")) {
-                    updateText(value);
-                }
-            }
-        }*/
-
         //Test
         new SubscribeTask().execute(1);
         new SubscribeTask().execute(2);
         new UnsubscribeTask().execute(3);
     }
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        //RequestUpdate();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
-        }
-    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -150,6 +120,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 // Signed out, show unauthenticated UI.
                 Log.d("", "Failed sign in");
+                this.finish();
             }
         }
     }
@@ -163,28 +134,6 @@ public class MainActivity extends AppCompatActivity
             Log.d("UpdateText", Text);
         }
     }
-
-    /*private void RequestUpdate()
-    {
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
-                .addData("request", "all")
-                .build());
-
-        Log.d("RequestUpdate", "Requested!");
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            Log.d("TOKENMAIN", FirebaseInstanceId.getInstance().getToken());
-            super.onBackPressed();
-        }
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
