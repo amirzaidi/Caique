@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.JsonToken;
@@ -110,18 +111,22 @@ public class MainActivity extends AppCompatActivity
                 GoogleSignInAccount acct = result.getSignInAccount();
                 Log.d("", "Sending registration");
 
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
-                        .addData("type", "reg")
-                        .addData("text", acct.getDisplayName())
-                        .addData("idtoken", acct.getIdToken())
-                        .build());
-            } else {
-                // Signed out, show unauthenticated UI.
-                Log.d("", "Failed sign in");
-                this.finish();
+                String token = acct.getIdToken();
+
+                if (token != null) {
+                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                            .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                            .addData("type", "reg")
+                            .addData("text", token)
+                            .build());
+
+                    return;
+                }
             }
+
+            Log.d("", "Failed sign in");
+            this.finish();
         }
     }
 

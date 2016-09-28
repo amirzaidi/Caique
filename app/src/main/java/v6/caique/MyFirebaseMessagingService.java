@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
-
     private static AtomicInteger Id = new AtomicInteger(0);
 
     @Override
@@ -39,47 +38,39 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
+        if (remoteMessage.getData() != null && remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-            sendNotification(Id.getAndIncrement(), remoteMessage.getMessageId(), remoteMessage.getData().toString());
-        }
+            sendNotification(remoteMessage.getData().toString());
 
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            //sendNotification(remoteMessage.getMessageId(), remoteMessage.getNotification().getBody());
-        }
-        else if (remoteMessage.getData() != null && MainActivity.Instance != null) {
-            MainActivity.Instance.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity.Instance.updateText(remoteMessage.getData().get("test"));
-                }
-            });
+            if (MainActivity.Instance != null) {
+                MainActivity.Instance.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.Instance.updateText(remoteMessage.getData().get("text"));
+                    }
+                });
+            }
         }
     }
 
-
-    private void sendNotification(Integer Id, String messageTitle, String messageBody) {
+    private void sendNotification(String messageBody) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(messageTitle)
+                .setContentTitle("Caique")
                 .setContentText(messageBody)
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(Id, notificationBuilder.build());
+        notificationManager.notify(Id.getAndIncrement(), notificationBuilder.build());
     }
 }

@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIIDService";
+    public static AtomicInteger msgId = new AtomicInteger(0);
 
     @Override
     public void onCreate() {
@@ -27,22 +28,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // Instance ID token to your app server.
-        sendRegistrationToServer(refreshedToken);
-    }
-
-    public static AtomicInteger msgId = new AtomicInteger();
-
-    private void sendRegistrationToServer(String token) {
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(msgId.incrementAndGet()))
-                .addData("phone_number", "0031642170000")
-                .build());
-
-        Log.d(TAG, "Sent to server");
+        Intent i = new Intent(this, MainActivity.class);
     }
 }
