@@ -54,7 +54,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
             }
 
-            sendNotification(remoteMessage.getData().toString());
+            sendNotification(Data.toString());
 
             if (MainActivity.Instance != null) {
                 MainActivity.Instance.runOnUiThread(new Runnable() {
@@ -71,7 +71,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     {
         Log.d(TAG, "Sub to " + Topic);
         for (int j = 0; j < SubTopics; j++) {
-            Instance.subscribeToTopic("chat" + Topic + "-" + j);
+            Instance.subscribeToTopic("%" + Topic + "%" + j);
         }
     }
 
@@ -79,7 +79,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     {
         Log.d(TAG, "Unsub from " + Topic);
         for (int j = 0; j < SubTopics; j++) {
-            Instance.unsubscribeFromTopic("chat" + Topic + "-" + j);
+            Instance.unsubscribeFromTopic("%" + Topic + "%" + j);
         }
     }
 
