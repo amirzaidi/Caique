@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "420728598029-nbgac6sip1r76re62n7041ok7u3juk1l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "E76475212E3F908E9FBBE389CC80026B8D0E3133"
+          }
+        },
+        {
           "client_id": "420728598029-aqtgtqp6uag441m92ffhhusmq0t61v1p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
