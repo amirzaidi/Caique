@@ -19,6 +19,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,30 +30,56 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
     private static AtomicInteger Id = new AtomicInteger(0);
+    private static int SubTopics = 32;
 
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        FirebaseMessaging Instance = FirebaseMessaging.getInstance();
 
         Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
-
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
+        final Map<String, String> Data = remoteMessage.getData();
 
         // Check if message contains a data payload.
-        if (remoteMessage.getData() != null && remoteMessage.getData().size() > 0) {
+        if (Data != null && Data.size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            if (Data.containsKey("chats")) {
+                try {
+                    JSONArray a = new JSONArray(Data.get("chats"));
+                    for (int i = 0; i < a.length(); i++) {
+                        Sub(Instance, a.getString(i));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
             sendNotification(remoteMessage.getData().toString());
 
             if (MainActivity.Instance != null) {
                 MainActivity.Instance.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.Instance.updateText(remoteMessage.getData().get("text"));
+                        MainActivity.Instance.updateText(Data.get("text"));
                     }
                 });
             }
+        }
+    }
+
+    public void Sub(FirebaseMessaging Instance, String Topic)
+    {
+        Log.d(TAG, "Sub to " + Topic);
+        for (int j = 0; j < SubTopics; j++) {
+            Instance.subscribeToTopic("chat" + Topic + "-" + j);
+        }
+    }
+
+    public void Unsub(FirebaseMessaging Instance, String Topic)
+    {
+        Log.d(TAG, "Unsub from " + Topic);
+        for (int j = 0; j < SubTopics; j++) {
+            Instance.unsubscribeFromTopic("chat" + Topic + "-" + j);
         }
     }
 
