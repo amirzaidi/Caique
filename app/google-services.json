@@ -15,12 +15,32 @@
       },
       "oauth_client": [
         {
+          "client_id": "420728598029-aqtgtqp6uag441m92ffhhusmq0t61v1p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "ECA1A6CDC453B3A424F1DEA35D7F289AC6768D82"
+          }
+        },
+        {
+          "client_id": "420728598029-aj2aa45c92lsi6qfpg84d8le1gtomgh5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "2547112502AB6B8D0FD4C2EB6BB4E4417C7D7625"
+          }
+        },
+        {
           "client_id": "420728598029-8tgsapltg7u6f3hc3ee3a3i6c7pbmvui.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "v6.caique",
             "certificate_hash": "5F3FAE467446B99B90AC4941DE2ADA6C249273EB"
           }
+        },
+        {
+          "client_id": "420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
