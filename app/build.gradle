@@ -24,9 +24,6 @@ android {
         javaMaxHeapSize "4g"
     }
     signingConfigs {
-        debug {
-            storeFile file("caique.keystore")
-        }
     }
 }
 
