@@ -1,20 +1,12 @@
 package v6.caique;
 
-import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
-import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
-import android.net.Uri;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -22,9 +14,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,7 +22,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
     private static AtomicInteger Id = new AtomicInteger(0);
-    public static HashMap<String, String> IncomingMessages = new HashMap<String, String>();
     private static int SubTopics = 32;
 
     @Override
@@ -47,9 +36,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (Data != null && Data.size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
+            Boolean SendNotif = true;
             if(Data.get("type").equals("text") && !Data.get("text").trim().isEmpty()) {
-
-                prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
+                SendNotif = !prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
             }
 
             if (Data.containsKey("chats")) {
@@ -63,7 +52,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
             }
 
-            sendNotification(Data.toString());
+            if (SendNotif)
+            {
+                sendNotification(Data.toString());
+            }
 
             if (MainActivity.Instance != null) {
                 MainActivity.Instance.runOnUiThread(new Runnable() {
@@ -73,24 +65,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     }
                 });
             }
-            // Check if message contains a notification payload.
-            if (remoteMessage.getNotification() != null) {
-                Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
-                Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-                //sendNotification(remoteMessage.getMessageId(), remoteMessage.getNotification().getBody());
-            } else if (remoteMessage.getData() != null && MainActivity.Instance != null) {
-                MainActivity.Instance.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainActivity.Instance.updateText(remoteMessage.getData().get("test"));
-                    }
-                });
-            }
         }
     }
 
-    public void prepareMessages(final String Chat, final String Text, final String Sender){
-        IncomingMessages.put(Chat, Text);
+    public Boolean prepareMessages(final String Chat, final String Text, final String Sender){
         if(ChatActivity.Instances.containsKey(Chat)){
             ChatActivity.Instances.get(Chat).runOnUiThread(new Runnable() {
                 @Override
@@ -98,7 +76,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     ChatActivity.Instances.get(Chat).DisplayMessage(Text, Sender);
                 }
             });
+
+            return true;
         }
+
+        return false;
     }
 
     public void Sub(FirebaseMessaging Instance, String Topic)
