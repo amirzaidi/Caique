@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener { //ahmad (meme police) was here
 
     public static MainActivity Instance;
+    public static String ButtonTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,5 +188,14 @@ public class MainActivity extends AppCompatActivity
     {
         Intent newActivity = new Intent(this, SendServerMessage.class);
         startActivity(newActivity);
+    }
+
+    public void newChat(View view)
+    {
+        Object ButtonTagObject = view.getTag();
+        ButtonTag = ButtonTagObject.toString();
+
+        Intent newChatActivity = new Intent (this, ChatActivity.class);
+        startActivity(newChatActivity);
     }
 }

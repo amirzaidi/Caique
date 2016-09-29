@@ -24,7 +24,18 @@
         android:layout_height="wrap_content"
         android:text="@string/open_new_activity"
         android:id="@+id/button"
+        android:onClick="OpenActivity"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="OpenActivity" />
+        android:layout_alignStart="@+id/chatButton"
+        android:layout_alignEnd="@+id/chatButton" />
+
+    <Button
+        android:text="@string/new_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="newChat"
+        android:id="@+id/chatButton"
+        android:tag="1"
+        android:layout_above="@+id/button"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

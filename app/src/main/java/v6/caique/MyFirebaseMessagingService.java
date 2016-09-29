@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.net.Uri;
 import android.media.RingtoneManager;
@@ -29,7 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
+
     private static AtomicInteger Id = new AtomicInteger(0);
+    public static HashMap<String, String> IncomingMessages = new HashMap<String, String>();
     private static int SubTopics = 32;
 
     @Override
@@ -43,6 +46,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (Data != null && Data.size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+
+            if(Data.get("type").equals("text") && !Data.get("text").trim().isEmpty()) {
+
+                prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
+            }
+
             if (Data.containsKey("chats")) {
                 try {
                     JSONArray a = new JSONArray(Data.get("chats"));
@@ -64,6 +73,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     }
                 });
             }
+            // Check if message contains a notification payload.
+            if (remoteMessage.getNotification() != null) {
+                Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
+                Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+                //sendNotification(remoteMessage.getMessageId(), remoteMessage.getNotification().getBody());
+            } else if (remoteMessage.getData() != null && MainActivity.Instance != null) {
+                MainActivity.Instance.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.Instance.updateText(remoteMessage.getData().get("test"));
+                    }
+                });
+            }
+        }
+    }
+
+    public void prepareMessages(final String Chat, final String Text, final String Sender){
+        IncomingMessages.put(Chat, Text);
+        if(ChatActivity.Instances.containsKey(Chat)){
+            ChatActivity.Instances.get(Chat).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ChatActivity.Instances.get(Chat).DisplayMessage(Text, Sender);
+                }
+            });
         }
     }
 

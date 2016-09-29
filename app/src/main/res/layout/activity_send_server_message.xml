@@ -12,13 +12,13 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
         android:ems="10"
         android:id="@+id/ChatId"
         android:hint="@string/chat"
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/button2"
-        android:layout_alignEnd="@+id/button2" />
+        android:layout_alignEnd="@+id/button2"
+        android:inputType="text" />
 
     <EditText
         android:layout_width="wrap_content"

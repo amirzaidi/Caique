@@ -14,5 +14,6 @@
     <string name="type">Message Type</string>
     <string name="date">Date</string>
     <string name="text">Text</string>
+    <string name="new_chat">Open new Chat (ID = 1)</string>string>
 
 </resources>
