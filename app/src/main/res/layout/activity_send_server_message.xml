@@ -18,7 +18,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/button2"
         android:layout_alignEnd="@+id/button2"
-        android:inputType="text" />
+        android:inputType="text"
+        android:text="-KSqbu0zMurmthzBE7GF" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -29,7 +30,8 @@
         android:hint="@string/sender"
         android:layout_below="@+id/ChatId"
         android:layout_alignStart="@+id/ChatId"
-        android:layout_alignEnd="@+id/ChatId" />
+        android:layout_alignEnd="@+id/ChatId"
+        android:text="0" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -49,7 +51,8 @@
         android:hint="@string/date"
         android:layout_below="@+id/MessageType"
         android:layout_alignStart="@+id/MessageType"
-        android:layout_alignEnd="@+id/SenderId" />
+        android:layout_alignEnd="@+id/SenderId"
+        android:text="0" />
 
     <EditText
         android:layout_width="wrap_content"

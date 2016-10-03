@@ -37,33 +37,57 @@ public class ChatActivity extends AppCompatActivity {
         Instances.remove("-KSqbu0zMurmthzBE7GF");
     }
 
-    public void SendMessage(View view) {
-        long unixTime = System.currentTimeMillis() / 1000;
-
-        String Date = String.valueOf(unixTime);
+    public void SendMusic(View view) {
+        String Date = String.valueOf(System.currentTimeMillis() / 1000);
 
         EditText Input = (EditText) findViewById(R.id.editText2);
-        String Text = Input.getText().toString();
-        String FinalText;
+        String Text = Input.getText().toString().trim();
 
-        if(Text.trim().length() > 1024){
-            FinalText =  Text.trim().substring(0, 1021) + "...";
+        if(Text.length() > 1024){
+            Text =  Text.substring(0, 1021) + "...";
         }
-        else{
-            FinalText  = Text.trim();
+        else if (Text.length() == 0)
+        {
+            return;
         }
 
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
                 .addData("chat", "-KSqbu0zMurmthzBE7GF")
-                .addData("sender", "1")
-                .addData("type", "text")
+                .addData("type", "madd")
                 .addData("date", Date)
-                .addData("text", FinalText)
+                .addData("text", Text)
                 .build());
 
-        Log.d("SendMessageToServer", "Message sent");
+        Log.d("SendMessageToServer", "Music message sent " + Text);
+        Input.setText("");
+    }
+
+    public void SendMessage(View view) {
+        String Date = String.valueOf(System.currentTimeMillis() / 1000);
+
+        EditText Input = (EditText) findViewById(R.id.editText2);
+        String Text = Input.getText().toString().trim();
+
+        if(Text.length() > 1024){
+            Text =  Text.substring(0, 1021) + "...";
+        }
+        else if (Text.length() == 0)
+        {
+            return;
+        }
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .addData("chat", "-KSqbu0zMurmthzBE7GF")
+                .addData("type", "text")
+                .addData("date", Date)
+                .addData("text", Text)
+                .build());
+
+        Log.d("SendMessageToServer", "Message sent " + Text);
         Input.setText("");
 
     }

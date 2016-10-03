@@ -2,12 +2,26 @@ package v6.caique;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.AsyncQueryHandler;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.content.Context;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -24,6 +38,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static AtomicInteger Id = new AtomicInteger(0);
     private static int SubTopics = 32;
 
+    private static ExoPlayer Player;
+
+    private static DefaultTrackSelector TrackSelector;
+    private static DefaultLoadControl LoadControl;
+    private static DefaultDataSourceFactory SourceFactory;
+    private static DefaultExtractorsFactory ExtractorsFactory;
+
+    @Override
+    public void onCreate()
+    {
+        SourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "Caique"));
+        TrackSelector = new DefaultTrackSelector(new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                return false;
+            }
+        }));
+        LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 100, 500, 500, 500);
+        ExtractorsFactory = new DefaultExtractorsFactory();
+    }
+
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -37,8 +72,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
             Boolean SendNotif = true;
-            if(Data.get("type").equals("text") && !Data.get("text").trim().isEmpty()) {
-                SendNotif = !prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
+            if(Data.get("type").equals("text"))
+            {
+                if (!Data.get("text").trim().isEmpty())
+                {
+                    SendNotif = !prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
+                }
+            }
+            else if(Data.get("type").equals("play"))
+            {
+                if (Player != null) {
+                    Player.stop();
+                    Player.seekTo(0L);
+                    Player.release();
+                }
+
+                Looper.prepare();
+                Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                Player.setPlayWhenReady(true);
             }
 
             if (Data.containsKey("chats")) {
@@ -67,6 +119,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
     }
+
+    //public void onPrepared(MediaPlayer player) {
+        //player.start();
+    //}
 
     public Boolean prepareMessages(final String Chat, final String Text, final String Sender){
         if(ChatActivity.Instances.containsKey(Chat)){

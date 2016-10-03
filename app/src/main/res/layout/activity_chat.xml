@@ -39,11 +39,20 @@
     </ScrollView>
 
     <Button
-        android:text="Go"
+        android:text="Music"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button3"
-        android:layout_width="50dip"
+        android:id="@+id/button4"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:onClick="SendMessage"/>
+        android:onClick="SendMusic" />
+
+    <Button
+        android:text="Send"
+        android:layout_height="wrap_content"
+        android:id="@+id/button3"
+        android:onClick="SendMessage"
+        android:layout_width="wrap_content"
+        android:layout_above="@+id/button4"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
