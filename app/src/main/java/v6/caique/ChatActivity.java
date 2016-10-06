@@ -17,24 +17,52 @@ import java.util.HashMap;
 public class ChatActivity extends AppCompatActivity {
 
     public static HashMap<String, ChatActivity> Instances = new HashMap<String, ChatActivity>();
+    public static boolean Active;
+    private String CurrentChat = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        Instances.put("-KSqbu0zMurmthzBE7GF", this);
+        Bundle b = getIntent().getExtras();
+        String Chat = null;
+        if (b != null){
+            Chat = b.getString("chat");
+            Instances.put(Chat, this);
+            CurrentChat = Chat;
+        }
+        Active = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Active = false;
+        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Active = true;
+        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(true);
+        RequestPlaying();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        //Instances.remove("-KSqbu0zMurmthzBE7GF");
+        Instances.remove(CurrentChat);
+        Active = false;
+        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Instances.remove("-KSqbu0zMurmthzBE7GF");
+        Instances.remove(CurrentChat);
+        Active = false;
+        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
     }
 
     public void SendMusic(View view) {
@@ -54,7 +82,7 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
-                .addData("chat", "-KSqbu0zMurmthzBE7GF")
+                .addData("chat", CurrentChat)
                 .addData("type", "madd")
                 .addData("date", Date)
                 .addData("text", Text)
@@ -81,7 +109,7 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
-                .addData("chat", "-KSqbu0zMurmthzBE7GF")
+                .addData("chat", CurrentChat)
                 .addData("type", "text")
                 .addData("date", Date)
                 .addData("text", Text)
@@ -89,6 +117,20 @@ public class ChatActivity extends AppCompatActivity {
 
         Log.d("SendMessageToServer", "Message sent " + Text);
         Input.setText("");
+
+    }
+
+    public void RequestPlaying() {
+        String Date = String.valueOf(System.currentTimeMillis() / 1000);
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .addData("chat", CurrentChat)
+                .addData("type", "mplaying")
+                .addData("date", Date)
+                .addData("text", "")
+                .build());
 
     }
 

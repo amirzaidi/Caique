@@ -20,7 +20,7 @@
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/button3"
         android:hint="Type your message here..."
-        android:layout_below="@+id/ChatScroll" />
+        android:layout_below="@+id/ChatList" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
         android:layout_alignParentStart="true"
         android:layout_above="@+id/button3"
         android:layout_alignParentEnd="true"
-        android:id="@+id/ChatScroll">
+        android:id="@+id/ChatList">
 
         <LinearLayout
             android:layout_width="match_parent"

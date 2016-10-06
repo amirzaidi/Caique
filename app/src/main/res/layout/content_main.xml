@@ -25,17 +25,22 @@
         android:text="@string/open_new_activity"
         android:id="@+id/button"
         android:onClick="OpenActivity"
-        android:layout_centerVertical="true"
-        android:layout_alignStart="@+id/chatButton"
-        android:layout_alignEnd="@+id/chatButton" />
-
-    <Button
-        android:text="@string/new_chat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="newChat"
-        android:id="@+id/chatButton"
-        android:tag="1"
-        android:layout_above="@+id/button"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/hello_world"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="17dp"
+        android:layout_above="@+id/button">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/ChatList" />
+    </ScrollView>
+
 </RelativeLayout>

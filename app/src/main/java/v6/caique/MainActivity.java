@@ -3,6 +3,7 @@ package v6.caique;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +17,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
@@ -30,6 +35,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener { //ahmad (meme police) was here
@@ -230,4 +238,30 @@ public class MainActivity extends AppCompatActivity
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+
+    public void CreateChatList(final ArrayList<String> Chat){
+        LinearLayout ChatList = (LinearLayout) findViewById(R.id.ChatList);
+
+        for(int i = 0; i < Chat.size(); i++) {
+            Button ChatButton = new Button(this);
+            ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.FILL_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT));
+            ChatButton.setText(Chat.get(i));
+            final int finalI = i;
+            ChatButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Intent newChatActivity = new Intent(MainActivity.Instance, ChatActivity.class);
+                    Bundle b = new Bundle();
+                    b.putString("chat", Chat.get(finalI));
+                    newChatActivity.putExtras(b);
+                    startActivity(newChatActivity);
+                }
+            });
+
+            ChatList.addView(ChatButton);
+        }
+    }
+
 }

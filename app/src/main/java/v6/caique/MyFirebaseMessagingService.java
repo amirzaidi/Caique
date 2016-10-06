@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
@@ -29,6 +30,12 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,6 +52,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static DefaultDataSourceFactory SourceFactory;
     private static DefaultExtractorsFactory ExtractorsFactory;
 
+    public static HashMap<Integer, MyFirebaseMessagingService> MessagingService = new HashMap<Integer, MyFirebaseMessagingService>();
+
     @Override
     public void onCreate()
     {
@@ -57,6 +66,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }));
         LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 100, 500, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
+        MessagingService.put(1, this);
     }
 
     @Override
@@ -79,6 +89,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     SendNotif = !prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
                 }
             }
+
             else if(Data.get("type").equals("play"))
             {
                 if (Player != null) {
@@ -87,20 +98,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     Player.release();
                 }
 
-                Looper.prepare();
-                Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
-                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
-                Player.setPlayWhenReady(true);
+                if(ChatActivity.Instances.get(Data.get("chat")).Active) {
+                    Looper.prepare();
+                    Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                    Player.setPlayWhenReady(true);
+                }
             }
 
             if (Data.containsKey("chats")) {
+
+                ArrayList<String> Topics = new ArrayList<String>();
+
                 try {
                     JSONArray a = new JSONArray(Data.get("chats"));
                     for (int i = 0; i < a.length(); i++) {
                         Sub(Instance, a.getString(i));
+                        Topics.add(a.getString(i));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                if(Topics != null && MainActivity.Instance != null) {
+                    final ArrayList<String> finalTopics = Topics;
+                    MainActivity.Instance.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MainActivity.Instance.CreateChatList(finalTopics);
+                        }
+                    });
                 }
             }
 
@@ -120,9 +147,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    //public void onPrepared(MediaPlayer player) {
-        //player.start();
-    //}
 
     public Boolean prepareMessages(final String Chat, final String Text, final String Sender){
         if(ChatActivity.Instances.containsKey(Chat)){
@@ -137,6 +161,17 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         return false;
+    }
+
+    public void MusicHandler(boolean Start){
+        if(Start){
+            if(Player != null) {
+                Player.setPlayWhenReady(true);
+            }
+        }
+        else{
+            Player.setPlayWhenReady(false);
+        }
     }
 
     public void Sub(FirebaseMessaging Instance, String Topic)
