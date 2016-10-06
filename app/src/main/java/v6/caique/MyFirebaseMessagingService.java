@@ -2,6 +2,7 @@ package v6.caique;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
@@ -30,7 +31,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -59,7 +64,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 return false;
             }
         }));
-        LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 500, 1000, 500, 500);
+        LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 100, 500, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
         MessagingService.put(1, this);
     }
@@ -87,14 +92,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             else if(Data.get("type").equals("play"))
             {
-                if (Player == null)  {
-                    Looper.prepare();
-                    Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
-                } else {
-                    Player.setPlayWhenReady(false);
+                if (Player != null) {
+                    Player.stop();
+                    Player.seekTo(0L);
+                    Player.release();
                 }
 
                 if(ChatActivity.Instances.get(Data.get("chat")).Active) {
+                    Looper.prepare();
+                    Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
                     Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
                     Player.setPlayWhenReady(true);
                 }
