@@ -98,11 +98,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     Player.release();
                 }
 
-                if(ChatActivity.Instances.get(Data.get("chat")).Active) {
-                    Looper.prepare();
-                    Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
-                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
-                    Player.setPlayWhenReady(true);
+                if(ChatActivity.Instances.get(Data.get("chat")) != null) {
+                    if (ChatActivity.Instances.get(Data.get("chat")).Active) {
+                        Looper.prepare();
+                        Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                        Player.setPlayWhenReady(true);
+                    }
                 }
             }
 
