@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
@@ -62,6 +61,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 500, 1000, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
         MessagingService.put(1, this);
+
+        Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
     }
 
     @Override
@@ -87,13 +88,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             else if(Data.get("type").equals("play"))
             {
-                if (Player == null)  {
-                    Looper.prepare();
-                    Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
-                } else {
-                    Player.setPlayWhenReady(false);
-                }
-
                 if(ChatActivity.Instances.containsKey(Data.get("chat")) && ChatActivity.Instances.get(Data.get("chat")).Active) {
                     Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
                     Player.setPlayWhenReady(true);
