@@ -25,11 +25,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Bundle b = getIntent().getExtras();
-        String Chat = null;
         if (b != null){
-            Chat = b.getString("chat");
-            Instances.put(Chat, this);
-            CurrentChat = Chat;
+            CurrentChat = b.getString("chat");
+            Instances.put(CurrentChat, this);
         }
         Active = true;
     }
@@ -45,7 +43,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         Active = true;
-        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(true);
+        //MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(true);
         RequestPlaying();
     }
 
