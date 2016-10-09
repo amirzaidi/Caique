@@ -78,6 +78,7 @@
         android:layout_below="@+id/Text"
         android:layout_centerHorizontal="true"
         android:background="#FFC107"
-        android:padding="16px" />
+        android:padding="16px"
+        android:textColor="#000"/>
 
 </RelativeLayout>
