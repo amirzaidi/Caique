@@ -7,7 +7,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="v6.caique.SendServerMessage">
+    tools:context="v6.caique.SendServerMessage"
+    android:background="#FFE082">
 
     <EditText
         android:layout_width="wrap_content"
@@ -19,7 +20,8 @@
         android:layout_alignStart="@+id/button2"
         android:layout_alignEnd="@+id/button2"
         android:inputType="text"
-        android:text="-KSqbu0zMurmthzBE7GF" />
+        android:text="-KSqbu0zMurmthzBE7GF"
+        android:textColor="#000"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -31,7 +33,8 @@
         android:layout_below="@+id/ChatId"
         android:layout_alignStart="@+id/ChatId"
         android:layout_alignEnd="@+id/ChatId"
-        android:text="0" />
+        android:text="0"
+        android:textColor="#000"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -40,7 +43,8 @@
         android:hint="@string/type"
         android:layout_below="@+id/SenderId"
         android:layout_alignStart="@+id/SenderId"
-        android:layout_alignEnd="@+id/SenderId" />
+        android:layout_alignEnd="@+id/SenderId"
+        android:textColorHint="#222"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -52,7 +56,8 @@
         android:layout_below="@+id/MessageType"
         android:layout_alignStart="@+id/MessageType"
         android:layout_alignEnd="@+id/SenderId"
-        android:text="0" />
+        android:text="0"
+        android:textColor="#000"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -61,7 +66,8 @@
         android:hint="@string/text"
         android:layout_below="@+id/Date"
         android:layout_alignStart="@+id/Date"
-        android:layout_alignEnd="@+id/Date" />
+        android:layout_alignEnd="@+id/Date"
+        android:textColorHint="#222"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -70,6 +76,8 @@
         android:id="@+id/button2"
         android:onClick="SendMessage"
         android:layout_below="@+id/Text"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="#FFC107"
+        android:padding="16px" />
 
 </RelativeLayout>

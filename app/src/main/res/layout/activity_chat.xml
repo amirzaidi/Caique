@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app=""
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_chat"
     android:layout_width="match_parent"
@@ -8,7 +10,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="v6.caique.ChatActivity">
+    tools:context="v6.caique.ChatActivity"
+    android:background="#FFE082">
+
 
     <EditText
         android:layout_width="match_parent"
@@ -17,35 +21,25 @@
         android:ems="10"
         android:id="@+id/editText2"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/button3"
         android:hint="Type your message here..."
-        android:layout_below="@+id/ChatList" />
+        android:padding="16px"
+        android:textColorHint="#000"
+        android:layout_alignTop="@+id/button3"
+        android:textColor="#000"
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/button3"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/ChatList">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/ScrollLayout" />
-    </ScrollView>
+        android:layout_toStartOf="@+id/button4"
+        android:background="@drawable/my_button_bg"/>
 
     <Button
-        android:text="Music"
+        android:text="@string/music"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button4"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:onClick="SendMusic" />
+        android:onClick="SendMusic"
+        android:background="#FFC107"
+        android:textColor="#000"/>
 
     <Button
         android:text="Send"
@@ -54,5 +48,20 @@
         android:onClick="SendMessage"
         android:layout_width="wrap_content"
         android:layout_above="@+id/button4"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:textColor="#000"
+        android:background="#FFC107"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/ScrollLayout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ChatList"
+        android:layout_below="@+id/ScrollLayout" />
+</ScrollView>
 </RelativeLayout>
