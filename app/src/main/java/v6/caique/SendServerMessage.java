@@ -9,7 +9,7 @@ import android.widget.EditText;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
-public class SendServerMessage {
+public class SendServerMessage extends AppCompatActivity {
 
     Boolean Error;
 
