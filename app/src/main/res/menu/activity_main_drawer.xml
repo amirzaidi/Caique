@@ -3,33 +3,39 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_chats"
+            android:icon="@drawable/ic_menu_chats"
+            android:title="@string/chats"
+            />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_contacts"
+            android:icon="@drawable/ic_menu_contacts"
+            android:title="@string/contacts"
+            />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_favorites"
+            android:icon="@drawable/ic_menu_favorite"
+            android:title="@string/favorites"
+            />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
-    </group>
+            android:id="@+id/nav_add_people"
+            android:icon="@drawable/ic_menu_person_add"
+            android:title="@string/add"
+            />
 
-    <item android:title="Communicate">
+    </group>
+    <item android:title="@string/nav_group_name">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_music_library"
+                android:icon="@drawable/ic_menu_music_library"
+                android:title="@string/music_library"
+                />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_search"
+                android:icon="@drawable/ic_menu_search"
+                android:title="@string/search"
+                />
         </menu>
     </item>
 
