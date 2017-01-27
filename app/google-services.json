@@ -15,6 +15,38 @@
       },
       "oauth_client": [
         {
+          "client_id": "420728598029-rnjt4i591ogc7am5tu4uplq9tl97970i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "A5F9D3270349659EAA48C69E6C3267D15351F32B"
+          }
+        },
+        {
+          "client_id": "420728598029-qv200ahje6jq88v7reonrje1smo83aej.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "5FFD9CDB1ACA792E4045919AB465946F8CEF221F"
+          }
+        },
+        {
+          "client_id": "420728598029-gvtb1qt0fcj68brf7h3iuu6q918dov7e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "884627CAD31EAD67A9B994462C1EBBD0B1ACFC81"
+          }
+        },
+        {
+          "client_id": "420728598029-fpkkorf63e7v1mqcmb92kre1o6q44hr4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "v6.caique",
+            "certificate_hash": "5918663F881FC5CAB3C98AEF19EF4E9D66D4DF08"
+          }
+        },
+        {
           "client_id": "420728598029-nbgac6sip1r76re62n7041ok7u3juk1l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

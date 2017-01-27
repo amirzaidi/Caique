@@ -9,10 +9,22 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Comment;
+
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -36,15 +48,17 @@ public class ChatActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Active = false;
-        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
+        if(MyFirebaseMessagingService.Instance != null) {
+            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        }
     }
 
     @Override
     protected void onResume(){
         super.onResume();
         Active = true;
-        //MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(true);
         RequestPlaying();
+        RequestMessages();
     }
 
     @Override
@@ -52,7 +66,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         Instances.remove(CurrentChat);
         Active = false;
-        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
+        if(MyFirebaseMessagingService.Instance != null) {
+            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        }
     }
 
     @Override
@@ -60,7 +76,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onDestroy();
         Instances.remove(CurrentChat);
         Active = false;
-        MyFirebaseMessagingService.MessagingService.get(1).MusicHandler(false);
+        if(MyFirebaseMessagingService.Instance != null) {
+            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        }
     }
 
     public void SendMusic(View view) {
@@ -143,5 +161,33 @@ public class ChatActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
 
         MessageWindow.addView(MessageBox);
+    }
+
+    private void RequestMessages()
+    {
+
+
+        final DatabaseReference mDatabase;
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        Query MessageData = mDatabase.child("chat").child(CurrentChat).child("message");
+        MessageData.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap<String, HashMap<String, String>> Children = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue();
+                for(Map.Entry<String, HashMap<String, String>> entry : Children.entrySet()) {
+                    HashMap<String, String> value = entry.getValue();
+                    String Message = value.get("text");
+                    String Sender = value.get("sender");
+                    DisplayMessage(Message, Sender);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 }

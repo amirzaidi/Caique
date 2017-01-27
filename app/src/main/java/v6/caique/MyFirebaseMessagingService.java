@@ -46,7 +46,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static DefaultDataSourceFactory SourceFactory;
     private static DefaultExtractorsFactory ExtractorsFactory;
 
-    public static HashMap<Integer, MyFirebaseMessagingService> MessagingService = new HashMap<Integer, MyFirebaseMessagingService>();
+    public static MyFirebaseMessagingService Instance;
+
 
     @Override
     public void onCreate()
@@ -60,7 +61,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }));
         LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 500, 1000, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
-        MessagingService.put(1, this);
+        Instance = this;
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
     }

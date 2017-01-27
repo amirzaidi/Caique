@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener { //ahmad (meme police) was here
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     public static MainActivity Instance;
     public static String ButtonTag;
@@ -101,6 +101,9 @@ public class MainActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        ArrayList<String> Test = new ArrayList<String>();
+        CreateChatList(Test);
     }
 
     @Override
@@ -262,6 +265,25 @@ public class MainActivity extends AppCompatActivity
 
             ChatList.addView(ChatButton);
         }
+
+        Button ChatButton = new Button(this);
+        ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.FILL_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT));
+        ChatButton.setText("Test Chat");
+
+        ChatButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent newChatActivity = new Intent(MainActivity.Instance, ChatActivity.class);
+                Bundle b = new Bundle();
+                b.putString("chat", "-KSqbu0zMurmthzBE7GF");
+                newChatActivity.putExtras(b);
+                startActivity(newChatActivity);
+            }
+        });
+
+        ChatList.addView(ChatButton);
     }
 
 }
