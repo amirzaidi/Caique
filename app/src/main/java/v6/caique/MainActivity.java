@@ -198,6 +198,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(newActivity);
     }
 
+    public void GoTo(View view) {
+        Intent intent = new Intent(this, MyFirebaseStorage.class);
+        startActivity(intent);
+    }
+
     public void newChat(View view) {
         Object ButtonTagObject = view.getTag();
         ButtonTag = ButtonTagObject.toString();

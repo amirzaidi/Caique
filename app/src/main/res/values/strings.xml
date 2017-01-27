@@ -27,6 +27,8 @@
     <string name="nav_user_title">What\'s the meaning of this?</string>
     <string name="desc">Caigue</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="download">Download</string>
+    <string name="Picture">Go to Picture</string>
 
     <!-- Strings related to Settings -->
 

@@ -43,4 +43,13 @@
             android:id="@+id/ChatList" />
     </ScrollView>
 
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to Picture"
+        android:id="@+id/GoTo"
+        android:onClick="GoTo"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
