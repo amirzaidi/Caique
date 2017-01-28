@@ -3,10 +3,7 @@ package v6.caique;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,8 +17,6 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -37,7 +32,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -113,22 +107,27 @@ public class MainActivity extends AppCompatActivity
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 1) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            Status s = result.getStatus();
             if (result.isSuccess()) {
                 // Signed in successfully, show authenticated UI.
                 GoogleSignInAccount acct = result.getSignInAccount();
                 Log.d("", "Sending registration");
 
-                String token = acct.getIdToken();
+                try {
+                    String token = acct.getIdToken();
 
-                if (token != null) {
-                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                            .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
-                            .addData("type", "reg")
-                            .addData("text", token)
-                            .build());
+                    if (token != null) {
+                        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                                .addData("type", "reg")
+                                .addData("text", token)
+                                .build());
 
+                        return;
+                    }
+                }
+                catch (NullPointerException Ex)
+                {
                     return;
                 }
             }

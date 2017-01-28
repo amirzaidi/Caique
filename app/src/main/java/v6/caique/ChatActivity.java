@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
-    public static HashMap<String, ChatActivity> Instances = new HashMap<String, ChatActivity>();
+    public static HashMap<String, ChatActivity> Instances = new HashMap<>();
     public static boolean Active;
     private String CurrentChat = null;
     private ArrayList<String> Messages = new ArrayList<>();
@@ -164,31 +164,8 @@ public class ChatActivity extends AppCompatActivity {
 
     public void DisplayMessage(String Message, String Sender)
     {
-        Messages.add(Sender + ": " + Message);
+        Messages.add(Sender + "\n" + Message);
         Adapter.notifyDataSetChanged();
-        MessageWindow.smoothScrollToPosition(MessageWindow.getLastVisiblePosition());
-
-    }
-
-    public void ScrollDown(View view)
-    {/*
-        final ScrollView S = (ScrollView) findViewById(R.id.ScrollChatList);
-        S.post(new Runnable() {
-            @Override
-            public void run() {
-                S.fullScroll(ScrollView.FOCUS_DOWN);
-
-                try
-                {
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException Ex)
-                {
-                }
-
-                S.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });*/
     }
 
     private void RequestMessages()
@@ -209,6 +186,7 @@ public class ChatActivity extends AppCompatActivity {
                     String Sender = value.get("sender");
                     DisplayMessage(Message, Sender);
                 }
+                    MessageWindow.setSelection(Adapter.getCount() - 1);
                 }
                 catch (NullPointerException Ex)
                 {

@@ -89,15 +89,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             else if(Data.get("type").equals("play"))
             {
-                if(ChatActivity.Instances.containsKey(Data.get("chat")) && ChatActivity.Instances.get(Data.get("chat")).Active) {
-                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
-                    Player.setPlayWhenReady(true);
+                if(ChatActivity.Instances.containsKey(Data.get("chat"))) {
+                    final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+
+                    if (Chat.Active)
+                    {
+                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                        Player.setPlayWhenReady(true);
+                        Chat.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Chat.setTitle("Playing " + Data.get("text"));
+                            }
+                        });
+                    }
                 }
             }
 
             if (Data.containsKey("chats")) {
-
-                ArrayList<String> Topics = new ArrayList<String>();
+                ArrayList<String> Topics = new ArrayList<>();
 
                 try {
                     JSONArray a = new JSONArray(Data.get("chats"));
@@ -109,7 +119,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     e.printStackTrace();
                 }
 
-                if(Topics != null && MainActivity.Instance != null) {
+                if (MainActivity.Instance != null) {
                     final ArrayList<String> finalTopics = Topics;
                     MainActivity.Instance.runOnUiThread(new Runnable() {
                         @Override
