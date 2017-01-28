@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_chat"
     android:layout_width="match_parent"
@@ -11,70 +10,63 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="v6.caique.ChatActivity"
-    android:gravity="bottom|fill">
+    android:gravity="bottom|fill"
+    android:orientation="vertical">
 
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/ChatList"
+        android:transcriptMode="alwaysScroll"
+        android:layout_weight="1" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button4"
+        android:weightSum="1">
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/ChatList"
-            android:transcriptMode="alwaysScroll"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+        <EditText
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/button4">
+            android:inputType="textPersonName"
+            android:id="@+id/editText2"
+            android:layout_alignParentBottom="true"
+            android:hint="Type your message here..."
+            android:padding="16dp"
+            android:textColorHint="#000"
+            android:textColor="#000"
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:id="@+id/editText2"
-                android:layout_alignParentBottom="true"
-                android:hint="Type your message here..."
-                android:padding="16px"
-                android:textColorHint="#000"
-                android:textColor="#000"
-
-                android:gravity="top"
-                android:layout_toStartOf="@+id/button3"
-                android:layout_weight="1"
-                android:onClick="ScrollDown" />
-
-            <Button
-                android:text="Send"
-                android:layout_height="wrap_content"
-                android:onClick="SendMessage"
-                android:layout_width="wrap_content"
-                android:layout_above="@+id/button4"
-                android:layout_alignParentEnd="true"
-                android:textColor="#000"
-                android:background="@color/colorAccent"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:padding="16dp"
-                android:id="@+id/button3" />
-
-        </LinearLayout>
+            android:gravity="top"
+            android:layout_toStartOf="@+id/button3"
+            android:layout_weight="1"
+            android:onClick="ScrollDown" />
 
         <Button
-            android:text="@string/music"
-            android:layout_width="match_parent"
+            android:text="Send"
             android:layout_height="wrap_content"
-            android:id="@+id/button4"
-            android:onClick="SendMusic"
-            android:background="#FFC107"
-            android:textColor="#000" />
+            android:onClick="SendMessage"
+            android:layout_width="wrap_content"
+            android:layout_above="@+id/button4"
+            android:layout_alignParentEnd="true"
+            android:textColor="#000"
+            android:background="@color/colorAccent"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="16dp" />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <Button
+        android:text="@string/music"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button4"
+        android:onClick="SendMusic"
+        android:background="#FFC107"
+        android:textColor="#000"
+        android:layout_alignParentBottom="true" />
+
+</LinearLayout>

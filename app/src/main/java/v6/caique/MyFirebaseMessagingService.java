@@ -36,15 +36,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
-    private static AtomicInteger Id = new AtomicInteger(0);
-    private static int SubTopics = 32;
+    private AtomicInteger Id = new AtomicInteger(0);
+    private int SubTopics = 32;
 
-    private static ExoPlayer Player;
+    private ExoPlayer Player;
 
-    private static DefaultTrackSelector TrackSelector;
-    private static DefaultLoadControl LoadControl;
-    private static DefaultDataSourceFactory SourceFactory;
-    private static DefaultExtractorsFactory ExtractorsFactory;
+    private DefaultTrackSelector TrackSelector;
+    private DefaultLoadControl LoadControl;
+    private DefaultDataSourceFactory SourceFactory;
+    private DefaultExtractorsFactory ExtractorsFactory;
 
     public static MyFirebaseMessagingService Instance;
 
