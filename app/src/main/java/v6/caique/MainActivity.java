@@ -81,14 +81,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -102,8 +102,8 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        ArrayList<String> Test = new ArrayList<String>();
-        CreateChatList(Test);
+        //ArrayList<String> Test = new ArrayList<String>();
+        //CreateChatList(Test);
     }
 
     @Override
@@ -138,13 +138,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void updateText(String Text) {
+    /*public void updateText(String Text) {
         if (Text != null) {
             TextView Layout = (TextView) findViewById(R.id.hello_world);
             Layout.setText(Text);
             Log.d("UpdateText", Text);
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void OpenActivity(View view) {
+    public void CreateChat(View view) {
         Intent newActivity = new Intent(this, SendServerMessage.class);
         startActivity(newActivity);
     }
@@ -251,11 +251,13 @@ public class MainActivity extends AppCompatActivity
         LinearLayout ChatList = (LinearLayout) findViewById(R.id.ChatList);
 
         for(int i = 0; i < Chat.size(); i++) {
+
             Button ChatButton = new Button(this);
             ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.FILL_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT));
             ChatButton.setText(Chat.get(i));
+
             final int finalI = i;
             ChatButton.setOnClickListener(new View.OnClickListener(){
                 @Override
@@ -271,7 +273,7 @@ public class MainActivity extends AppCompatActivity
             ChatList.addView(ChatButton);
         }
 
-        Button ChatButton = new Button(this);
+        /*Button ChatButton = new Button(this);
         ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.FILL_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        ChatList.addView(ChatButton);
+        ChatList.addView(ChatButton);*/
     }
 
 }

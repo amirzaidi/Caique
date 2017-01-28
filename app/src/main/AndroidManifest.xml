@@ -41,7 +41,7 @@
         </service>
 
         <activity android:name=".SendServerMessage" />
-        <activity android:name=".ChatActivity" />
+        <activity android:name=".ChatActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".MyFirebaseStorage" />
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
@@ -51,9 +51,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
+        <!--<activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings"></activity>-->
     </application>
 
 </manifest>

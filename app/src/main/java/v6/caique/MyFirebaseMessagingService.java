@@ -129,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 MainActivity.Instance.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.Instance.updateText(Data.get("text"));
+                        //MainActivity.Instance.updateText(Data.get("text"));
                     }
                 });
             }
