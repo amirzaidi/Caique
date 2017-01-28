@@ -149,12 +149,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     public Boolean prepareMessages(final String Chat, final String Text, final String Sender){
         if(ChatActivity.Instances.containsKey(Chat)){
-            ChatActivity.Instances.get(Chat).runOnUiThread(new Runnable() {
+            /*ChatActivity.Instances.get(Chat).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ChatActivity.Instances.get(Chat).DisplayMessage(Text, Sender);
                 }
-            });
+            });*/
 
             return true;
         }

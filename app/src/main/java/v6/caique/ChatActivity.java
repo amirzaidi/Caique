@@ -3,6 +3,7 @@ package v6.caique;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -12,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,7 +37,6 @@ public class ChatActivity extends AppCompatActivity {
     public static HashMap<String, ChatActivity> Instances = new HashMap<>();
     public static boolean Active;
     private String CurrentChat = null;
-    private ArrayList<String> Messages = new ArrayList<>();
     private ArrayAdapter<String> Adapter;
     private ListView MessageWindow;
 
@@ -50,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
-        Adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Messages);
+        Adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         MessageWindow.setAdapter(Adapter);
 
         Active = true;
@@ -164,42 +165,40 @@ public class ChatActivity extends AppCompatActivity {
 
     public void DisplayMessage(String Message, String Sender)
     {
-        Messages.add(Sender + "\n" + Message);
-        Adapter.notifyDataSetChanged();
+        Adapter.add(Sender + "\n" + Message);
     }
 
     private void RequestMessages()
     {
-        Messages.clear();
+        Adapter.clear();
 
         final DatabaseReference mDatabase;
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        Query MessageData = mDatabase.child("chat").child(CurrentChat).child("message").orderByKey().limitToLast(50);
-        MessageData.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query MessageData = mDatabase.child("chat").child(CurrentChat).child("message").limitToLast(50);
+        MessageData.addChildEventListener(new ChildEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    HashMap<String, HashMap<String, String>> Children = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue();
-                for (Map.Entry<String, HashMap<String, String>> entry : Children.entrySet()) {
-                    HashMap<String, String> value = entry.getValue();
-                    String Message = value.get("text");
-                    String Sender = value.get("sender");
-                    DisplayMessage(Message, Sender);
-                }
-                    MessageWindow.setSelection(Adapter.getCount() - 1);
-                }
-                catch (NullPointerException Ex)
-                {
-                    Log.d("ChatActivity", "No msgs");
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                HashMap<String, String> MsgData = (HashMap<String, String>) dataSnapshot.getValue();
+                DisplayMessage(MsgData.get("text"), "FB" + MsgData.get("sender"));
+                MessageWindow.setSelection(Adapter.getCount() - 1);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
-
-
     }
 }
