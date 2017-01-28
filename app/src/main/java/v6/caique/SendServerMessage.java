@@ -39,7 +39,7 @@ public class SendServerMessage extends AppCompatActivity {
         if(!ChatID.isEmpty() && !SenderID.isEmpty() && !Date.isEmpty()) {
             FirebaseMessaging fm = FirebaseMessaging.getInstance();
             fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", ChatID)
                 .addData("sender", SenderID)
                 .addData("type", MessageType)

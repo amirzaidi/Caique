@@ -8,7 +8,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+public class FirebaseIDService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIIDService";
     public static AtomicInteger msgId = new AtomicInteger(0);
 

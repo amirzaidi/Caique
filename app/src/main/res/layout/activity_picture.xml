@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="v6.caique.MyFirebaseStorage">
+    tools:context="v6.caique.PictureActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Choose"
-            android:onClick="Picture" />
+            android:onClick="Choose" />
 
         <Button
             android:id="@+id/Download"

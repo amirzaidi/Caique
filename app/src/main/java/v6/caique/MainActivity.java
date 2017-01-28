@@ -27,7 +27,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static MainActivity Instance;
-    public static String ButtonTag;
+    //public static String ButtonTag;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -92,6 +91,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_chats);
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity
                     if (token != null) {
                         FirebaseMessaging fm = FirebaseMessaging.getInstance();
                         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                                 .addData("type", "reg")
                                 .addData("text", token)
                                 .build());
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -173,17 +174,28 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        RelativeLayout ContentMain = (RelativeLayout) findViewById(R.id.maincontent);
+
         if (id == R.id.nav_chats) {
-
-        } else if (id == R.id.nav_contacts) {
-
+            ContentMain.setVisibility(View.VISIBLE); //REPLACE
+        } else if (id == R.id.nav_explore) {
+            ContentMain.setVisibility(View.INVISIBLE); //REPLACE
         } else if (id == R.id.nav_favorites) {
+            ContentMain.setVisibility(View.INVISIBLE); //REPLACE
+        } else if (id == R.id.nav_invite_people) {
 
-        } else if (id == R.id.nav_add_people) {
+            Intent newActivity = new Intent(this, PictureActivity.class);
+            startActivity(newActivity);
 
         } else if (id == R.id.nav_music_library) {
 
-        } else if (id == R.id.nav_search) {
+            Intent newActivity = new Intent(this, PictureActivity.class);
+            startActivity(newActivity);
+
+        } else if (id == R.id.nav_settings) {
+
+            Intent newActivity = new Intent(this, PictureActivity.class);
+            startActivity(newActivity);
 
         }
 
@@ -195,19 +207,6 @@ public class MainActivity extends AppCompatActivity
     public void CreateChat(View view) {
         Intent newActivity = new Intent(this, SendServerMessage.class);
         startActivity(newActivity);
-    }
-
-    public void GoTo(View view) {
-        Intent intent = new Intent(this, MyFirebaseStorage.class);
-        startActivity(intent);
-    }
-
-    public void newChat(View view) {
-        Object ButtonTagObject = view.getTag();
-        ButtonTag = ButtonTagObject.toString();
-
-        Intent newChatActivity = new Intent(this, ChatActivity.class);
-        startActivity(newChatActivity);
     }
 
     /**
