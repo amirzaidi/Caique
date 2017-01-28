@@ -1,5 +1,7 @@
 package v6.caique;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,10 +47,17 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Bundle b = getIntent().getExtras();
-        if (b != null){
-            CurrentChat = b.getString("chat");
-            Instances.put(CurrentChat, this);
+
+        if (b == null|| !b.containsKey("chat")){
+            this.finish();
         }
+
+        CurrentChat = b.getString("chat");
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(CurrentChat.hashCode());
+
+        Instances.put(CurrentChat, this);
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
         Adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());

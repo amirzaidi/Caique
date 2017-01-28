@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -75,38 +76,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         final Map<String, String> Data = remoteMessage.getData();
 
         // Check if message contains a data payload.
-        if (Data != null && Data.size() > 0) {
+        if (Data != null && Data.size() > 0)
+        {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
-            Boolean SendNotif = true;
-            if(Data.get("type").equals("text"))
+            if (Data.containsKey("chat"))
             {
-                if (!Data.get("text").trim().isEmpty())
+                String ChatId = Data.get("chat");
+                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
+                String Type = Data.get("type");
+
+                if (Type.equals("text") && !Active)
                 {
-                    SendNotif = !prepareMessages(Data.get("chat"), Data.get("text").trim(), Data.get("sender"));
+                    sendNotification(ChatId, Data.get("sender") + ": " + Data.get("text"));
                 }
-            }
+                else if(Type.equals("play") && Active)
+                {
+                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                    Player.setPlayWhenReady(true);
 
-            else if(Data.get("type").equals("play"))
-            {
-                if(ChatActivity.Instances.containsKey(Data.get("chat"))) {
                     final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
-
-                    if (Chat.Active)
-                    {
-                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
-                        Player.setPlayWhenReady(true);
-                        Chat.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Chat.setTitle("Playing " + Data.get("text"));
-                            }
-                        });
-                    }
+                    Chat.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Chat.setTitle("Playing " + Data.get("text"));
+                        }
+                    });
                 }
             }
-
-            if (Data.containsKey("chats")) {
+            else if (Data.containsKey("chats"))
+            {
                 ArrayList<String> Topics = new ArrayList<>();
 
                 try {
@@ -129,37 +128,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     });
                 }
             }
-
-            if (SendNotif)
+            else
             {
-                sendNotification(Data.toString());
-            }
-
-            if (MainActivity.Instance != null) {
-                MainActivity.Instance.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //MainActivity.Instance.updateText(Data.get("text"));
-                    }
-                });
+                sendNotification("Log", Data.toString());
             }
         }
-    }
-
-
-    public Boolean prepareMessages(final String Chat, final String Text, final String Sender){
-        if(ChatActivity.Instances.containsKey(Chat)){
-            /*ChatActivity.Instances.get(Chat).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ChatActivity.Instances.get(Chat).DisplayMessage(Text, Sender);
-                }
-            });*/
-
-            return true;
-        }
-
-        return false;
     }
 
     public void MusicHandler(boolean Start){
@@ -173,12 +146,17 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    public void Sub(FirebaseMessaging Instance, String Topic)
+    public void Sub(final FirebaseMessaging Instance, final String Topic)
     {
-        Log.d(TAG, "Sub to " + Topic);
-        for (int j = 0; j < SubTopics; j++) {
-            Instance.subscribeToTopic("%" + Topic + "%" + j);
-        }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Sub to " + Topic);
+                for (int j = 0; j < SubTopics; j++) {
+                    Instance.subscribeToTopic("%" + Topic + "%" + j);
+                }
+            }
+        });
     }
 
     public void Unsub(FirebaseMessaging Instance, String Topic)
@@ -189,24 +167,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+    private void sendNotification(String chat, String messageBody) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("chat", chat);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Caique")
+                .setContentTitle(chat)
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(Id.getAndIncrement(), notificationBuilder.build());
+        notificationManager.notify(chat.hashCode(), notificationBuilder.build());
     }
 }
