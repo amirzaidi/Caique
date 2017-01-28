@@ -5,15 +5,10 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -26,13 +21,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Comment;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -41,6 +33,11 @@ public class ChatActivity extends AppCompatActivity {
     private String CurrentChat = null;
     private ArrayAdapter<String> Adapter;
     private ListView MessageWindow;
+
+    private Semaphore Conc = new Semaphore(1, false);
+    private int Unresolved = 0;
+    private LinkedList<HashMap<String, String>> ToAdd = new LinkedList<>();
+    private HashMap<String, HashMap<String, String>> SenderDatas = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,25 +169,70 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    public void DisplayMessage(String Message, String Sender)
+    public void DisplayMessage(HashMap<String, String> Message, HashMap<String, String> Sender)
     {
-        Adapter.add(Sender + "\n" + Message);
+        Adapter.add(Sender.get("name") + "\n" + Message.get("text"));
     }
 
     private void RequestMessages()
     {
         Adapter.clear();
 
-        final DatabaseReference mDatabase;
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         Query MessageData = mDatabase.child("chat").child(CurrentChat).child("message").limitToLast(50);
+
         MessageData.addChildEventListener(new ChildEventListener()
         {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                Conc.acquireUninterruptibly();
+
                 HashMap<String, String> MsgData = (HashMap<String, String>) dataSnapshot.getValue();
-                DisplayMessage(MsgData.get("text"), "FB" + MsgData.get("sender"));
-                MessageWindow.setSelection(Adapter.getCount() - 1);
+                final String SenderId = MsgData.get("sender");
+                if (SenderDatas.containsKey(SenderId) && Unresolved == 0)
+                {
+                    DisplayMessage(MsgData, SenderDatas.get(SenderId));
+                }
+                else
+                {
+                    ToAdd.add(MsgData);
+
+                    if (!SenderDatas.containsKey(SenderId))
+                    {
+                        Unresolved++;
+                        SenderDatas.put(SenderId, null);
+
+                        mDatabase.child("user").child(SenderId).child("data").limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                HashMap<String, String> SenderData = (HashMap<String, String>) dataSnapshot.getValue();
+
+                                Conc.acquireUninterruptibly();
+
+                                SenderDatas.put(SenderId, SenderData);
+                                if (--Unresolved == 0)
+                                {
+                                    while (ToAdd.size() != 0)
+                                    {
+                                        HashMap<String, String> MsgData = ToAdd.removeFirst();
+                                        DisplayMessage(MsgData, SenderDatas.get(MsgData.get("sender")));
+                                        MessageWindow.setSelection(Adapter.getCount() - 1);
+                                    }
+                                }
+
+                                Conc.release();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+                    }
+                }
+
+                Conc.release();
             }
 
             @Override

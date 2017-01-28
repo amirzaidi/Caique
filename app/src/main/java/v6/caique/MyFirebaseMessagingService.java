@@ -182,7 +182,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         notificationManager.notify(chat.hashCode(), notificationBuilder.build());
     }
 }
