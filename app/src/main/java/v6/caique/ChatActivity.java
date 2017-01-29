@@ -38,6 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     private int Unresolved = 0;
     private LinkedList<HashMap<String, String>> ToAdd = new LinkedList<>();
     private HashMap<String, HashMap<String, String>> SenderDatas = new HashMap<>();
+    private String PreviousID = new String();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,9 +170,14 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    public void DisplayMessage(HashMap<String, String> Message, HashMap<String, String> Sender)
+    public void DisplayMessage(HashMap<String, String> Message, HashMap<String, String> Sender, String SenderId)
     {
-        Adapter.add(Sender.get("name") + "\n" + Message.get("text"));
+        if(PreviousID.equals(SenderId)){
+            Adapter.add(Message.get("text"));
+        }
+        else {
+            Adapter.add(Sender.get("name") + ": \n" + Message.get("text"));
+        }
     }
 
     private void RequestMessages()
@@ -192,7 +198,8 @@ public class ChatActivity extends AppCompatActivity {
                 final String SenderId = MsgData.get("sender");
                 if (SenderDatas.containsKey(SenderId) && Unresolved == 0)
                 {
-                    DisplayMessage(MsgData, SenderDatas.get(SenderId));
+                    DisplayMessage(MsgData, SenderDatas.get(SenderId), SenderId);
+                    PreviousID = SenderId;
                 }
                 else
                 {
@@ -217,7 +224,8 @@ public class ChatActivity extends AppCompatActivity {
                                     while (ToAdd.size() != 0)
                                     {
                                         HashMap<String, String> MsgData = ToAdd.removeFirst();
-                                        DisplayMessage(MsgData, SenderDatas.get(MsgData.get("sender")));
+                                        DisplayMessage(MsgData, SenderDatas.get(MsgData.get("sender")), MsgData.get("sender"));
+                                        PreviousID = MsgData.get("sender");
                                         MessageWindow.setSelection(Adapter.getCount() - 1);
                                     }
                                 }
@@ -227,6 +235,7 @@ public class ChatActivity extends AppCompatActivity {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
+
                             }
                         });
                     }
