@@ -37,7 +37,6 @@
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
             android:id="@+id/editText2"
             android:layout_alignParentBottom="true"
             android:hint="Type your message here..."
@@ -47,7 +46,9 @@
 
             android:gravity="top"
             android:layout_toStartOf="@+id/button3"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:inputType="textCapSentences"
+            android:singleLine="false" />
 
         <Button
             android:text="Send"

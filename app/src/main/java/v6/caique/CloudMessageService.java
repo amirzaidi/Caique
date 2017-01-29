@@ -157,12 +157,17 @@ public class CloudMessageService extends FirebaseMessagingService {
         });
     }
 
-    public void Unsub(FirebaseMessaging Instance, String Topic)
+    public void Unsub(final FirebaseMessaging Instance, final String Topic)
     {
-        Log.d(TAG, "Unsub from " + Topic);
-        for (int j = 0; j < SubTopics; j++) {
-            Instance.unsubscribeFromTopic("%" + Topic + "%" + j);
-        }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Unsub from " + Topic);
+                for (int j = 0; j < SubTopics; j++) {
+                    Instance.subscribeToTopic("%" + Topic + "%" + j);
+                }
+            }
+        });
     }
 
     private void sendNotification(String chat, String messageBody) {
