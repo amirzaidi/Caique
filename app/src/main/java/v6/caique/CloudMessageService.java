@@ -121,7 +121,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     MainActivity.Instance.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            MainActivity.Instance.CreateChatList(finalTopics);
+                            MainActivity.Instance.GetChatNames(finalTopics);
                         }
                     });
                 }
