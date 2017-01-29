@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore;
 public class ChatActivity extends AppCompatActivity {
 
     public static HashMap<String, ChatActivity> Instances = new HashMap<>();
-    public static boolean Active;
+    public boolean Active;
     private String CurrentChat = null;
     private ArrayAdapter<String> Adapter;
     private ListView MessageWindow;
@@ -69,7 +69,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         Active = false;
         if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
+            CloudMessageService.Instance.SetMusicPlaying(false);
         }
     }
 
@@ -87,7 +87,7 @@ public class ChatActivity extends AppCompatActivity {
         Instances.remove(CurrentChat);
         Active = false;
         if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
+            CloudMessageService.Instance.SetMusicPlaying(false);
         }
     }
 
@@ -97,7 +97,7 @@ public class ChatActivity extends AppCompatActivity {
         Instances.remove(CurrentChat);
         Active = false;
         if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
+            CloudMessageService.Instance.SetMusicPlaying(false);
         }
     }
 

@@ -2,6 +2,7 @@ package v6.caique;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -240,28 +241,33 @@ public class MainActivity extends AppCompatActivity
 
     public void GetChatNames(final ArrayList<String> Chat) {
 
-        LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
+        final LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
         if (Chats != null)
         {
-            Chats.removeAllViews();
-        }
-
-        for (int i = 0; i < Chat.size(); i++) {
-            final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            Query MessageData = mDatabase.child("chat").child(Chat.get(i)).child("data").child("title");
-
-            final int finalI = i;
-            MessageData.addListenerForSingleValueEvent(new ValueEventListener() {
-
+            runOnUiThread(new Runnable() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    AddChat((String) dataSnapshot.getValue(), Chat.get(finalI));
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void run() {
+                    Chats.removeAllViews();
                 }
             });
+
+            for (int i = 0; i < Chat.size(); i++) {
+                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                Query MessageData = mDatabase.child("chat").child(Chat.get(i)).child("data").child("title");
+
+                final int finalI = i;
+                MessageData.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        AddChat((String) dataSnapshot.getValue(), Chat.get(finalI));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
         }
     }
 
@@ -289,8 +295,6 @@ public class MainActivity extends AppCompatActivity
         {
             Chats.addView(ChatButton);
         }
-
-        //Subs.Adapter.add(Chat);
     }
 
     @Override

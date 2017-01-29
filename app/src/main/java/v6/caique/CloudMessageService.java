@@ -30,12 +30,13 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
-    private AtomicInteger Id = new AtomicInteger(0);
     private int SubTopics = 32;
 
     private ExoPlayer Player;
@@ -46,7 +47,6 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultExtractorsFactory ExtractorsFactory;
 
     public static CloudMessageService Instance;
-
 
     @Override
     public void onCreate()
@@ -73,7 +73,6 @@ public class CloudMessageService extends FirebaseMessagingService {
         Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
         final Map<String, String> Data = remoteMessage.getData();
 
-        // Check if message contains a data payload.
         if (Data != null && Data.size() > 0)
         {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
@@ -81,8 +80,9 @@ public class CloudMessageService extends FirebaseMessagingService {
             if (Data.containsKey("chat"))
             {
                 String ChatId = Data.get("chat");
-                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
                 String Type = Data.get("type");
+
+                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
 
                 if (Type.equals("text") && !Active)
                 {
@@ -117,13 +117,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                 }
 
                 if (MainActivity.Instance != null) {
-                    final ArrayList<String> finalTopics = Topics;
-                    MainActivity.Instance.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainActivity.Instance.GetChatNames(finalTopics);
-                        }
-                    });
+                    MainActivity.Instance.GetChatNames(Topics);
                 }
             }
             else
@@ -133,31 +127,38 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
-    public void MusicHandler(boolean Start){
-        if(Start){
-            if(Player != null) {
-                Player.setPlayWhenReady(true);
-            }
-        }
-        else{
-            Player.setPlayWhenReady(false);
+    public void SetMusicPlaying(boolean Start){
+        if(Player != null) {
+            Player.setPlayWhenReady(Start);
         }
     }
+
+    private static ArrayList<String> Subs = new ArrayList<>();
 
     public void Sub(final FirebaseMessaging Instance, final String Topic)
     {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Sub to " + Topic);
-                for (int j = 0; j < SubTopics; j++) {
-                    Instance.subscribeToTopic("%" + Topic + "%" + j);
+        if (!Subs.contains(Topic))
+        {
+            Subs.add(Topic);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Log.d(TAG, "Sub to " + Topic);
+                        for (int j = 0; j < SubTopics; j++) {
+                            Thread.sleep(200);
+
+                            Instance.subscribeToTopic("%" + Topic + "%" + j);
+                        }
+                    }
+                    catch (InterruptedException Ex) {}
                 }
-            }
-        });
+            }).start();
+        }
     }
 
-    public void Unsub(final FirebaseMessaging Instance, final String Topic)
+    /*public void Unsub(final FirebaseMessaging Instance, final String Topic)
     {
         AsyncTask.execute(new Runnable() {
             @Override
@@ -168,7 +169,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                 }
             }
         });
-    }
+    }*/
 
     private void sendNotification(String chat, String messageBody) {
         Intent intent = new Intent(this, ChatActivity.class);
