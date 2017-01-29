@@ -31,7 +31,7 @@ public class ChatActivity extends AppCompatActivity {
     public static HashMap<String, ChatActivity> Instances = new HashMap<>();
     public boolean Active;
     private String CurrentChat = null;
-    private ArrayAdapter<String> Adapter;
+    private Adapter Adapter;
     private ListView MessageWindow;
 
     private Semaphore Conc = new Semaphore(1, false);
@@ -58,7 +58,7 @@ public class ChatActivity extends AppCompatActivity {
         Instances.put(CurrentChat, this);
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
-        Adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
+        Adapter = new Adapter(this, R.layout.chat_message, new ArrayList<String>());
         MessageWindow.setAdapter(Adapter);
 
         Active = true;
