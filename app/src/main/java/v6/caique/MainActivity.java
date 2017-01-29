@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
         FavoritesFragment.OnFragmentInteractionListener {
 
     public static MainActivity Instance;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -154,6 +155,12 @@ public class MainActivity extends AppCompatActivity
 
             drawer.closeDrawer(GravityCompat.START);
 
+            FirebaseMessaging fm = FirebaseMessaging.getInstance();
+            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                    .addData("type", "reg")
+                    .build());
+
         } else if (id == R.id.nav_explore) {
 
             manager.beginTransaction()
@@ -161,12 +168,6 @@ public class MainActivity extends AppCompatActivity
                 .commit();
 
             drawer.closeDrawer(GravityCompat.START);
-
-            FirebaseMessaging fm = FirebaseMessaging.getInstance();
-            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                    .addData("type", "reg")
-                    .build());
 
         } else if (id == R.id.nav_favorites) {
 
@@ -239,8 +240,11 @@ public class MainActivity extends AppCompatActivity
 
     public void GetChatNames(final ArrayList<String> Chat) {
 
-        LinearLayout ChatList = (LinearLayout) findViewById(R.id.ChatList);
-        ChatList.removeAllViews();
+        LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
+        if (Chats != null)
+        {
+            Chats.removeAllViews();
+        }
 
         for (int i = 0; i < Chat.size(); i++) {
             final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -251,18 +255,17 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    CreateChatList((String) dataSnapshot.getValue(), Chat.get(finalI));
+                    AddChat((String) dataSnapshot.getValue(), Chat.get(finalI));
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
         }
     }
 
-    public void CreateChatList(final String Chat, final String ChatID){
+    public void AddChat(final String Chat, final String ChatID){
 
         Button ChatButton = new Button(this);
         ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
@@ -281,8 +284,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        LinearLayout ChatList = (LinearLayout) findViewById(R.id.ChatList);
-        ChatList.addView(ChatButton);
+        LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
+        if (Chats != null)
+        {
+            Chats.addView(ChatButton);
+        }
+
+        //Subs.Adapter.add(Chat);
     }
 
     @Override

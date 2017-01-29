@@ -7,8 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="v6.caique.SubscribedFragment"
-    tools:showIn="@layout/activity_main_content"
-    android:id="@+id/maincontent">
+    tools:showIn="@layout/activity_main_content">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,10 +16,10 @@
         android:fillViewport="false">
 
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/ChatList" />
+            android:id="@+id/ChatList"></LinearLayout>
     </ScrollView>
 
 </RelativeLayout>
