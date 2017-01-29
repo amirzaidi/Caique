@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="v6.caique.SendServerMessage"
-    android:background="#FFE082">
+    android:background="#fff">
 
     <EditText
         android:layout_width="wrap_content"
@@ -77,7 +77,7 @@
         android:onClick="SendMessage"
         android:layout_below="@+id/Text"
         android:layout_centerHorizontal="true"
-        android:background="#FFC107"
+        android:background="@color/colorAccent"
         android:padding="16dp"
         android:textColor="#000"/>
 

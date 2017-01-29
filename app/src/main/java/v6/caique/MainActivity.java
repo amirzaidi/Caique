@@ -14,7 +14,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //Subs.Adapter.clear();
+                    //Subs.ChatAdapter.clear();
                 }
             });
 
@@ -274,29 +273,6 @@ public class MainActivity extends AppCompatActivity
         Data.Id = ChatID;
         Data.Name = Chat;
         Subs.Adapter.add(Data);
-
-        /*Button ChatButton = new Button(this);
-        ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ChatButton.setText(Chat);
-
-        ChatButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent newChatActivity = new Intent(MainActivity.Instance, ChatActivity.class);
-                Bundle b = new Bundle();
-                b.putString("chat", ChatID);
-                newChatActivity.putExtras(b);
-                startActivity(newChatActivity);
-            }
-        });
-
-        LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
-        if (Chats != null)
-        {
-            Chats.addView(ChatButton);
-        }*/
     }
 
     @Override

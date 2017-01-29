@@ -10,11 +10,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-class Adapter extends ArrayAdapter<String> {
+class ChatAdapter extends ArrayAdapter<String> {
 
     ArrayList<String> MessageArray;
 
-    public Adapter(Context context, @LayoutRes int resource, ArrayList<String> data) {
+    public ChatAdapter(Context context, @LayoutRes int resource, ArrayList<String> data) {
         super(context, resource, data);
 
         this.MessageArray = data;

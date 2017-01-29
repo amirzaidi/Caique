@@ -3,7 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    style="@android:style/Widget.DeviceDefault.Light.TextView">
+    style="@android:style/Widget.DeviceDefault.Light.TextView"
+    android:clickable="true"
+    android:background="?attr/selectableItemBackground">
 
     <TextView
         android:text="Insert Name Here"
