@@ -20,8 +20,7 @@ public class SubscribedFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    //public ArrayAdapter<String> Adapter;
-    //private ListView Chats;
+    public ListAdapterMaterial Adapter;
 
     public SubscribedFragment() {
     }
@@ -29,17 +28,19 @@ public class SubscribedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Chats = (ListView) getView().findViewById(R.id.ChatList);
-        //Adapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_1, new ArrayList<String>());
-        //Chats.setAdapter(Adapter);
+        Adapter = new ListAdapterMaterial(this.getActivity());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_subscribed, container, false);
+
+        View RootView = inflater.inflate(R.layout.fragment_subscribed, container, false);
+
+        ListView Chats = (ListView) RootView.findViewById(R.id.ChatList);
+        Chats.setAdapter(Adapter);
+
+        return RootView;
     }
 
     @Override

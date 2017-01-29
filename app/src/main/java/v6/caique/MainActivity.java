@@ -2,7 +2,6 @@ package v6.caique;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -15,9 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -46,6 +43,7 @@ public class MainActivity extends AppCompatActivity
         FavoritesFragment.OnFragmentInteractionListener {
 
     public static MainActivity Instance;
+    private SubscribedFragment Subs;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setCheckedItem(R.id.nav_chats);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.mainframe, new SubscribedFragment())
+                .replace(R.id.mainframe, Subs = new SubscribedFragment())
                 .commit();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -151,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_chats) {
 
             manager.beginTransaction()
-                    .replace(R.id.mainframe, new SubscribedFragment())
+                    .replace(R.id.mainframe, Subs = new SubscribedFragment())
                     .commit();
 
             drawer.closeDrawer(GravityCompat.START);
@@ -241,13 +239,12 @@ public class MainActivity extends AppCompatActivity
 
     public void GetChatNames(final ArrayList<String> Chat) {
 
-        final LinearLayout Chats = (LinearLayout)findViewById(R.id.ChatList);
-        if (Chats != null)
+        if (Subs != null)
         {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Chats.removeAllViews();
+                    //Subs.Adapter.clear();
                 }
             });
 
@@ -273,7 +270,12 @@ public class MainActivity extends AppCompatActivity
 
     public void AddChat(final String Chat, final String ChatID){
 
-        Button ChatButton = new Button(this);
+        ListAdapterMaterial.Str2D Data = new ListAdapterMaterial.Str2D();
+        Data.Id = ChatID;
+        Data.Name = Chat;
+        Subs.Adapter.add(Data);
+
+        /*Button ChatButton = new Button(this);
         ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -294,7 +296,7 @@ public class MainActivity extends AppCompatActivity
         if (Chats != null)
         {
             Chats.addView(ChatButton);
-        }
+        }*/
     }
 
     @Override
