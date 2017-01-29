@@ -9,33 +9,49 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-class ChatAdapter extends ArrayAdapter<String> {
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
-    ArrayList<String> MessageArray;
+class ChatAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-    public ChatAdapter(Context context, @LayoutRes int resource, ArrayList<String> data) {
-        super(context, resource, data);
+    ArrayList<HashMap<String, String>> MessageArray;
 
-        this.MessageArray = data;
+    public ChatAdapter(Context context, @LayoutRes int resource, ArrayList<HashMap<String, String>> MessageArray) {
+        super(context, resource, MessageArray);
+        this.MessageArray = MessageArray;
     }
 
     @Override
-
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Check if an existing view is being reused, otherwise inflate the view
 
-        if (convertView == null) {
+        if (convertView == null)
+        {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.chat_message, parent, false);
-            TextView Message = (TextView) convertView.findViewById(R.id.messageItem);
-            Message.setText(MessageArray.get(position));
-        }
-        else{
-            TextView Message = (TextView) convertView.findViewById(R.id.messageItem);
-            Message.setText(MessageArray.get(position));
         }
 
-        // Return the completed view to render on screen
+        if (MessageArray.size() > position)
+        {
+            TextView MessageSender = (TextView) convertView.findViewById(R.id.messageItemSender);
+            TextView Message = (TextView) convertView.findViewById(R.id.messageItem);
+
+            HashMap<String, String> Data = MessageArray.get(position);
+            String SenderId = Data.get("sender");
+
+            if (position != 0 && SenderId.equals(MessageArray.get(position - 1).get("sender")))
+            {
+                MessageSender.setVisibility(INVISIBLE);
+            }
+            else
+            {
+                MessageSender.setVisibility(VISIBLE);
+            }
+
+            MessageSender.setText(DatabaseCache.GetUserName(SenderId, "Loading.."));
+            Message.setText(Data.get("text"));
+        }
+
         return convertView;
     }
 }

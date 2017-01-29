@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -30,9 +29,6 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
@@ -79,14 +75,35 @@ public class CloudMessageService extends FirebaseMessagingService {
 
             if (Data.containsKey("chat"))
             {
-                String ChatId = Data.get("chat");
+                final String ChatId = Data.get("chat");
                 String Type = Data.get("type");
 
                 boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
 
                 if (Type.equals("text") && !Active)
                 {
-                    sendNotification(ChatId, Data.get("sender") + ": " + Data.get("text"));
+                    String ChatName = DatabaseCache.GetChatName(ChatId, null);
+                    String UserName = DatabaseCache.GetUserName(Data.get("sender"), null);
+
+                    if (ChatName == null || UserName == null)
+                    {
+                        DatabaseCache.LoadChatDataOnce(ChatId, new Runnable()
+                        {
+                            @Override
+                            public void run() {
+                                DatabaseCache.LoadUserDataOnce(Data.get("sender"), new Runnable()
+                                {
+                                    @Override
+                                    public void run() {
+                                        sendNotification(DatabaseCache.GetChatName(ChatId, ""), DatabaseCache.GetUserName(Data.get("sender"), "") + ": " + Data.get("text"));
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    sendNotification(ChatName, UserName + ": " + Data.get("text"));
+
                 }
                 else if(Type.equals("play") && Active)
                 {

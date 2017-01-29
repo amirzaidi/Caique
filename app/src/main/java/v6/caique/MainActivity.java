@@ -24,16 +24,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -49,6 +45,7 @@ public class MainActivity extends AppCompatActivity
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    private HashMap<String, Integer> ToCancel = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +91,6 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mainframe, Subs = new SubscribedFragment())
                 .commit();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -166,6 +159,7 @@ public class MainActivity extends AppCompatActivity
                 .commit();
 
             drawer.closeDrawer(GravityCompat.START);
+            Subs = null;
 
         } else if (id == R.id.nav_favorites) {
 
@@ -174,6 +168,7 @@ public class MainActivity extends AppCompatActivity
                     .commit();
 
             drawer.closeDrawer(GravityCompat.START);
+            Subs = null;
 
         } else if (id == R.id.nav_invite_people) {
 
@@ -200,79 +195,40 @@ public class MainActivity extends AppCompatActivity
         startActivity(newActivity);
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
     }
 
     public void GetChatNames(final ArrayList<String> Chat) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (Subs != null)
+                {
+                    for (int i = 0; i < Chat.size(); i++) {
+                        final String ID = Chat.get(i);
+                        Subs.Adapter.add(ID);
 
-        if (Subs != null)
-        {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //Subs.ChatAdapter.clear();
+                        if (ToCancel.containsKey(ID)) {
+                            DatabaseCache.Cancel(ToCancel.get(ID));
+                        }
+
+                        ToCancel.put(ID, DatabaseCache.LoadChatData(ID, new Runnable() {
+                            @Override
+                            public void run() {
+                                Subs.Adapter.notifyDataSetChanged();
+                            }
+                        }));
+                    }
                 }
-            });
-
-            for (int i = 0; i < Chat.size(); i++) {
-                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                Query MessageData = mDatabase.child("chat").child(Chat.get(i)).child("data").child("title");
-
-                final int finalI = i;
-                MessageData.addListenerForSingleValueEvent(new ValueEventListener() {
-
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        AddChat((String) dataSnapshot.getValue(), Chat.get(finalI));
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
             }
-        }
-    }
-
-    public void AddChat(final String Chat, final String ChatID){
-
-        ListAdapterMaterial.Str2D Data = new ListAdapterMaterial.Str2D();
-        Data.Id = ChatID;
-        Data.Name = Chat;
-        Subs.Adapter.add(Data);
+        });
     }
 
     @Override

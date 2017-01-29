@@ -7,20 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 
 public class SubscribedFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-
-    public ListAdapterMaterial Adapter;
+    public SubscribedAdapter Adapter;
 
     public SubscribedFragment() {
     }
@@ -28,7 +22,7 @@ public class SubscribedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Adapter = new ListAdapterMaterial(this.getActivity());
+        Adapter = new SubscribedAdapter(this.getActivity(), new ArrayList<String>());
     }
 
     @Override
