@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.media.RingtoneManager;
@@ -30,11 +29,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
 
     private AtomicInteger Id = new AtomicInteger(0);
@@ -47,7 +45,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private DefaultDataSourceFactory SourceFactory;
     private DefaultExtractorsFactory ExtractorsFactory;
 
-    public static MyFirebaseMessagingService Instance;
+    public static CloudMessageService Instance;
 
 
     @Override

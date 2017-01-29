@@ -18,7 +18,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import java.io.File;
 
-public class MyFirebaseStorage extends AppCompatActivity {
+public class PictureActivity extends AppCompatActivity {
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -30,26 +30,27 @@ public class MyFirebaseStorage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
-    public void Download() {
+    public void Download(View view) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://firebase-caique.appspot.com").child("TestImages/Testimg.jpg");
-        ImageView imageView =(ImageView) findViewById(R.id.Picture);
+        ImageView imageView = (ImageView) findViewById(R.id.Picture);
         Glide.with(this)
                 .using(new FirebaseImageLoader())
                 .load(storageRef)
                 .into(imageView);
     }
 
-    public void Download(View view){
-        Download();
-    }
+    public void Choose(View view)
+    {
 
+    }
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -57,7 +58,7 @@ public class MyFirebaseStorage extends AppCompatActivity {
      */
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
-                .setName("MyFirebaseStorage Page")
+                .setName("PictureActivity Page")
                 // TODO: Make sure this auto-generated URL is correct.
                 .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
                 .build();

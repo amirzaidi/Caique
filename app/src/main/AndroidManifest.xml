@@ -25,7 +25,7 @@
         </activity>
 
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".CloudMessageService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -33,7 +33,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".MyFirebaseInstanceIDService"
+            android:name=".FirebaseIDService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -43,7 +43,7 @@
 
         <activity android:name=".SendServerMessage" />
         <activity android:name=".ChatActivity" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".MyFirebaseStorage" />
+        <activity android:name=".PictureActivity" />
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.

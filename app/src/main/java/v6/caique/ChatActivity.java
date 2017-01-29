@@ -68,8 +68,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Active = false;
-        if(MyFirebaseMessagingService.Instance != null) {
-            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        if(CloudMessageService.Instance != null) {
+            CloudMessageService.Instance.MusicHandler(false);
         }
     }
 
@@ -86,8 +86,8 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         Instances.remove(CurrentChat);
         Active = false;
-        if(MyFirebaseMessagingService.Instance != null) {
-            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        if(CloudMessageService.Instance != null) {
+            CloudMessageService.Instance.MusicHandler(false);
         }
     }
 
@@ -96,8 +96,8 @@ public class ChatActivity extends AppCompatActivity {
         super.onDestroy();
         Instances.remove(CurrentChat);
         Active = false;
-        if(MyFirebaseMessagingService.Instance != null) {
-            MyFirebaseMessagingService.Instance.MusicHandler(false);
+        if(CloudMessageService.Instance != null) {
+            CloudMessageService.Instance.MusicHandler(false);
         }
     }
 
@@ -117,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
 
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", CurrentChat)
                 .addData("type", "madd")
                 .addData("date", Date)
@@ -144,7 +144,7 @@ public class ChatActivity extends AppCompatActivity {
 
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", CurrentChat)
                 .addData("type", "text")
                 .addData("date", Date)
@@ -161,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
 
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(MyFirebaseInstanceIDService.msgId.incrementAndGet()))
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", CurrentChat)
                 .addData("type", "mplaying")
                 .addData("date", Date)
