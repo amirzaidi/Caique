@@ -15,9 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,7 +26,6 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -39,41 +35,20 @@ public class MainActivity extends AppCompatActivity
 
     public static MainActivity Instance;
     private SubscribedFragment Subs;
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
     private HashMap<String, Integer> ToCancel = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         if (Instance != null) {
             Instance.finish();
         }
 
         Instance = this;
-        super.onCreate(savedInstanceState);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
-                .build();
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        //Close app
-                    }
-                } /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, 1);
-
+        setTheme(R.style.AppTheme_NoActionBar);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -88,6 +63,27 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_chats);
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
+                .build();
+
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        //Close app
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, 1);
+    }
+
+    private void SetSubscribedFragment()
+    {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mainframe, Subs = new SubscribedFragment())
                 .commit();
@@ -97,35 +93,23 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 1) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Signed in successfully, show authenticated UI.
-                GoogleSignInAccount acct = result.getSignInAccount();
-                Log.d("", "Sending registration");
-
-                try {
-                    String token = acct.getIdToken();
-
-                    if (token != null) {
-                        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                                .addData("type", "reg")
-                                .addData("text", token)
-                                .build());
-
-                        return;
-                    }
-                }
-                catch (NullPointerException Ex)
-                {
-                }
-            }
-
-            Log.d("", "Failed sign in");
+        if (requestCode != 1 || !result.isSuccess()) {
             this.finish();
+        }
+
+        try {
+            CloudMessageService.RegToken = result.getSignInAccount().getIdToken();
+
+            if (CloudMessageService.RegToken != null) {
+                SetSubscribedFragment();
+            }
+        }
+        catch (NullPointerException Ex)
+        {
+            Log.d("GSO", "Failed getting token");
         }
     }
 
@@ -139,52 +123,27 @@ public class MainActivity extends AppCompatActivity
         FragmentManager manager = getSupportFragmentManager();
 
         if (id == R.id.nav_chats) {
-
-            manager.beginTransaction()
-                    .replace(R.id.mainframe, Subs = new SubscribedFragment())
-                    .commit();
-
+            SetSubscribedFragment();
             drawer.closeDrawer(GravityCompat.START);
-
-            FirebaseMessaging fm = FirebaseMessaging.getInstance();
-            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                    .addData("type", "reg")
-                    .build());
-
         } else if (id == R.id.nav_explore) {
-
             manager.beginTransaction()
                 .replace(R.id.mainframe, new ExploreFragment())
                 .commit();
-
             drawer.closeDrawer(GravityCompat.START);
-            Subs = null;
-
         } else if (id == R.id.nav_favorites) {
-
             manager.beginTransaction()
                     .replace(R.id.mainframe, new FavoritesFragment())
                     .commit();
-
             drawer.closeDrawer(GravityCompat.START);
-            Subs = null;
-
         } else if (id == R.id.nav_invite_people) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         } else if (id == R.id.nav_music_library) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         } else if (id == R.id.nav_settings) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         }
 
         return true;
@@ -209,7 +168,7 @@ public class MainActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (Subs != null)
+                if (Subs != null && Subs.isAdded())
                 {
                     for (int i = 0; i < Chat.size(); i++) {
                         final String ID = Chat.get(i);

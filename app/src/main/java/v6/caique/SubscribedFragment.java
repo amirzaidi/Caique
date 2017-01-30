@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
+
 import java.util.ArrayList;
 
 public class SubscribedFragment extends Fragment {
@@ -16,13 +19,17 @@ public class SubscribedFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     public SubscribedAdapter Adapter;
 
-    public SubscribedFragment() {
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Adapter = new SubscribedAdapter(this.getActivity(), new ArrayList<String>());
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("type", "reg")
+                .addData("text", CloudMessageService.RegToken)
+                .build());
     }
 
     @Override

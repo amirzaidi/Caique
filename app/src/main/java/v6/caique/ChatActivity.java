@@ -39,8 +39,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        Bundle b = getIntent().getExtras();
 
+        Bundle b = getIntent().getExtras();
         if (b == null|| !b.containsKey("chat")){
             this.finish();
         }
@@ -56,10 +56,7 @@ public class ChatActivity extends AppCompatActivity {
         Adapter = new ChatAdapter(this, R.layout.chat_message, new ArrayList<HashMap<String, String>>());
         MessageWindow.setAdapter(Adapter);
 
-        Active = true;
-
         MessageData = FirebaseDatabase.getInstance().getReference().child("chat").child(CurrentChat).child("message").limitToLast(50);
-
         MessageData.addChildEventListener(Listener = new ChildEventListener()
         {
             @Override
@@ -96,29 +93,34 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+        DatabaseCache.LoadChatDataOnce(CurrentChat, new Runnable() {
+            @Override
+            public void run() {
+                setTitle(DatabaseCache.GetChatName(CurrentChat, ""));
+            }
+        });
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Active = false;
-        if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.SetMusicPlaying(false);
-        }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         Active = true;
-        RequestPlaying();
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", CurrentChat)
+                .addData("type", "mplaying")
+                .addData("text", "")
+                .build());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Instances.remove(CurrentChat);
         Active = false;
+
         if(CloudMessageService.Instance != null) {
             CloudMessageService.Instance.SetMusicPlaying(false);
         }
@@ -128,10 +130,6 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Instances.remove(CurrentChat);
-        Active = false;
-        if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.SetMusicPlaying(false);
-        }
 
         MessageData.removeEventListener(Listener);
         Adapter.clear();
@@ -194,20 +192,6 @@ public class ChatActivity extends AppCompatActivity {
 
         Log.d("SendMessageToServer", "Message sent " + Text);
         Input.setText("");
-
-    }
-
-    public void RequestPlaying() {
-        String Date = String.valueOf(System.currentTimeMillis() / 1000);
-
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", CurrentChat)
-                .addData("type", "mplaying")
-                .addData("date", Date)
-                .addData("text", "")
-                .build());
 
     }
 }

@@ -49,7 +49,8 @@
             android:layout_toStartOf="@+id/button3"
             android:layout_weight="1"
             android:inputType="textCapSentences"
-            android:singleLine="false" />
+            android:singleLine="false"
+            android:imeOptions="flagNoExtractUi" />
 
         <Button
             android:text="Send"

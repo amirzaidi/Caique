@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class CloudMessageService extends FirebaseMessagingService {
-    private static final String TAG = "MyFirebaseMsgService";
+    private static final String TAG = "CloudMessageService";
 
     private int SubTopics = 32;
 
@@ -43,6 +43,7 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultExtractorsFactory ExtractorsFactory;
 
     public static CloudMessageService Instance;
+    public static String RegToken;
 
     @Override
     public void onCreate()
@@ -59,6 +60,8 @@ public class CloudMessageService extends FirebaseMessagingService {
         Instance = this;
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+
+        Log.d(TAG, "New Instance");
     }
 
     @Override
@@ -95,14 +98,16 @@ public class CloudMessageService extends FirebaseMessagingService {
                                 {
                                     @Override
                                     public void run() {
-                                        sendNotification(DatabaseCache.GetChatName(ChatId, ""), DatabaseCache.GetUserName(Data.get("sender"), "") + ": " + Data.get("text"));
+                                        sendNotification(ChatId, DatabaseCache.GetUserName(Data.get("sender"), "") + ": " + Data.get("text"));
                                     }
                                 });
                             }
                         });
                     }
-
-                    sendNotification(ChatName, UserName + ": " + Data.get("text"));
+                    else
+                    {
+                        sendNotification(ChatId, UserName + ": " + Data.get("text"));
+                    }
 
                 }
                 else if(Type.equals("play") && Active)
@@ -164,7 +169,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     try {
                         Log.d(TAG, "Sub to " + Topic);
                         for (int j = 0; j < SubTopics; j++) {
-                            Thread.sleep(200);
+                            Thread.sleep(225);
 
                             Instance.subscribeToTopic("%" + Topic + "%" + j);
                         }
@@ -188,21 +193,20 @@ public class CloudMessageService extends FirebaseMessagingService {
         });
     }*/
 
-    private void sendNotification(String chat, String messageBody) {
-        Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra("chat", chat);
+    private void sendNotification(String chat, String text) {
+        Intent intent = new Intent(this, ChatActivity.class)
+                .putExtra("chat", chat);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(chat.hashCode(), new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(chat)
-                .setContentText(messageBody)
+                .setContentTitle(DatabaseCache.GetChatName(chat, "Unknown"))
+                .setContentText(text)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(chat.hashCode(), notificationBuilder.build());
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build());
     }
 }

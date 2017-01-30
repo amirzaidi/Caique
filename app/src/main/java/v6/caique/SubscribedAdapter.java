@@ -44,8 +44,20 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
             nameTextView.setText(DatabaseCache.GetChatName(ChatId, "Loading"));
 
+            ArrayList<String> Tags = DatabaseCache.GetChatTags(ChatId, new ArrayList<String>());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < Tags.size(); i++)
+            {
+                if (i != 0)
+                {
+                    sb.append(", ");
+                }
+
+                sb.append(Tags.get(i));
+            }
+
             TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
-            descTextView.setText(ChatId);
+            descTextView.setText("Tags: " + sb.toString());
 
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
