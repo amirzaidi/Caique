@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.tagmanager.InstallReferrerService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -67,7 +68,7 @@ public class CloudMessageService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        FirebaseMessaging Instance = FirebaseMessaging.getInstance();
+        final FirebaseMessaging Instance = FirebaseMessaging.getInstance();
 
         Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
         final Map<String, String> Data = remoteMessage.getData();
@@ -129,14 +130,28 @@ public class CloudMessageService extends FirebaseMessagingService {
                 ArrayList<String> Topics = new ArrayList<>();
 
                 try {
-                    JSONArray a = new JSONArray(Data.get("chats"));
+                    final JSONArray a = new JSONArray(Data.get("chats"));
                     for (int i = 0; i < a.length(); i++) {
-                        Sub(Instance, a.getString(i));
                         Topics.add(a.getString(i));
                     }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < a.length(); i++) {
+                                try {
+                                    Sub(Instance, a.getString(i));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }).start();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
 
                 if (MainActivity.Instance != null) {
                     MainActivity.Instance.GetChatNames(Topics);
@@ -163,20 +178,14 @@ public class CloudMessageService extends FirebaseMessagingService {
         {
             Subs.add(Topic);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Log.d(TAG, "Sub to " + Topic);
-                        for (int j = 0; j < SubTopics; j++) {
-                            Thread.sleep(225);
-
-                            Instance.subscribeToTopic("%" + Topic + "%" + j);
-                        }
-                    }
-                    catch (InterruptedException Ex) {}
+            try {
+                Log.d(TAG, "Sub to " + Topic);
+                for (int j = 0; j < SubTopics; j++) {
+                    Thread.sleep(75);
+                    Instance.subscribeToTopic("%" + Topic + "%" + j);
                 }
-            }).start();
+            }
+            catch (InterruptedException Ex) {}
         }
     }
 
