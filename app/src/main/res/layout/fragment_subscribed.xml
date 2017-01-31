@@ -6,22 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="v6.caique.MainActivity"
-    tools:showIn="@layout/app_bar_main"
-    android:id="@+id/maincontent">
+    tools:context="v6.caique.SubscribedFragment">
 
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:fillViewport="false">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/ChatList" />
-    </ScrollView>
-
+        android:id="@+id/ChatList" />
 
 </RelativeLayout>

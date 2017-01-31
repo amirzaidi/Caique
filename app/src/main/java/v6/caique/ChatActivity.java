@@ -2,49 +2,45 @@ package v6.caique;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
+import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
     public static HashMap<String, ChatActivity> Instances = new HashMap<>();
-    public static boolean Active;
+    public boolean Active;
     private String CurrentChat = null;
-    private ArrayAdapter<String> Adapter;
+    private ChatAdapter Adapter;
     private ListView MessageWindow;
 
-    private Semaphore Conc = new Semaphore(1, false);
-    private int Unresolved = 0;
-    private LinkedList<HashMap<String, String>> ToAdd = new LinkedList<>();
-    private HashMap<String, HashMap<String, String>> SenderDatas = new HashMap<>();
+    private Query MessageData;
+    private ChildEventListener Listener;
+    private HashMap<String, Integer> LoadDatas = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        Bundle b = getIntent().getExtras();
 
+        Bundle b = getIntent().getExtras();
         if (b == null|| !b.containsKey("chat")){
             this.finish();
         }
@@ -57,36 +53,76 @@ public class ChatActivity extends AppCompatActivity {
         Instances.put(CurrentChat, this);
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
-        Adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
+        Adapter = new ChatAdapter(this, R.layout.chat_message, new ArrayList<HashMap<String, String>>());
         MessageWindow.setAdapter(Adapter);
 
-        Active = true;
+        MessageData = FirebaseDatabase.getInstance().getReference().child("chat").child(CurrentChat).child("message").limitToLast(50);
+        MessageData.addChildEventListener(Listener = new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                HashMap<String, String> MsgData = (HashMap<String, String>) dataSnapshot.getValue();
+                String SenderId = MsgData.get("sender");
+                if (!LoadDatas.containsKey(SenderId))
+                {
+                    LoadDatas.put(SenderId, DatabaseCache.LoadUserData(SenderId, new Runnable() {
+                        @Override
+                        public void run() {
+                            Adapter.notifyDataSetChanged();
+                        }
+                    }));
+                }
+
+                Adapter.add(MsgData);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        DatabaseCache.LoadChatDataOnce(CurrentChat, new Runnable() {
+            @Override
+            public void run() {
+                setTitle(DatabaseCache.GetChatName(CurrentChat, ""));
+            }
+        });
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Active = false;
-        if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
-        }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         Active = true;
-        RequestPlaying();
-        RequestMessages();
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", CurrentChat)
+                .addData("type", "mplaying")
+                .addData("text", "")
+                .build());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Instances.remove(CurrentChat);
         Active = false;
+
         if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
+            CloudMessageService.Instance.SetMusicPlaying(false);
         }
     }
 
@@ -94,9 +130,13 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Instances.remove(CurrentChat);
-        Active = false;
-        if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.MusicHandler(false);
+
+        MessageData.removeEventListener(Listener);
+        Adapter.clear();
+
+        for (Map.Entry<String, Integer> x : LoadDatas.entrySet())
+        {
+            DatabaseCache.Cancel(x.getValue());
         }
     }
 
@@ -153,103 +193,5 @@ public class ChatActivity extends AppCompatActivity {
         Log.d("SendMessageToServer", "Message sent " + Text);
         Input.setText("");
 
-    }
-
-    public void RequestPlaying() {
-        String Date = String.valueOf(System.currentTimeMillis() / 1000);
-
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", CurrentChat)
-                .addData("type", "mplaying")
-                .addData("date", Date)
-                .addData("text", "")
-                .build());
-
-    }
-
-    public void DisplayMessage(HashMap<String, String> Message, HashMap<String, String> Sender)
-    {
-        Adapter.add(Sender.get("name") + "\n" + Message.get("text"));
-    }
-
-    private void RequestMessages()
-    {
-        Adapter.clear();
-
-        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        Query MessageData = mDatabase.child("chat").child(CurrentChat).child("message").limitToLast(50);
-
-        MessageData.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                Conc.acquireUninterruptibly();
-
-                HashMap<String, String> MsgData = (HashMap<String, String>) dataSnapshot.getValue();
-                final String SenderId = MsgData.get("sender");
-                if (SenderDatas.containsKey(SenderId) && Unresolved == 0)
-                {
-                    DisplayMessage(MsgData, SenderDatas.get(SenderId));
-                }
-                else
-                {
-                    ToAdd.add(MsgData);
-
-                    if (!SenderDatas.containsKey(SenderId))
-                    {
-                        Unresolved++;
-                        SenderDatas.put(SenderId, null);
-
-                        mDatabase.child("user").child(SenderId).child("data").limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                HashMap<String, String> SenderData = (HashMap<String, String>) dataSnapshot.getValue();
-
-                                Conc.acquireUninterruptibly();
-
-                                SenderDatas.put(SenderId, SenderData);
-                                if (--Unresolved == 0)
-                                {
-                                    while (ToAdd.size() != 0)
-                                    {
-                                        HashMap<String, String> MsgData = ToAdd.removeFirst();
-                                        DisplayMessage(MsgData, SenderDatas.get(MsgData.get("sender")));
-                                        MessageWindow.setSelection(Adapter.getCount() - 1);
-                                    }
-                                }
-
-                                Conc.release();
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
-                    }
-                }
-
-                Conc.release();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
     }
 }

@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -21,6 +20,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.tagmanager.InstallReferrerService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -30,12 +30,10 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CloudMessageService extends FirebaseMessagingService {
-    private static final String TAG = "MyFirebaseMsgService";
+    private static final String TAG = "CloudMessageService";
 
-    private AtomicInteger Id = new AtomicInteger(0);
     private int SubTopics = 32;
 
     private ExoPlayer Player;
@@ -46,7 +44,7 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultExtractorsFactory ExtractorsFactory;
 
     public static CloudMessageService Instance;
-
+    public static String RegToken;
 
     @Override
     public void onCreate()
@@ -63,30 +61,55 @@ public class CloudMessageService extends FirebaseMessagingService {
         Instance = this;
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+
+        Log.d(TAG, "New Instance");
     }
 
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        FirebaseMessaging Instance = FirebaseMessaging.getInstance();
+        final FirebaseMessaging Instance = FirebaseMessaging.getInstance();
 
         Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
         final Map<String, String> Data = remoteMessage.getData();
 
-        // Check if message contains a data payload.
         if (Data != null && Data.size() > 0)
         {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
             if (Data.containsKey("chat"))
             {
-                String ChatId = Data.get("chat");
-                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
+                final String ChatId = Data.get("chat");
                 String Type = Data.get("type");
+
+                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
 
                 if (Type.equals("text") && !Active)
                 {
-                    sendNotification(ChatId, Data.get("sender") + ": " + Data.get("text"));
+                    String ChatName = DatabaseCache.GetChatName(ChatId, null);
+                    String UserName = DatabaseCache.GetUserName(Data.get("sender"), null);
+
+                    if (ChatName == null || UserName == null)
+                    {
+                        DatabaseCache.LoadChatDataOnce(ChatId, new Runnable()
+                        {
+                            @Override
+                            public void run() {
+                                DatabaseCache.LoadUserDataOnce(Data.get("sender"), new Runnable()
+                                {
+                                    @Override
+                                    public void run() {
+                                        sendNotification(ChatId, DatabaseCache.GetUserName(Data.get("sender"), "") + ": " + Data.get("text"));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        sendNotification(ChatId, UserName + ": " + Data.get("text"));
+                    }
+
                 }
                 else if(Type.equals("play") && Active)
                 {
@@ -107,23 +130,31 @@ public class CloudMessageService extends FirebaseMessagingService {
                 ArrayList<String> Topics = new ArrayList<>();
 
                 try {
-                    JSONArray a = new JSONArray(Data.get("chats"));
+                    final JSONArray a = new JSONArray(Data.get("chats"));
                     for (int i = 0; i < a.length(); i++) {
-                        Sub(Instance, a.getString(i));
                         Topics.add(a.getString(i));
                     }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < a.length(); i++) {
+                                try {
+                                    Sub(Instance, a.getString(i));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }).start();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
+
                 if (MainActivity.Instance != null) {
-                    final ArrayList<String> finalTopics = Topics;
-                    MainActivity.Instance.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainActivity.Instance.CreateChatList(finalTopics);
-                        }
-                    });
+                    MainActivity.Instance.GetChatNames(Topics);
                 }
             }
             else
@@ -133,53 +164,58 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
-    public void MusicHandler(boolean Start){
-        if(Start){
-            if(Player != null) {
-                Player.setPlayWhenReady(true);
-            }
-        }
-        else{
-            Player.setPlayWhenReady(false);
+    public void SetMusicPlaying(boolean Start){
+        if(Player != null) {
+            Player.setPlayWhenReady(Start);
         }
     }
 
+    private static ArrayList<String> Subs = new ArrayList<>();
+
     public void Sub(final FirebaseMessaging Instance, final String Topic)
+    {
+        if (!Subs.contains(Topic))
+        {
+            Subs.add(Topic);
+
+            try {
+                Log.d(TAG, "Sub to " + Topic);
+                for (int j = 0; j < SubTopics; j++) {
+                    Thread.sleep(75);
+                    Instance.subscribeToTopic("%" + Topic + "%" + j);
+                }
+            }
+            catch (InterruptedException Ex) {}
+        }
+    }
+
+    /*public void Unsub(final FirebaseMessaging Instance, final String Topic)
     {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Sub to " + Topic);
+                Log.d(TAG, "Unsub from " + Topic);
                 for (int j = 0; j < SubTopics; j++) {
                     Instance.subscribeToTopic("%" + Topic + "%" + j);
                 }
             }
         });
-    }
+    }*/
 
-    public void Unsub(FirebaseMessaging Instance, String Topic)
-    {
-        Log.d(TAG, "Unsub from " + Topic);
-        for (int j = 0; j < SubTopics; j++) {
-            Instance.unsubscribeFromTopic("%" + Topic + "%" + j);
-        }
-    }
+    private void sendNotification(String chat, String text) {
+        Intent intent = new Intent(this, ChatActivity.class)
+                .putExtra("chat", chat);
 
-    private void sendNotification(String chat, String messageBody) {
-        Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra("chat", chat);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(chat.hashCode(), new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(chat)
-                .setContentText(messageBody)
+                .setContentTitle(DatabaseCache.GetChatName(chat, "Unknown"))
+                .setContentText(text)
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(chat.hashCode(), notificationBuilder.build());
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build());
     }
 }

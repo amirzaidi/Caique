@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -12,15 +13,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,57 +25,33 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SubscribedFragment.OnFragmentInteractionListener,
+        ExploreFragment.OnFragmentInteractionListener,
+        FavoritesFragment.OnFragmentInteractionListener {
 
     public static MainActivity Instance;
-    //public static String ButtonTag;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private SubscribedFragment Subs;
+    private HashMap<String, Integer> ToCancel = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         if (Instance != null) {
             Instance.finish();
         }
 
         Instance = this;
-        super.onCreate(savedInstanceState);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
-                .build();
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        //Close app
-                    }
-                } /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, 1);
-
+        setTheme(R.style.AppTheme_NoActionBar);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -93,80 +63,55 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_chats);
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
+                .build();
 
-        //ArrayList<String> Test = new ArrayList<String>();
-        //CreateChatList(Test);
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        //Close app
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, 1);
+    }
+
+    private void SetSubscribedFragment()
+    {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.mainframe, Subs = new SubscribedFragment())
+                .commit();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 1) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Signed in successfully, show authenticated UI.
-                GoogleSignInAccount acct = result.getSignInAccount();
-                Log.d("", "Sending registration");
-
-                try {
-                    String token = acct.getIdToken();
-
-                    if (token != null) {
-                        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                                .addData("type", "reg")
-                                .addData("text", token)
-                                .build());
-
-                        return;
-                    }
-                }
-                catch (NullPointerException Ex)
-                {
-                    return;
-                }
-            }
-
-            Log.d("", "Failed sign in");
+        if (requestCode != 1 || !result.isSuccess()) {
             this.finish();
         }
-    }
 
-    /*public void updateText(String Text) {
-        if (Text != null) {
-            TextView Layout = (TextView) findViewById(R.id.hello_world);
-            Layout.setText(Text);
-            Log.d("UpdateText", Text);
+        try {
+            CloudMessageService.RegToken = result.getSignInAccount().getIdToken();
+
+            if (CloudMessageService.RegToken != null) {
+                SetSubscribedFragment();
+            }
         }
-    }*/
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        catch (NullPointerException Ex)
+        {
+            Log.d("GSO", "Failed getting token");
         }
-
-        return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -174,33 +119,33 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        RelativeLayout ContentMain = (RelativeLayout) findViewById(R.id.maincontent);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        FragmentManager manager = getSupportFragmentManager();
 
         if (id == R.id.nav_chats) {
-            ContentMain.setVisibility(View.VISIBLE); //REPLACE
+            SetSubscribedFragment();
+            drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_explore) {
-            ContentMain.setVisibility(View.INVISIBLE); //REPLACE
+            manager.beginTransaction()
+                .replace(R.id.mainframe, new ExploreFragment())
+                .commit();
+            drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_favorites) {
-            ContentMain.setVisibility(View.INVISIBLE); //REPLACE
+            manager.beginTransaction()
+                    .replace(R.id.mainframe, new FavoritesFragment())
+                    .commit();
+            drawer.closeDrawer(GravityCompat.START);
         } else if (id == R.id.nav_invite_people) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         } else if (id == R.id.nav_music_library) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         } else if (id == R.id.nav_settings) {
-
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -209,86 +154,44 @@ public class MainActivity extends AppCompatActivity
         startActivity(newActivity);
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
     }
 
-    public void CreateChatList(final ArrayList<String> Chat){
-        LinearLayout ChatList = (LinearLayout) findViewById(R.id.ChatList);
-
-        for(int i = 0; i < Chat.size(); i++) {
-
-            Button ChatButton = new Button(this);
-            ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT));
-            ChatButton.setText(Chat.get(i));
-
-            final int finalI = i;
-            ChatButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    Intent newChatActivity = new Intent(MainActivity.Instance, ChatActivity.class);
-                    Bundle b = new Bundle();
-                    b.putString("chat", Chat.get(finalI));
-                    newChatActivity.putExtras(b);
-                    startActivity(newChatActivity);
-                }
-            });
-
-            ChatList.addView(ChatButton);
-        }
-
-        /*Button ChatButton = new Button(this);
-        ChatButton.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.FILL_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ChatButton.setText("Test Chat");
-
-        ChatButton.setOnClickListener(new View.OnClickListener(){
+    public void GetChatNames(final ArrayList<String> Chat) {
+        runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                Intent newChatActivity = new Intent(MainActivity.Instance, ChatActivity.class);
-                Bundle b = new Bundle();
-                b.putString("chat", "-KSqbu0zMurmthzBE7GF");
-                newChatActivity.putExtras(b);
-                startActivity(newChatActivity);
+            public void run() {
+                if (Subs != null && Subs.isAdded())
+                {
+                    for (int i = 0; i < Chat.size(); i++) {
+                        final String ID = Chat.get(i);
+                        Subs.Adapter.add(ID);
+
+                        if (ToCancel.containsKey(ID)) {
+                            DatabaseCache.Cancel(ToCancel.get(ID));
+                        }
+
+                        ToCancel.put(ID, DatabaseCache.LoadChatData(ID, new Runnable() {
+                            @Override
+                            public void run() {
+                                Subs.Adapter.notifyDataSetChanged();
+                            }
+                        }));
+                    }
+                }
             }
         });
-
-        ChatList.addView(ChatButton);*/
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }
