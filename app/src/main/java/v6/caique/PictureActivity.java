@@ -1,5 +1,8 @@
 package v6.caique;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,9 +16,14 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 public class PictureActivity extends AppCompatActivity {
@@ -47,15 +55,66 @@ public class PictureActivity extends AppCompatActivity {
                 .into(imageView);
     }
 
-    public void Choose(View view)
-    {
+    private ImageView Picture;
+    private static final int PICK_IMAGE = 100;
+
+    public void Choose(View view) {
+
+        Intent Gal = new Intent();
+        Gal.setType("image/*");
+        Gal.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(Gal, "Select Picture"), PICK_IMAGE);
+        Picture = (ImageView) findViewById(R.id.Picture);
+    }
+    private Uri file;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        file = data.getData();
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
+            Uri imageUri = data.getData();
+            Picture.setImageURI(imageUri);
+        }
 
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
+
+    private void Upload() {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://firebase-caique.appspot.com");
+        Picture.setDrawingCacheEnabled(true);
+        Picture.buildDrawingCache();
+        StorageReference pictureRef = storageRef.child("newImg.jpg");
+        pictureRef.putFile(file)
+       .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                System.out.println(downloadUrl);
+            }
+        });
+                }
+
+
+    public void Upload(View view) {
+
+        Upload();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+        /**
+         * ATTENTION: This was auto-generated to implement the App Indexing API.
+         * See https://g.co/AppIndexing/AndroidStudio for more information.
+         */
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
                 .setName("PictureActivity Page")
