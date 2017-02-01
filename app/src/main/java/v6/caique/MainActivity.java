@@ -21,6 +21,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity
     public static MainActivity Instance;
     private SubscribedFragment Subs;
     private HashMap<String, Integer> ToCancel = new HashMap<>();
-
+    //private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,8 @@ public class MainActivity extends AppCompatActivity
 
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, 1);
+
+        //mAuth = FirebaseAuth.getInstance();
     }
 
     private void SetSubscribedFragment()
@@ -157,6 +163,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
+        /*FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            mAuth.signInAnonymously().getResult();
+        }*/
     }
 
     @Override

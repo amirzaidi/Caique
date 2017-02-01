@@ -37,11 +37,31 @@ public class DatabaseCache {
         return Alt;
     }
 
+    public static String GetUserPicUrl(String UserId, String Alt)
+    {
+        if (UserData.containsKey(UserId))
+        {
+            return (String)UserData.get(UserId).get("picture");
+        }
+
+        return Alt;
+    }
+
     public static String GetChatName(String ChatId, String Alt)
     {
         if (ChatData.containsKey(ChatId))
         {
             return (String)ChatData.get(ChatId).get("title");
+        }
+
+        return Alt;
+    }
+
+    public static String GetChatPicUrl(String ChatId, String Alt)
+    {
+        if (ChatData.containsKey(ChatId))
+        {
+            return (String)ChatData.get(ChatId).get("picture");
         }
 
         return Alt;
