@@ -214,6 +214,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                 .setContentTitle(DatabaseCache.GetChatName(chat, "Unknown"))
                 .setContentText(text)
                 .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build());
