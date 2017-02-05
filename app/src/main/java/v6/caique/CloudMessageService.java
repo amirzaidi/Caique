@@ -2,15 +2,15 @@ package v6.caique;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
-import android.content.Context;
+import android.util.Log;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -21,15 +21,10 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.gms.tagmanager.InstallReferrerService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
@@ -96,8 +91,10 @@ public class CloudMessageService extends FirebaseMessagingService {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
                     } else if (Type.equals("play")) {
                         if (Active) {
-                            Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
-                            Player.setPlayWhenReady(true);
+                            if(CurrentSettings.MusicInChats) {
+                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                                Player.setPlayWhenReady(true);
+                            }
 
                             final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
                             Chat.runOnUiThread(new Runnable() {
