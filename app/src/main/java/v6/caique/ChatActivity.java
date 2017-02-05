@@ -34,10 +34,15 @@ public class ChatActivity extends AppCompatActivity {
 
         CurrentChat = b.getString("chat");
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(CurrentChat.hashCode());
+        if (Instances.containsKey(CurrentChat))
+        {
+            Instances.get(CurrentChat).finish();
+        }
 
         Instances.put(CurrentChat, this);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(CurrentChat.hashCode());
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
         Adapter = new ChatAdapter(this, R.layout.chat_message, CurrentChat);

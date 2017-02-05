@@ -172,13 +172,13 @@ public class CloudMessageService extends FirebaseMessagingService {
 
         if (Chat == null)
         {
-            Chat = "Log";
             intent = new Intent(this, MainActivity.class);
+            Chat = "Log";
         }
         else
         {
-            Chat = CacheChats.Loaded.get(Chat).Title;
             intent = new Intent(this, ChatActivity.class).putExtra("chat", Chat);
+            Chat = CacheChats.Loaded.get(Chat).Title;
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
