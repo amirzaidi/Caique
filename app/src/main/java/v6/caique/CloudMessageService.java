@@ -85,7 +85,10 @@ public class CloudMessageService extends FirebaseMessagingService {
 
                     String Type = Data.get("type");
 
-                    boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
+                    boolean Active = false;
+                    if(ChatActivity.Instances.containsKey(ChatId)) {
+                        Active = ChatActivity.Instances.get(ChatId).Active;
+                    }
 
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
