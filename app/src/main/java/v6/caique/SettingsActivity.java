@@ -1,5 +1,6 @@
 package v6.caique;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.CompoundButton;
@@ -15,14 +16,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class SettingsActivity extends AppCompatActivity {
-    private JSONObject JSONSettings;
+    private Context CurrentContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        GetJSONSettings();
         final Switch MusicSwitch = (Switch)findViewById(R.id.playMusic);
 
         if(CurrentSettings.MusicInChats == true){
@@ -36,25 +36,25 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SetJSONSettings(MusicSwitch.isChecked());
+                SetJSONSettings(MusicSwitch.isChecked(), CurrentContext);
             }
         });
     }
 
-    private void SetJSONSettings(boolean NewSwitchValue){
+    private void SetJSONSettings(boolean NewSwitchValue, Context context){
         try {
-            JSONSettings.put("PlayMusic", NewSwitchValue);
-            CreateSettingsFile(JSONSettings);
+            CurrentSettings.JSONSettings.put("PlayMusic", NewSwitchValue);
+            CreateSettingsFile(CurrentSettings.JSONSettings, context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void GetJSONSettings(){
+    public void GetSettings(Context context){
 
         String json = new String();
         StringBuilder text = new StringBuilder();
-        File f = new File(getCacheDir()+ "/Settings.json");
+        File f = new File(context.getCacheDir()+ "/Settings.json");
 
         if(f.isFile()){
             BufferedReader br;
@@ -73,21 +73,21 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
         else{
-            CreateSettingsFile(null);
+            CreateSettingsFile(null, context);
         }
 
         try {
-            JSONSettings = new JSONObject(json);
-            boolean PlayMusic = JSONSettings.getBoolean("PlayMusic");
+            CurrentSettings.JSONSettings = new JSONObject(json);
+            boolean PlayMusic = CurrentSettings.JSONSettings.getBoolean("PlayMusic");
             CurrentSettings.MusicInChats = PlayMusic;
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void CreateSettingsFile(JSONObject JSONSettings){
+    private void CreateSettingsFile(JSONObject JSONSettings, Context context){
         try {
-            File file = new File(getCacheDir(), "Settings.json");
+            File file = new File(context.getCacheDir(), "Settings.json");
             FileWriter writer = new FileWriter(file);
             if(JSONSettings != null){
                 writer.append(JSONSettings.toString());
@@ -103,5 +103,9 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Context getContext(){
+        return this;
     }
 }
