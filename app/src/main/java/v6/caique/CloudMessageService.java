@@ -143,8 +143,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                 catch (InterruptedException Ex) {}
             }
         });
-
-
     }
 
     public static void Unsub(final String ChatId)

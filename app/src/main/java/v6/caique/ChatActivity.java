@@ -61,7 +61,6 @@ public class ChatActivity extends AppCompatActivity {
 
         Active = true;
 
-
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
