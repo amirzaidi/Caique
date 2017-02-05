@@ -41,7 +41,18 @@ public class MainActivity extends AppCompatActivity
     public static MainActivity Instance;
     private SubscribedFragment Subs;
     private SharedPreferences sharedPref;
-    private FirebaseAuth mAuth;
+
+    private static void RelogFirebase()
+    {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        mAuth.signInWithEmailAndPassword("v6@inf.com", "caique");
+    }
+
+    static
+    {
+        RelogFirebase();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +83,7 @@ public class MainActivity extends AppCompatActivity
         Subs = new SubscribedFragment();
         SetSubscribedFragment();
 
-        mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() == null)
-        {
-            mAuth.signInAnonymously();
-        }
+        RelogFirebase();
 
         sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
         if (sharedPref.contains("gid"))

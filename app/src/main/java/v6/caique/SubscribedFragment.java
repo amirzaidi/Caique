@@ -23,13 +23,6 @@ public class SubscribedFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Adapter = new SubscribedAdapter(this.getActivity());
-
-        /*FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("type", "reg")
-                .addData("text", CloudMessageService.RegToken)
-                .build());*/
     }
 
     @Override
