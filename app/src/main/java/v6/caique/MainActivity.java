@@ -24,6 +24,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     public static MainActivity Instance;
     private SubscribedFragment Subs;
     private SharedPreferences sharedPref;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +71,12 @@ public class MainActivity extends AppCompatActivity
 
         Subs = new SubscribedFragment();
         SetSubscribedFragment();
+
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() == null)
+        {
+            mAuth.signInAnonymously();
+        }
 
         sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
         if (sharedPref.contains("gid"))
@@ -190,6 +199,11 @@ public class MainActivity extends AppCompatActivity
     public void CreateChat(View view) {
         Intent newActivity = new Intent(this, SendServerMessage.class);
         startActivity(newActivity);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override

@@ -21,8 +21,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageException;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.InputStream;
@@ -30,6 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class SubscribedAdapter extends ArrayAdapter<String> {
 
@@ -57,16 +60,22 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
             final String ChatId = CacheChats.Subs.get(position);
             final CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
 
-            CircleImageView imageView = (CircleImageView) row.findViewById(R.id.chatdp);
+            final ImageView imageView = (ImageView) row.findViewById(R.id.chatdp);
             imageView.setImageDrawable(null);
 
-            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ChatId);
-
-            Glide.with(context)
-                    .using(new FirebaseImageLoader())
-                    .load(storageRef)
-                    .signature(new StringSignature(String.valueOf(Math.round(System.currentTimeMillis() / 10000))))
-                    .into(imageView);
+            final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ChatId);
+            storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    Glide.with(context)
+                            .using(new FirebaseImageLoader())
+                            .load(storageRef)
+                            .centerCrop()
+                            .bitmapTransform(new CropCircleTransformation(context))
+                            .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                            .into(imageView);
+                }
+            });
 
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
             nameTextView.setText(Chat.Title);

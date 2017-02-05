@@ -118,7 +118,7 @@ public class CloudMessageService extends FirebaseMessagingService {
             }
             else
             {
-                sendNotification("Log", Data.toString());
+                sendNotification(null, Data.toString());
             }
         }
     }
@@ -169,20 +169,33 @@ public class CloudMessageService extends FirebaseMessagingService {
         });
     }
 
-    private void sendNotification(String chat, String text) {
-        Intent intent = new Intent(this, ChatActivity.class).putExtra("chat", chat);
+    private void sendNotification(String Chat, String text) {
+
+        Intent intent;
+
+        if (Chat == null)
+        {
+            Chat = "Log";
+            intent = new Intent(this, MainActivity.class);
+        }
+        else
+        {
+            Chat = CacheChats.Loaded.get(Chat).Title;
+            intent = new Intent(this, ChatActivity.class).putExtra("chat", Chat);
+        }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(chat.hashCode(), new NotificationCompat.Builder(this)
+        notificationManager.notify(Chat.hashCode(), new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(CacheChats.Loaded.get(chat).Title)
+                .setContentTitle(Chat)
                 .setContentText(text)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build());
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build()
+        );
     }
 }

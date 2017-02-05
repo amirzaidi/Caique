@@ -8,7 +8,7 @@
     android:clickable="true"
     android:background="?attr/selectableItemBackground">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         app:srcCompat="@drawable/cast_album_art_placeholder"
         android:id="@+id/chatdp"
         android:cropToPadding="false"
