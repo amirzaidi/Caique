@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     static
     {
-        //RelogFirebase();
+        RelogFirebase();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         Subs = new SubscribedFragment();
         SetSubscribedFragment();
 
-        //RelogFirebase();
+        RelogFirebase();
 
         sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
         if (sharedPref.contains("gid"))
