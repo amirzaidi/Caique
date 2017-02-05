@@ -63,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
             public void run() {
                 try
                 {
-                    Thread.sleep(250);
+                    Thread.sleep(350);
                 }
                 catch (InterruptedException e)
                 {
