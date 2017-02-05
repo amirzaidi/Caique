@@ -35,6 +35,7 @@ public class CacheChats {
         public HashMap<String, Integer> Ranks = new HashMap<>();
     }
 
+    private static int MaxMsgs = 50;
     private static DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
     private static String GID;
     private static Query SubsQuery;
@@ -123,11 +124,11 @@ public class CacheChats {
                 }
             };
 
-            Chat.MessageQuery = Database.child("chat").child(ChatId).child("message").limitToLast(20);
+            Chat.MessageQuery = Database.child("chat").child(ChatId).child("message").limitToLast(MaxMsgs);
             Chat.MessageListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    while (Chat.Messages.size() >= 20)
+                    while (Chat.Messages.size() >= MaxMsgs)
                     {
                         Chat.Messages.removeFirst();
                     }

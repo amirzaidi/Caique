@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageException;
@@ -30,32 +31,16 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class SubscribedAdapter extends BaseAdapter {
+public class SubscribedAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater vi;
     private Context context;
 
     public SubscribedAdapter(Context c)
     {
-        //super();
-        //super(c, R.layout.list_item_chat);
+        super(c, R.layout.list_item_chat, CacheChats.Subs);
         vi = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         context = c;
-    }
-
-    @Override
-    public int getCount() {
-        return CacheChats.Subs.size();
-    }
-
-    @Override
-    public CacheChats.ChatStructure getItem(int position) {
-        return CacheChats.Loaded.get(CacheChats.Subs.get(position));
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return CacheChats.Subs.get(position).hashCode();
     }
 
     @Override
@@ -70,7 +55,7 @@ public class SubscribedAdapter extends BaseAdapter {
         if (CacheChats.Loaded.size() > position)
         {
             final String ChatId = CacheChats.Subs.get(position);
-            final CacheChats.ChatStructure Chat = getItem(position);
+            final CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
 
             CircleImageView imageView = (CircleImageView) row.findViewById(R.id.chatdp);
             imageView.setImageDrawable(null);
@@ -80,6 +65,7 @@ public class SubscribedAdapter extends BaseAdapter {
             Glide.with(context)
                     .using(new FirebaseImageLoader())
                     .load(storageRef)
+                    .signature(new StringSignature(String.valueOf(Math.round(System.currentTimeMillis() / 10000))))
                     .into(imageView);
 
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
