@@ -131,24 +131,29 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_chats) {
             SetSubscribedFragment();
             drawer.closeDrawer(GravityCompat.START);
-        } else if (id == R.id.nav_explore) {
+        }
+        else if (id == R.id.nav_explore) {
             manager.beginTransaction()
                 .replace(R.id.mainframe, new ExploreFragment())
                 .commit();
             drawer.closeDrawer(GravityCompat.START);
-        } else if (id == R.id.nav_favorites) {
+        }
+        else if (id == R.id.nav_favorites) {
             manager.beginTransaction()
                     .replace(R.id.mainframe, new FavoritesFragment())
                     .commit();
             drawer.closeDrawer(GravityCompat.START);
-        } else if (id == R.id.nav_invite_people) {
+        }
+        else if (id == R.id.nav_invite_people) {
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-        } else if (id == R.id.nav_music_library) {
+        }
+        else if (id == R.id.nav_music_library) {
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-        } else if (id == R.id.nav_settings) {
-            Intent newActivity = new Intent(this, PictureActivity.class);
+        }
+        else if (id == R.id.nav_settings) {
+            Intent newActivity = new Intent(this, SettingsActivity.class);
             startActivity(newActivity);
         }
 
