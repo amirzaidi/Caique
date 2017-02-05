@@ -2,14 +2,15 @@ package v6.caique;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.media.RingtoneManager;
+import android.support.v4.app.NotificationCompat;
+import android.content.Context;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -20,6 +21,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.tagmanager.InstallReferrerService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -29,11 +31,12 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "CloudMessageService";
 
-    private int SubTopics = 32;
+    private static int SubTopics = 32;
 
     private ExoPlayer Player;
 
@@ -43,7 +46,12 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultExtractorsFactory ExtractorsFactory;
 
     public static CloudMessageService Instance;
-    public static String RegToken;
+
+    public CloudMessageService()
+    {
+        super();
+        Instance = this;
+    }
 
     @Override
     public void onCreate()
@@ -57,7 +65,6 @@ public class CloudMessageService extends FirebaseMessagingService {
         }));
         LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 500, 1000, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
-        Instance = this;
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
 
@@ -79,106 +86,34 @@ public class CloudMessageService extends FirebaseMessagingService {
             if (Data.containsKey("chat"))
             {
                 final String ChatId = Data.get("chat");
-                String Type = Data.get("type");
+                if (CacheChats.Subs.contains(ChatId)) {
 
-                boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
+                    String Type = Data.get("type");
 
-                if (Type.equals("text") && !Active)
-                {
-                    String ChatName = DatabaseCache.GetChatName(ChatId, null);
-                    String UserName = DatabaseCache.GetUserName(Data.get("sender"), null);
+                    boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
 
-                    if (ChatName == null || UserName == null)
-                    {
-                        DatabaseCache.LoadChatDataOnce(ChatId, new Runnable()
-                        {
-                            @Override
-                            public void run() {
-                                DatabaseCache.LoadUserDataOnce(Data.get("sender"), new Runnable()
-                                {
-                                    @Override
-                                    public void run() {
-                                        sendNotification(ChatId, DatabaseCache.GetUserName(Data.get("sender"), "") + ": " + Data.get("text"));
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    else
-                    {
-                        sendNotification(ChatId, UserName + ": " + Data.get("text"));
-                    }
-
-                }
-                else if(Type.equals("play"))
-                {
-                    if (Active)
-                    {
-                        if(CurrentSettings.MusicInChats) {
+                    if (Type.equals("text") && !Active) {
+                        sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
+                    } else if (Type.equals("play")) {
+                        if (Active) {
                             Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
                             Player.setPlayWhenReady(true);
-                        }
 
-                        final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
-                        Chat.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Chat.setTitle("Playing " + Data.get("text"));
-                            }
-                        });
-                    }
-                    else
-                    {
-                        String ChatName = DatabaseCache.GetChatName(ChatId, null);
-
-                        if (ChatName == null)
-                        {
-                            DatabaseCache.LoadChatDataOnce(ChatId, new Runnable()
-                            {
+                            final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+                            Chat.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    sendNotification(ChatId, "Playing " + Data.get("text"));
+                                    Chat.setTitle("Playing " + Data.get("text"));
                                 }
                             });
-                        }
-                        else
-                        {
+                        } else {
                             sendNotification(ChatId, "Playing " + Data.get("text"));
                         }
-
                     }
                 }
-            }
-            else if (Data.containsKey("chats"))
-            {
-                ArrayList<String> Topics = new ArrayList<>();
-
-                try {
-                    final JSONArray a = new JSONArray(Data.get("chats"));
-                    for (int i = 0; i < a.length(); i++) {
-                        Topics.add(a.getString(i));
-                    }
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (int i = 0; i < a.length(); i++) {
-                                try {
-                                    Sub(Instance, a.getString(i));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }).start();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-                if (MainActivity.Instance != null) {
-                    MainActivity.Instance.GetChatNames(Topics);
+                else
+                {
+                    Unsub(ChatId);
                 }
             }
             else
@@ -194,48 +129,55 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
-    private static ArrayList<String> Subs = new ArrayList<>();
-
-    public void Sub(final FirebaseMessaging Instance, final String Topic)
+    public static void Sub(final String ChatId)
     {
-        if (!Subs.contains(Topic))
-        {
-            Subs.add(Topic);
-
-            try {
-                Log.d(TAG, "Sub to " + Topic);
-                for (int j = 0; j < SubTopics; j++) {
-                    Thread.sleep(75);
-                    Instance.subscribeToTopic("%" + Topic + "%" + j);
-                }
-            }
-            catch (InterruptedException Ex) {}
-        }
-    }
-
-    /*public void Unsub(final FirebaseMessaging Instance, final String Topic)
-    {
+        final FirebaseMessaging Instance = FirebaseMessaging.getInstance();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Unsub from " + Topic);
-                for (int j = 0; j < SubTopics; j++) {
-                    Instance.subscribeToTopic("%" + Topic + "%" + j);
+                try {
+                    Random r = new Random();
+                    Log.d(TAG, "Sub to " + ChatId);
+                    for (int j = 0; j < SubTopics; j++) {
+                        Thread.sleep(50 + (int)Math.ceil(50 * r.nextDouble()));
+                        Instance.subscribeToTopic("%" + ChatId + "%" + j);
+                    }
+                }
+                catch (InterruptedException Ex) {}
+            }
+        });
+
+
+    }
+
+    public static void Unsub(final String ChatId)
+    {
+        final FirebaseMessaging Instance = FirebaseMessaging.getInstance();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Random r = new Random();
+                    Log.d(TAG, "Unsub from " + ChatId);
+                    for (int j = 0; j < SubTopics; j++) {
+                        Thread.sleep(50 + (int)Math.ceil(50 * r.nextDouble()));
+                        Instance.unsubscribeFromTopic("%" + ChatId + "%" + j);
+                    }
+                } catch (InterruptedException Ex) {
                 }
             }
         });
-    }*/
+    }
 
     private void sendNotification(String chat, String text) {
-        Intent intent = new Intent(this, ChatActivity.class)
-                .putExtra("chat", chat);
+        Intent intent = new Intent(this, ChatActivity.class).putExtra("chat", chat);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(chat.hashCode(), new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(DatabaseCache.GetChatName(chat, "Unknown"))
+                .setContentTitle(CacheChats.Loaded.get(chat).Title)
                 .setContentText(text)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

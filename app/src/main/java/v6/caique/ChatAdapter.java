@@ -19,22 +19,23 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-class ChatAdapter extends ArrayAdapter<HashMap<String, String>> {
+class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
 
-    ArrayList<HashMap<String, String>> MessageArray;
+    private String ChatId;
     private LayoutInflater vi;
     private Context context;
 
-    public ChatAdapter(Context c, @LayoutRes int resource, ArrayList<HashMap<String, String>> MessageArray) {
-        super(c, resource, MessageArray);
+    public ChatAdapter(Context c, @LayoutRes int resource, String ChatId) {
+        super(c, resource, CacheChats.Loaded.get(ChatId).Messages);
+        this.ChatId = ChatId;
         vi = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.MessageArray = MessageArray;
         this.context = c;
     }
 
@@ -46,14 +47,14 @@ class ChatAdapter extends ArrayAdapter<HashMap<String, String>> {
             row = vi.inflate(R.layout.chat_message, parent, false);
         }
 
-        if (MessageArray.size() > position)
+        CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
+        if (Chat.Messages.size() > position)
         {
             //final CircleImageView imageView = (CircleImageView) row.findViewById(R.id.userdp);
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
-            HashMap<String, String> Data = MessageArray.get(position);
-            String SenderId = Data.get("sender");
+            CacheChats.MessageStructure Data = Chat.Messages.get(position);
 
             //String pic = DatabaseCache.GetUserPicUrl(SenderId, null);
 
@@ -73,7 +74,7 @@ class ChatAdapter extends ArrayAdapter<HashMap<String, String>> {
                 });*/
             }
 
-            if (position != 0 && SenderId.equals(MessageArray.get(position - 1).get("sender")))
+            if (position != 0 && Data.Sender.equals(Chat.Messages.get(position - 1).Sender))
             {
                 //imageView.setVisibility(INVISIBLE);
                 //imageView.setMaxHeight(1);
@@ -86,8 +87,8 @@ class ChatAdapter extends ArrayAdapter<HashMap<String, String>> {
                 MessageSender.setVisibility(VISIBLE);
             }
 
-            MessageSender.setText(DatabaseCache.GetUserName(SenderId, "Loading.."));
-            Message.setText(Data.get("text"));
+            MessageSender.setText(CacheChats.Name(Data.Sender, "Loading.."));
+            Message.setText(Data.Content);
         }
 
         return row;

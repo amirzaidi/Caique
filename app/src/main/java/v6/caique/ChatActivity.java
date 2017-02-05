@@ -31,10 +31,6 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter Adapter;
     private ListView MessageWindow;
 
-    private Query MessageData;
-    private ChildEventListener Listener;
-    private HashMap<String, Integer> LoadDatas = new HashMap<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,53 +49,13 @@ public class ChatActivity extends AppCompatActivity {
         Instances.put(CurrentChat, this);
 
         MessageWindow = (ListView) findViewById(R.id.ChatList);
-        Adapter = new ChatAdapter(this, R.layout.chat_message, new ArrayList<HashMap<String, String>>());
+        Adapter = new ChatAdapter(this, R.layout.chat_message, CurrentChat);
         MessageWindow.setAdapter(Adapter);
+    }
 
-        MessageData = FirebaseDatabase.getInstance().getReference().child("chat").child(CurrentChat).child("message").limitToLast(50);
-        MessageData.addChildEventListener(Listener = new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                HashMap<String, String> MsgData = (HashMap<String, String>) dataSnapshot.getValue();
-                String SenderId = MsgData.get("sender");
-                if (!LoadDatas.containsKey(SenderId))
-                {
-                    LoadDatas.put(SenderId, DatabaseCache.LoadUserData(SenderId, new Runnable() {
-                        @Override
-                        public void run() {
-                            Adapter.notifyDataSetChanged();
-                        }
-                    }));
-                }
-
-                Adapter.add(MsgData);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        DatabaseCache.LoadChatDataOnce(CurrentChat, new Runnable() {
-            @Override
-            public void run() {
-                setTitle(DatabaseCache.GetChatName(CurrentChat, ""));
-            }
-        });
+    public void ReloadViews()
+    {
+        Adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -130,14 +86,6 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Instances.remove(CurrentChat);
-
-        MessageData.removeEventListener(Listener);
-        Adapter.clear();
-
-        for (Map.Entry<String, Integer> x : LoadDatas.entrySet())
-        {
-            DatabaseCache.Cancel(x.getValue());
-        }
     }
 
     public void SendMusic(View view) {

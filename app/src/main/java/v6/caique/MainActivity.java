@@ -1,6 +1,9 @@
 package v6.caique;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,10 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +38,7 @@ public class MainActivity extends AppCompatActivity
 
     public static MainActivity Instance;
     private SubscribedFragment Subs;
-    private HashMap<String, Integer> ToCancel = new HashMap<>();
-    //private FirebaseAuth mAuth;
+    private SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,32 +66,49 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_chats);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
-                .build();
+        Subs = new SubscribedFragment();
+        SetSubscribedFragment();
 
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        //Close app
-                    }
-                })
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
+        if (sharedPref.contains("gid"))
+        {
+            CacheChats.Restart(sharedPref.getString("gid", null));
+        }
+        else
+        {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .requestIdToken("420728598029-dt0td1a1a40javb5knfggd0m5crag15d.apps.googleusercontent.com")
+                    .build();
 
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, 1);
+            final Activity end = this;
+            GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                            end.finish();
+                        }
+                    })
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
 
-        //mAuth = FirebaseAuth.getInstance();
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, 1);
+        }
+    }
+
+    public void ReloadViews()
+    {
+        Subs.Adapter.notifyDataSetChanged();
     }
 
     private void SetSubscribedFragment()
     {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.mainframe, Subs = new SubscribedFragment())
+                .replace(R.id.mainframe, Subs)
                 .commit();
+
+        CacheChats.FilterSubs();
     }
 
     @Override
@@ -101,10 +123,21 @@ public class MainActivity extends AppCompatActivity
         }
 
         try {
-            CloudMessageService.RegToken = result.getSignInAccount().getIdToken();
+            GoogleSignInAccount Acc = result.getSignInAccount();
 
-            if (CloudMessageService.RegToken != null) {
-                SetSubscribedFragment();
+            if (Acc.getIdToken() != null) {
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("type", "reg")
+                        .addData("text", Acc.getIdToken())
+                        .build());
+
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("gid", Acc.getId());
+                editor.commit();
+
+                CacheChats.Restart(Acc.getId());
             }
         }
         catch (NullPointerException Ex)
@@ -160,47 +193,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        /*FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
-            mAuth.signInAnonymously().getResult();
-        }*/
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    public void GetChatNames(final ArrayList<String> Chat) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (Subs != null && Subs.isAdded())
-                {
-                    for (int i = 0; i < Chat.size(); i++) {
-                        final String ID = Chat.get(i);
-                        Subs.Adapter.add(ID);
-
-                        if (ToCancel.containsKey(ID)) {
-                            DatabaseCache.Cancel(ToCancel.get(ID));
-                        }
-
-                        ToCancel.put(ID, DatabaseCache.LoadChatData(ID, new Runnable() {
-                            @Override
-                            public void run() {
-                                Subs.Adapter.notifyDataSetChanged();
-                            }
-                        }));
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
     public void onFragmentInteraction(Uri uri) {
-
     }
 }

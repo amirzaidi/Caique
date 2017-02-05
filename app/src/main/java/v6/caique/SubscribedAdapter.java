@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,18 +30,32 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class SubscribedAdapter extends ArrayAdapter<String> {
+public class SubscribedAdapter extends BaseAdapter {
 
     private LayoutInflater vi;
     private Context context;
-    private ArrayList<String> Items;
 
-    public SubscribedAdapter(Context c, ArrayList<String> Items)
+    public SubscribedAdapter(Context c)
     {
-        super(c, R.layout.list_item_chat, Items);
-        this.Items = Items;
+        //super();
+        //super(c, R.layout.list_item_chat);
         vi = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         context = c;
+    }
+
+    @Override
+    public int getCount() {
+        return CacheChats.Subs.size();
+    }
+
+    @Override
+    public CacheChats.ChatStructure getItem(int position) {
+        return CacheChats.Loaded.get(CacheChats.Subs.get(position));
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return CacheChats.Subs.get(position).hashCode();
     }
 
     @Override
@@ -52,40 +67,30 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
             row = vi.inflate(R.layout.list_item_chat, null);
         }
 
-        if (Items.size() > position)
+        if (CacheChats.Loaded.size() > position)
         {
-            final String ChatId = Items.get(position);
+            final String ChatId = CacheChats.Subs.get(position);
+            final CacheChats.ChatStructure Chat = getItem(position);
+
             CircleImageView imageView = (CircleImageView) row.findViewById(R.id.chatdp);
             imageView.setImageDrawable(null);
 
-            String pic = DatabaseCache.GetChatPicUrl(ChatId, null);
-            if (pic != null && !pic.isEmpty())
-            {
-                StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + pic);
+            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ChatId);
 
-                Glide.with(context)
-                        .using(new FirebaseImageLoader())
-                        .load(storageRef)
-                        .into(imageView);
-            }
+            Glide.with(context)
+                    .using(new FirebaseImageLoader())
+                    .load(storageRef)
+                    .into(imageView);
 
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
-            nameTextView.setText(DatabaseCache.GetChatName(ChatId, "Loading"));
+            nameTextView.setText(Chat.Title);
 
-            ArrayList<String> Tags = DatabaseCache.GetChatTags(ChatId, new ArrayList<String>());
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Tags.size(); i++)
+            if (Chat.Messages.size() != 0)
             {
-                if (i != 0)
-                {
-                    sb.append(", ");
-                }
-
-                sb.append(Tags.get(i));
+                CacheChats.MessageStructure Msg = Chat.Messages.getLast();
+                TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
+                descTextView.setText(CacheChats.Name(Msg.Sender, "Unknown") + ": " + Msg.Content);
             }
-
-            TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
-            descTextView.setText("Tags: " + sb.toString());
 
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
