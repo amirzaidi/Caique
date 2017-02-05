@@ -92,7 +92,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     } else if (Type.equals("play")) {
                         if (Active) {
                             if(CurrentSettings.MusicInChats) {
-                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null));
+                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
                                 Player.setPlayWhenReady(true);
                             }
 
@@ -120,9 +120,11 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
-    public void SetMusicPlaying(boolean Start){
+    public void StopMusic(){
         if(Player != null) {
-            Player.setPlayWhenReady(Start);
+            Player.setPlayWhenReady(false);
+            Player.stop();
+            Player.seekTo(Long.MAX_VALUE);
         }
     }
 

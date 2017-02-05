@@ -1,7 +1,6 @@
 package v6.caique;
 
-import android.app.NotificationManager;
-import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -57,17 +56,28 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        new SettingsActivity().GetSettings(this);
-
         Active = true;
 
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", CurrentChat)
-                .addData("type", "mplaying")
-                .addData("text", "")
-                .build());
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try
+                {
+                    Thread.sleep(250);
+                }
+                catch (InterruptedException e)
+                {
+                }
+
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("chat", CurrentChat)
+                        .addData("type", "mplaying")
+                        .addData("text", "")
+                        .build());
+            }
+        });
     }
 
     @Override
@@ -76,7 +86,7 @@ public class ChatActivity extends AppCompatActivity {
         Active = false;
 
         if(CloudMessageService.Instance != null) {
-            CloudMessageService.Instance.SetMusicPlaying(false);
+            CloudMessageService.Instance.StopMusic();
         }
     }
 
