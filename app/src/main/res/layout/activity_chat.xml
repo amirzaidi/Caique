@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_chat"
     android:layout_width="match_parent"
@@ -9,63 +9,4 @@
     android:gravity="bottom|fill"
     android:orientation="vertical">
 
-    <Button
-        android:text="@string/music"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="SendMusic"
-        android:textColor="#000"
-        android:layout_alignParentBottom="true"
-        android:theme="@style/AppThemeOverlay"
-        style="@style/Widget.AppCompat.Button.Colored"  />
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/ChatList"
-        android:transcriptMode="normal"
-        android:layout_weight="1"
-        android:stackFromBottom="true">
-    </ListView>
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/editText2"
-            android:layout_alignParentBottom="true"
-            android:hint="Type your message here..."
-            android:padding="16dp"
-            android:textColorHint="#000"
-            android:textColor="#000"
-
-            android:gravity="top"
-            android:layout_toStartOf="@+id/button3"
-            android:layout_weight="1"
-            android:inputType="textCapSentences"
-            android:singleLine="false"
-            android:imeOptions="flagNoExtractUi" />
-
-        <Button
-            android:text="Send"
-            android:layout_height="wrap_content"
-            android:onClick="SendMessage"
-            android:layout_width="wrap_content"
-            android:layout_alignParentEnd="false"
-            android:textColor="#000"
-            android:minHeight="48dp"
-            android:minWidth="88dp"
-            android:padding="16dp"
-            android:theme="@style/AppThemeOverlay"
-            style="@style/Widget.AppCompat.Button.Colored" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

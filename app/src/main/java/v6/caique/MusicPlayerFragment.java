@@ -7,29 +7,26 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-public class SubscribedFragment extends Fragment {
+public class MusicPlayerFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    public SubscribedAdapter Adapter;
+
+    public MusicPlayerFragment() {
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Adapter = new SubscribedAdapter(this.getActivity());
+
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-        View RootView = inflater.inflate(R.layout.fragment_subscribed, container, false);
-
-        ListView Chats = (ListView) RootView.findViewById(R.id.ChatList);
-        Chats.setAdapter(Adapter);
-
-        return RootView;
+        return inflater.inflate(R.layout.fragment_music_player, container, false);
     }
 
     @Override
