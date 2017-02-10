@@ -5,12 +5,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
@@ -40,6 +44,14 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         RootView = inflater.inflate(R.layout.fragment_chat, container, false);
+
+        Toolbar toolbar = (Toolbar) RootView.findViewById(R.id.ChatToolbar);
+        Button button = new Button(this.getContext());
+        button.setText("Music");
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        toolbar.addView(button, params);
 
         MessageWindow = (ListView) RootView.findViewById(R.id.ChatList);
         Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity)getActivity()).CurrentChat);

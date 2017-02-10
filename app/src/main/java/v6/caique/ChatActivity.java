@@ -43,8 +43,7 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
 
         ChatWindow = new ChatFragment();
         SetChatFragment();
-        //MusicPlayer = new MusicPlayerFragment();
-        //SetMusicPlayerFragment();
+        MusicPlayer = new MusicPlayerFragment();
     }
 
     public void ReloadViews(){
@@ -63,13 +62,6 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                try
-                {
-                    Thread.sleep(350);
-                }
-                catch (InterruptedException e)
-                {
-                }
 
                 FirebaseMessaging fm = FirebaseMessaging.getInstance();
                 fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
