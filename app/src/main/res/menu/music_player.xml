@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/to_chat"
+        android:icon="@drawable/ic_chat_button"
+        android:title="Chat button"
+        app:showAsAction="always"
+        android:orderInCategory="0"
+        android:onClick="SetChatFragment"/>
+</menu>

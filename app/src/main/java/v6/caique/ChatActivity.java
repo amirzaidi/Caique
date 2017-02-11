@@ -1,17 +1,23 @@
 package v6.caique;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.HashMap;
 
-public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFragmentInteractionListener {
+public class ChatActivity extends AppCompatActivity {
 
     public static HashMap<String, ChatActivity> Instances = new HashMap<>();
     public boolean Active;
@@ -42,8 +48,27 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
         //notificationManager.cancel(CurrentChat.hashCode());
 
         ChatWindow = new ChatFragment();
-        SetChatFragment();
+        SetChatFragment(null);
         MusicPlayer = new MusicPlayerFragment();
+
+        DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
+
+        Query DataQuery = Database.child("chat").child(CurrentChat).child("data");
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                String Title = (String) Data.get("title");
+
+                ChatActivity.Instances.get(CurrentChat).setTitle(Title);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+
+        DataQuery.addValueEventListener(listener);
     }
 
     public void ReloadViews(){
@@ -52,6 +77,10 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
 
     public void SendMessage(View view) {
         ChatWindow.SendMessage();
+    }
+
+    public void AddMusic(View view){
+        MusicPlayer.SendMusic();
     }
 
     @Override
@@ -91,51 +120,17 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
         Instances.remove(CurrentChat);
     }
 
-    private void SetMusicPlayerFragment()
+    public void SetMusicPlayerFragment(MenuItem item)
     {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_chat, MusicPlayer)
                 .commit();
-
-        CacheChats.FilterSubs();
     }
 
-    /*public void SendMusic(View view) {
-        String Date = String.valueOf(System.currentTimeMillis() / 1000);
-
-        EditText Input = (EditText) findViewById(R.id.editText2);
-        String Text = Input.getText().toString().trim();
-
-        if(Text.length() > 1024){
-            Text =  Text.substring(0, 1021) + "...";
-        }
-        else if (Text.length() == 0)
-        {
-            return;
-        }
-
-        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
-                .addData("type", "madd")
-                .addData("date", Date)
-                .addData("text", Text)
-                .build());
-
-        Log.d("SendMessageToServer", "Music message sent " + Text);
-        Input.setText("");
-    }*/
-
-    private void SetChatFragment()
+    public void SetChatFragment(MenuItem item)
     {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_chat, ChatWindow)
                 .commit();
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 }
