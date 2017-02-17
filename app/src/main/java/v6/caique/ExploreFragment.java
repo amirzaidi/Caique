@@ -28,6 +28,8 @@ public class ExploreFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_explore, container, false);
     }
 
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

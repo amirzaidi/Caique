@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
             startActivityForResult(signInIntent, 1);
         }
+
     }
 
     public void ReloadViews()
@@ -119,7 +120,31 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.mainframe, Subs)
                 .commit();
 
+        Subs.Active = true;
         CacheChats.FilterSubs();
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(!Subs.Active){
+            Subs.Active = true;
+
+            FragmentManager manager = getSupportFragmentManager();
+            manager.beginTransaction()
+                    .replace(R.id.mainframe, Subs)
+                    .commit();
+
+            CacheChats.FilterSubs();
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setCheckedItem(R.id.nav_chats);
+        }
+        else{
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -195,6 +220,10 @@ public class MainActivity extends AppCompatActivity
             startActivity(newActivity);
         }
 
+        if(id != R.id.nav_chats){
+            Subs.Active = false;
+        }
+
         return true;
     }
 
@@ -211,5 +240,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+    }
+
+    public void GoToPicture(View view) {
+        Intent GoToPicture = new Intent (this, PictureActivity.class);
+        startActivity(GoToPicture);
     }
 }

@@ -13,6 +13,7 @@ public class SubscribedFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     public SubscribedAdapter Adapter;
+    public boolean Active = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

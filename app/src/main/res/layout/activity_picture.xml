@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Choose"
+            android:text="Choose profile Picture"
             android:onClick="Choose" />
 
         <Button
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Download"
+            android:text="Even negeren"
             android:onClick="Download" />
 
         <Button
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Upload"
+            android:text="Confirm profile Picture"
             android:onClick="Upload" />
 
     </LinearLayout>
@@ -51,6 +51,7 @@
         android:layout_below="@id/linearLayout"/>
 
 </RelativeLayout>
+
 
 
 

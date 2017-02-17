@@ -64,7 +64,7 @@ public class PictureActivity extends AppCompatActivity {
         Gal.setType("image/*");
         Gal.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(Gal, "Select Picture"), PICK_IMAGE);
-        Picture = (ImageView) findViewById(R.id.Picture);
+        Picture = (ImageView) findViewById(R.id.Testface);
     }
     private Uri file;
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -72,7 +72,8 @@ public class PictureActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             Uri imageUri = data.getData();
-            Picture.setImageURI(imageUri);
+            //TODO FIX ERROR
+            //Picture.setImageURI(imageUri);
         }
 
     }
@@ -85,36 +86,26 @@ public class PictureActivity extends AppCompatActivity {
         Picture.buildDrawingCache();
         StorageReference pictureRef = storageRef.child("newImg.jpg");
         pictureRef.putFile(file)
-       .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                System.out.println(downloadUrl);
-            }
-        });
-                }
-
-
-    public void Upload(View view) {
-
-        Upload();
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                        System.out.println(downloadUrl);
+                    }
+                });
     }
 
 
+    public void Upload(View view) {
+        Upload();
+        Intent GoBack = new Intent (this, MainActivity.class);
+        startActivity(GoBack);
+    }
 
-
-
-
-
-
-
-
-
-
-        /**
-         * ATTENTION: This was auto-generated to implement the App Indexing API.
-         * See https://g.co/AppIndexing/AndroidStudio for more information.
-         */
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
                 .setName("PictureActivity Page")
@@ -147,6 +138,10 @@ public class PictureActivity extends AppCompatActivity {
         client.disconnect();
     }
 }
+
+
+
+
 
 
 
