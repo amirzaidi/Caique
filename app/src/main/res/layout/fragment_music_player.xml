@@ -7,32 +7,43 @@
     <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:layout_width="299dp"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="Music to add"
-            android:ems="10"
-            android:id="@+id/editText2"
-            android:layout_weight="1.17" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:text=""
-            android:layout_width="30dp"
-            android:layout_height="34dp"
-            android:id="@+id/button3"
-            android:background="@null"
-            android:drawableTop="@drawable/ic_add_song"
-            android:onClick="AddMusic"
-            android:layout_marginTop="30dp"
-            android:layout_marginRight="7dp"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_weight="0.33" />
+            <EditText
+                android:layout_width="299dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Music to add"
+                android:ems="10"
+                android:id="@+id/editText2"
+                android:layout_weight="1.17" />
 
+            <Button
+                android:text=""
+                android:layout_width="30dp"
+                android:layout_height="34dp"
+                android:id="@+id/button3"
+                android:background="@null"
+                android:drawableTop="@drawable/ic_add_song"
+                android:onClick="AddMusic"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="7dp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_weight="0.33" />
+
+        </LinearLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/SongQueue" />
     </LinearLayout>
 
 </FrameLayout>

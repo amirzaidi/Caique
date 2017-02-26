@@ -276,7 +276,7 @@ public class CacheChats {
             {
                 if (ChatActivity.Instances.containsKey(ChatId))
                 {
-                    ChatActivity.Instances.get(ChatId).ReloadViews();
+                    ChatActivity.Instances.get(ChatId).ReloadChatViews();
                 }
             }
         }

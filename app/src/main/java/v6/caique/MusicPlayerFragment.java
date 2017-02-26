@@ -2,6 +2,7 @@ package v6.caique;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,14 +12,28 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
+
 public class MusicPlayerFragment extends Fragment {
+    static class SongStructure {
+        public String SongName;
+        public String Chat;
+        public int Index;
+        public Boolean IsFile = false;
+    }
+
+    public static ArrayList<SongStructure> Songs = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
+    public MusicAdapter Adapter;
     private View RootView;
+    private ListView SongQueue;
+    private String ChatId = new String();
 
     public MusicPlayerFragment() {
 
@@ -27,8 +42,34 @@ public class MusicPlayerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ChatId = ((ChatActivity)getActivity()).CurrentChat;
     }
+
+    public void ReloadViews()
+    {
+        Songs.clear();
+        ArrayList<String> PlaylistTemp = ((ChatActivity)getActivity()).Playlist;
+        if(PlaylistTemp != null) {
+            if (PlaylistTemp.size() > 0) {
+                for (String Song : PlaylistTemp) {
+
+                    SongStructure SongStruct = new SongStructure();
+                    SongStruct.Chat = ChatId;
+                    SongStruct.Index = Songs.size();
+                    SongStruct.SongName = Song;
+
+                    Songs.add(SongStruct);
+                }
+            }
+        }
+        Adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,6 +78,22 @@ public class MusicPlayerFragment extends Fragment {
         RootView = inflater.inflate(R.layout.fragment_music_player, container, false);
 
         setHasOptionsMenu(true);
+
+        Songs.clear();
+        for (String Song : ((ChatActivity)getActivity()).Playlist) {
+
+            SongStructure SongStruct = new SongStructure();
+            SongStruct.Chat = ChatId;
+            SongStruct.Index = Songs.size();
+            SongStruct.SongName = Song;
+
+            Songs.add(SongStruct);
+        }
+
+
+        SongQueue = (ListView) RootView.findViewById(R.id.SongQueue);
+        Adapter = new MusicAdapter(this.getActivity(), R.layout.song_queue_item);
+        SongQueue.setAdapter(Adapter);
 
         return RootView;
     }
@@ -69,14 +126,33 @@ public class MusicPlayerFragment extends Fragment {
         FirebaseMessaging fm = FirebaseMessaging.getInstance();
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
+                .addData("chat", ChatId)
                 .addData("type", "madd")
                 .addData("date", Date)
                 .addData("text", Text)
                 .build());
 
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("chat", ChatId)
+                        .addData("type", "mqueue")
+                        .addData("text", "")
+                        .build());
+            }
+        });
+
         Log.d("SendMessageToServer", "Music message sent " + Text);
         Input.setText("");
+
     }
 
     @Override

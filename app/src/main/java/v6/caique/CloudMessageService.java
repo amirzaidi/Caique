@@ -25,6 +25,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -39,6 +44,7 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultLoadControl LoadControl;
     private DefaultDataSourceFactory SourceFactory;
     private DefaultExtractorsFactory ExtractorsFactory;
+    private ArrayList<String> Playlist = new ArrayList<>();
 
     public static CloudMessageService Instance;
 
@@ -100,12 +106,52 @@ public class CloudMessageService extends FirebaseMessagingService {
                             Chat.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Chat.setTitle("Playing " + Data.get("text"));
+                                    Chat.setTitle("Playing: " + Data.get("text"));
+                                    if(Chat.Playlist.size() > 0) {
+                                        Chat.RemoveFromQueue();
+                                        Chat.ReloadSongViews();
+
+                                    }
                                 }
                             });
                         } else {
-                            sendNotification(ChatId, "Playing " + Data.get("text"));
+                            sendNotification(ChatId, "Playing: " + Data.get("text"));
                         }
+                    } else if(Type.equals("mqueue")){
+
+                        ArrayList<String> PrePlaylist = new ArrayList<>();
+                        try {
+
+                            JSONObject PreSongListJSONObject = new JSONObject(Data.get("text"));
+
+                            Iterator x = PreSongListJSONObject.keys();
+                            JSONArray PreSongListJSONArray = new JSONArray();
+
+                            while (x.hasNext()){
+                                String key = (String) x.next();
+                                PreSongListJSONArray.put(PreSongListJSONObject.get(key));
+                            }
+
+                            for (int i = 0; i < PreSongListJSONArray.getJSONArray(1).length(); i++){
+                                PrePlaylist.add(PreSongListJSONArray.getJSONArray(1).getString(i));
+                            }
+                        } catch (Throwable t) {
+                            PrePlaylist.clear();
+                        }
+
+                        for(String s: PrePlaylist) {
+                            Playlist.add(s);
+                        }
+                        final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+                        Chat.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Chat.Playlist = Playlist;
+                                if(Chat.Playlist.size() > 0) {
+                                    Chat.ReloadSongViews();
+                                }
+                            }
+                        });
                     }
                 }
                 else

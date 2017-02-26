@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ChatActivity extends AppCompatActivity {
@@ -23,7 +24,8 @@ public class ChatActivity extends AppCompatActivity {
     public boolean Active;
     protected String CurrentChat = null;
     private ChatFragment ChatWindow;
-    private MusicPlayerFragment MusicPlayer;
+    public MusicPlayerFragment MusicPlayer;
+    public ArrayList<String> Playlist = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +50,8 @@ public class ChatActivity extends AppCompatActivity {
         //notificationManager.cancel(CurrentChat.hashCode());
 
         ChatWindow = new ChatFragment();
-        SetChatFragment(null);
         MusicPlayer = new MusicPlayerFragment();
+        SetChatFragment(null);
 
         DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
 
@@ -71,8 +73,16 @@ public class ChatActivity extends AppCompatActivity {
         DataQuery.addValueEventListener(listener);
     }
 
-    public void ReloadViews(){
-        ChatWindow.ReloadViews();
+    public void ReloadChatViews(){
+        if(ChatWindow.isVisible()) {
+            ChatWindow.ReloadViews();
+        }
+    }
+
+    public void ReloadSongViews(){
+        if(MusicPlayer.isVisible()) {
+            MusicPlayer.ReloadViews();
+        }
     }
 
     public void SendMessage(View view) {
@@ -83,6 +93,18 @@ public class ChatActivity extends AppCompatActivity {
         MusicPlayer.SendMusic();
     }
 
+    public void RemoveFromQueue(){
+        Playlist.remove(0);
+        ArrayList<String> PlaylistTemp = new ArrayList<>();
+        for(String Song: Playlist){
+            PlaylistTemp.add(Song);
+        }
+        Playlist.clear();
+        for(String Song: PlaylistTemp){
+            Playlist.add(Song);
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -91,7 +113,6 @@ public class ChatActivity extends AppCompatActivity {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-
                 FirebaseMessaging fm = FirebaseMessaging.getInstance();
                 fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                         .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
@@ -101,6 +122,26 @@ public class ChatActivity extends AppCompatActivity {
                         .build());
             }
         });
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("chat", CurrentChat)
+                        .addData("type", "mqueue")
+                        .addData("text", "")
+                        .build());
+            }
+        });
+
+
     }
 
     @Override
