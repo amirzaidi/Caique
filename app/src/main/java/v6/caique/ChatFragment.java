@@ -49,6 +49,27 @@ public class ChatFragment extends Fragment {
         Adapter.notifyDataSetChanged();
     }
 
+    private String SavedText;
+
+    @Override
+    public void onPause()
+    {
+        SavedText = ((EditText) getView().findViewById(R.id.editChatText)).getText().toString();
+
+        super.onPause();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (SavedText != null)
+        {
+            ((EditText) getView().findViewById(R.id.editChatText)).setText(SavedText);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,14 +85,12 @@ public class ChatFragment extends Fragment {
 
         Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
         MessageWindow.setAdapter(Adapter);
-        scrollMyListViewToBottom();
 
-        return RootView;
-    }
-
-    private void scrollMyListViewToBottom() {
         List = (ListView) RootView.findViewById(R.id.ChatList);
         List.setSelection(Adapter.getCount() - 1);
+        List.setDivider(null);
+
+        return RootView;
     }
 
     @Override
@@ -88,7 +107,7 @@ public class ChatFragment extends Fragment {
     public void SendMessage() {
         String Date = String.valueOf(System.currentTimeMillis() / 1000);
 
-        EditText Input = (EditText) RootView.findViewById(R.id.editChatText);
+        EditText Input = (EditText) getView().findViewById(R.id.editChatText);
         String Text = Input.getText().toString().trim();
 
         if(Text.length() > 1024){
@@ -120,7 +139,7 @@ public class ChatFragment extends Fragment {
             TextInputEditText Typer = new TextInputEditText(this.getContext());
             Typer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
             Typer.setEms(10);
-            //Typer.setId(R.id.editChatText);
+            Typer.setId(R.id.editChatText);
             Typer.setHint("Type your message...");
             Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
             Typer.setPadding(12, 8, 12, 8);

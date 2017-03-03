@@ -3,26 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
-    android:gravity="bottom">
+    android:gravity="bottom"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:weightSum="1">
 
-    <TextView
-        android:id="@+id/messageItemSender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="8dp"
-        android:paddingLeft="8dp"
-        android:paddingTop="8dp"
-        android:text="TextView"
-        android:textSize="16dp" />
+    <ImageView
+        android:id="@+id/userdp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="0"
+        android:elevation="1dp" />
 
-    <TextView
-        android:id="@+id/messageItem"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="16dp"></TextView>
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/messageItemSender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="1dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="24dp"
+            android:text="Name"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/messageItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:paddingBottom="8dp"
+            android:text="Message"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"></TextView>
+    </LinearLayout>
+
 </LinearLayout>

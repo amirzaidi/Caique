@@ -117,7 +117,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                                         Waiter.acquire();
                                         Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
                                         Player.setPlayWhenReady(true);
-                                        Thread.sleep(300);
                                         Waiter.release();
                                     }
                                     catch (InterruptedException e)
@@ -205,7 +204,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                         Waiter.acquire();
                         Player.setPlayWhenReady(false);
                         Player.stop();
-                        Thread.sleep(300);
                         Waiter.release();
                     }
                     catch (InterruptedException e)

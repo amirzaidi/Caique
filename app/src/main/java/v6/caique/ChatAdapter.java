@@ -2,12 +2,29 @@ package v6.caique;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.text.format.DateFormat;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.Date;
+
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -36,26 +53,58 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         if (Chat.Messages.size() > position)
         {
             //final CircleImageView imageView = (CircleImageView) row.findViewById(R.id.userdp);
+            final ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
             CacheChats.MessageStructure Data = Chat.Messages.get(position);
+            Message.setText(Data.Content);
 
-            if (position != 0 && Data.Sender.equals(Chat.Messages.get(position - 1).Sender))
+            int Dp56 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getContext().getResources().getDisplayMetrics());
+
+            Boolean HidePic = false;
+
+            if (position != 0)
             {
-                //imageView.setVisibility(INVISIBLE);
-                //imageView.setMaxHeight(1);
-                MessageSender.setVisibility(INVISIBLE);
+                CacheChats.MessageStructure Previous = Chat.Messages.get(position - 1);
+                if (Data.Sender.equals(Previous.Sender) && Math.round((double)Previous.Date / 60) == Math.round((double)Data.Date / 60))
+                {
+                    HidePic = true;
+                }
+            }
+
+            if (HidePic)
+            {
+                MessageSender.setVisibility(GONE);
+                imageView.getLayoutParams().height = 0;
             }
             else
             {
-                //imageView.setVisibility(VISIBLE);
-                //imageView.setMaxHeight(9999);
+                Date d = new Date(Data.Date*1000L);
+
                 MessageSender.setVisibility(VISIBLE);
+                MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " [" + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "]");
+                imageView.getLayoutParams().height = Dp56;
+
+                imageView.setImageDrawable(null);
+
+                final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Data.Sender);
+                storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        Glide.with(context)
+                                .using(new FirebaseImageLoader())
+                                .load(storageRef)
+                                .centerCrop()
+                                .bitmapTransform(new CropCircleTransformation(context))
+                                .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                .into(imageView);
+                    }
+                });
             }
 
-            MessageSender.setText(CacheChats.Name(Data.Sender, "Loading.."));
-            Message.setText(Data.Content);
+            imageView.requestLayout();
+
         }
 
         return row;
