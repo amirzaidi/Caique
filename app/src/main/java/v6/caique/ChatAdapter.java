@@ -3,6 +3,7 @@ package v6.caique;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
+import java.util.concurrent.RejectedExecutionException;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -86,18 +88,24 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
                 imageView.setImageDrawable(null);
 
                 final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Data.Sender);
-                storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                    @Override
-                    public void onSuccess(StorageMetadata storageMetadata) {
-                        Glide.with(context)
-                                .using(new FirebaseImageLoader())
-                                .load(storageRef)
-                                .centerCrop()
-                                .bitmapTransform(new CropCircleTransformation(context))
-                                .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
-                                .into(imageView);
-                    }
-                });
+                try {
+                    storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                        @Override
+                        public void onSuccess(StorageMetadata storageMetadata) {
+                            Glide.with(context)
+                                    .using(new FirebaseImageLoader())
+                                    .load(storageRef)
+                                    .centerCrop()
+                                    .bitmapTransform(new CropCircleTransformation(context))
+                                    .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                    .into(imageView);
+                        }
+                    });
+                }
+                catch (RejectedExecutionException e)
+                {
+                    Log.d("ChatAdapter", "Rejected StorageMetadata: " + e.getMessage());
+                }
             }
 
             imageView.requestLayout();
