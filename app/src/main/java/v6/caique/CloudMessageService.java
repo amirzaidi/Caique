@@ -28,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
+
+import static com.google.android.exoplayer2.ExoPlayer.STATE_IDLE;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "CloudMessageService";
@@ -50,7 +53,6 @@ public class CloudMessageService extends FirebaseMessagingService {
     private DefaultLoadControl LoadControl;
     private DefaultDataSourceFactory SourceFactory;
     private DefaultExtractorsFactory ExtractorsFactory;
-    private ArrayList<String> Playlist = new ArrayList<>();
 
     public static CloudMessageService Instance;
 
@@ -64,13 +66,8 @@ public class CloudMessageService extends FirebaseMessagingService {
     public void onCreate()
     {
         SourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "Caique"));
-        TrackSelector = new DefaultTrackSelector(new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                return false;
-            }
-        }));
-        LoadControl = new DefaultLoadControl(new DefaultAllocator(8 * 1024), 500, 1000, 500, 500);
+        TrackSelector = new DefaultTrackSelector();
+        LoadControl = new DefaultLoadControl(new DefaultAllocator(false, 8 * 1024), 500, 1000, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
@@ -95,90 +92,104 @@ public class CloudMessageService extends FirebaseMessagingService {
                 if (CacheChats.Subs.contains(ChatId)) {
 
                     String Type = Data.get("type");
-
                     boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
 
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
-                    } else if (Type.equals("play") && ChatActivity.Instances.containsKey(Data.get("chat"))) {
+                    } else if (Type.equals("play") && ChatActivity.Instances.containsKey(ChatId)) {
 
-                        final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+                        final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
 
-                        if(Data.get("text") != null) {
+                        if (Data.get("text") == null || Data.get("text").isEmpty())
+                        {
                             if (Active) {
-                                if (CurrentSettings.MusicInChats) {
-                                    try
-                                    {
-                                        if (Player.getPlayWhenReady())
-                                        {
-                                            StopMusic();
-                                        }
+                                Chat.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Chat.setTitle(CacheChats.Name(ChatId, "Caique"));
+                                        Chat.CurrentSong = "";
+                                        Chat.MusicPlayer.SetCurrentlyPlaying();
+                                        Chat.Playlist.clear();
+                                        Chat.ReloadSongViews();
+                                    }
+                                });
+                            }
 
-                                        Waiter.acquire();
-                                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
-                                        Player.setPlayWhenReady(true);
-                                        Waiter.release();
-                                    }
-                                    catch (InterruptedException e)
-                                    {
-                                    }
+                            return;
+                        }
+
+                        try {
+                            JSONObject ParseMain = new JSONObject(Data.get("text"));
+                            JSONObject Playing = ParseMain.getJSONObject("Playing");
+                            String mTitle = "";
+                            if (!Playing.isNull("name"))
+                            {
+                                mTitle = Playing.get("name").toString();
+                            }
+
+                            final String Title = mTitle;
+
+                            if (Active) {
+                                final ArrayList<String> NewPlaylist = new ArrayList<>();
+                                JSONArray Array = ParseMain.getJSONArray("Titles");
+
+                                for (int i = 0; i < Array.length(); i++){
+                                    NewPlaylist.add(Array.getString(i));
                                 }
 
                                 Chat.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Chat.setTitle("Playing: " + Data.get("text"));
-                                        Chat.CurrentSong = Data.get("text");
-                                        Chat.MusicPlayer.SetCurrentlyPlaying(Data.get("text"));
-                                        if (Chat.Playlist.size() > 0) {
-                                            Chat.RemoveFromQueue();
-                                            Chat.ReloadSongViews();
-
+                                        Chat.CurrentSong = Title;
+                                        if (Title.isEmpty())
+                                        {
+                                            Chat.setTitle(CacheChats.Name(ChatId, "Caique"));
                                         }
-                                    }
-                                });
-                            } else {
-                                sendNotification(ChatId, "Playing: " + Data.get("text"));
-                            }
-                        }
+                                        else
+                                        {
+                                            Chat.setTitle("Playing " + Title);
+                                        }
 
-                    } else if(Type.equals("mqueue")){
-
-                        ArrayList<String> PrePlaylist = new ArrayList<>();
-                        try {
-
-                            JSONObject PreSongListJSONObject = new JSONObject(Data.get("text"));
-
-                            Iterator x = PreSongListJSONObject.keys();
-                            JSONArray PreSongListJSONArray = new JSONArray();
-
-                            while (x.hasNext()){
-                                String key = (String) x.next();
-                                PreSongListJSONArray.put(PreSongListJSONObject.get(key));
-                            }
-
-                            for (int i = 0; i < PreSongListJSONArray.getJSONArray(1).length(); i++){
-                                PrePlaylist.add(PreSongListJSONArray.getJSONArray(1).getString(i));
-                            }
-                        } catch (Throwable t) {
-                            PrePlaylist.clear();
-                        }
-
-                        for(String s: PrePlaylist) {
-                            Playlist.add(s);
-                        }
-                        final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
-
-                        if(Chat != null) {
-                            Chat.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Chat.Playlist = Playlist;
-                                    if (Chat.Playlist.size() > 0) {
+                                        Chat.MusicPlayer.SetCurrentlyPlaying();
+                                        Chat.Playlist = NewPlaylist;
                                         Chat.ReloadSongViews();
                                     }
+                                });
+
+                                if (CurrentSettings.MusicInChats && !Title.isEmpty()) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try
+                                            {
+                                                Waiter.acquire();
+
+                                                Player.setPlayWhenReady(false);
+                                                Player.stop();
+                                                Player.seekTo(0);
+                                                while (Player.getPlaybackState() != STATE_IDLE)
+                                                {
+                                                    Thread.sleep(25);
+                                                }
+
+                                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, new DefaultExtractorsFactory(), null, null));
+                                                Player.setPlayWhenReady(true);
+
+                                                Waiter.release();
+                                            }
+                                            catch (InterruptedException e)
+                                            {
+                                            }
+                                        }
+                                    }).start();
                                 }
-                            });
+                            } else {
+                                sendNotification(ChatId, "♫ " + Title + " ♫");
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Log.d("JSONMainPlaying", e.getMessage());
                         }
                     }
                 }
@@ -202,8 +213,15 @@ public class CloudMessageService extends FirebaseMessagingService {
                     try
                     {
                         Waiter.acquire();
+
                         Player.setPlayWhenReady(false);
                         Player.stop();
+                        Player.seekTo(0);
+                        while (Player.getPlaybackState() != STATE_IDLE)
+                        {
+                            Thread.sleep(25);
+                        }
+
                         Waiter.release();
                     }
                     catch (InterruptedException e)

@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -94,7 +95,7 @@ public class ChatFragment extends Fragment {
             CacheChats.StartListen(((ChatActivity) getActivity()).CurrentChat);
         }
 
-        Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
+        Adapter = new ChatAdapter(this.getContext(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
         MessageWindow.setAdapter(Adapter);
 
         List = (ListView) RootView.findViewById(R.id.ChatList);

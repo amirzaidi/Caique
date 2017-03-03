@@ -55,6 +55,8 @@ public class ChatActivity extends AppCompatActivity {
         MusicPlayer = new MusicPlayerFragment();
 
         SetChatFragment(null);
+
+        setTitle(CacheChats.Name(CurrentChat, "Caique"));
     }
 
     public void SetSubbed(boolean Subbed) {
@@ -63,10 +65,6 @@ public class ChatActivity extends AppCompatActivity {
             ChatWindow.SetSubbed(Subbed);
             MusicPlayer.SetSubbed(Subbed);
         }
-    }
-
-    public void SetSubbed() {
-        SetSubbed(CacheChats.Subs.contains(CurrentChat));
     }
 
     public void ReloadChatViews(){
@@ -89,7 +87,7 @@ public class ChatActivity extends AppCompatActivity {
         MusicPlayer.SendMusic();
     }
 
-    public void RemoveFromQueue(){
+    /*public void RemoveFromQueue(){
         Playlist.remove(0);
         ArrayList<String> PlaylistTemp = new ArrayList<>();
         for(String Song: Playlist){
@@ -99,7 +97,7 @@ public class ChatActivity extends AppCompatActivity {
         for(String Song: PlaylistTemp){
             Playlist.add(Song);
         }
-    }
+    }*/
 
     @Override
     protected void onStart() {
@@ -118,31 +116,6 @@ public class ChatActivity extends AppCompatActivity {
                         .build());
             }
         });
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                        .addData("chat", CurrentChat)
-                        .addData("type", "mqueue")
-                        .addData("text", "")
-                        .build());
-            }
-        });
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        //SetSubbed(CacheChats.Subs.contains(CurrentChat));
     }
 
     public boolean isSubbed()

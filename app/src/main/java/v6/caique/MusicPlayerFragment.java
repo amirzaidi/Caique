@@ -2,7 +2,6 @@ package v6.caique;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -109,7 +108,7 @@ public class MusicPlayerFragment extends Fragment {
             Songs.add(SongStruct);
         }
 
-        SetCurrentlyPlaying(((ChatActivity)getActivity()).CurrentSong);
+        SetCurrentlyPlaying();
 
         SongQueue = (ListView) RootView.findViewById(R.id.SongQueue);
         Adapter = new MusicAdapter(this.getActivity(), R.layout.song_queue_item);
@@ -129,12 +128,14 @@ public class MusicPlayerFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    public void SetCurrentlyPlaying(String SongPlaying){
-        if(getActivity() != null) {
+    public void SetCurrentlyPlaying(){
+        ChatActivity Activity = (ChatActivity) getActivity();
+        if(Activity != null) {
+
             TextView CurrentSong = (TextView) RootView.findViewById(R.id.CurrentSong);
             Button SkipButton = (Button) RootView.findViewById(R.id.SkipButton);
-            CurrentSong.setText(SongPlaying);
-            if (SongPlaying == null) {
+            CurrentSong.setText(Activity.CurrentSong);
+            if (Activity.CurrentSong == null || Activity.CurrentSong.isEmpty()) {
                 SkipButton.setVisibility(View.INVISIBLE);
             } else {
                 SkipButton.setVisibility(View.VISIBLE);
@@ -165,25 +166,15 @@ public class MusicPlayerFragment extends Fragment {
                 .addData("text", Text)
                 .build());
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if(getActivity() != null) {
-                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                            .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                            .addData("chat", ChatId)
-                            .addData("type", "mqueue")
-                            .addData("text", "")
-                            .build());
-                }
-            }
-        });
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", ChatId)
+                .addData("type", "msearch")
+                .addData("date", Date)
+                .addData("text", Text)
+                .build());
+
+        //TODO: Switch to msearch
 
         Log.d("SendMessageToServer", "Music message sent " + Text);
         Input.setText("");

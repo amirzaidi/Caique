@@ -92,19 +92,25 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
                     storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                         @Override
                         public void onSuccess(StorageMetadata storageMetadata) {
-                            Glide.with(context)
-                                    .using(new FirebaseImageLoader())
-                                    .load(storageRef)
-                                    .centerCrop()
-                                    .bitmapTransform(new CropCircleTransformation(context))
-                                    .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
-                                    .into(imageView);
+                            try {
+                                Glide.with(context)
+                                        .using(new FirebaseImageLoader())
+                                        .load(storageRef)
+                                        .centerCrop()
+                                        .bitmapTransform(new CropCircleTransformation(context))
+                                        .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                        .into(imageView);
+                            }
+                            catch (Exception x)
+                            {
+                                Log.d("GlideChatAdapter", "Glide: " + x.getMessage());
+                            }
                         }
                     });
                 }
-                catch (RejectedExecutionException e)
+                catch (Exception e)
                 {
-                    Log.d("ChatAdapter", "Rejected StorageMetadata: " + e.getMessage());
+                    Log.d("ChatAdapter", "Glide: " + e.getMessage());
                 }
             }
 
