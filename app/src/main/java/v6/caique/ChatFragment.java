@@ -57,7 +57,7 @@ public class ChatFragment extends Fragment {
         EditText T = (EditText) getView().findViewById(R.id.editChatText);
         if (T != null)
         {
-            T.getText().toString();
+            SavedText = T.getText().toString();
         }
 
         super.onPause();
