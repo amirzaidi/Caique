@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.Semaphore;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "CloudMessageService";
@@ -39,6 +41,7 @@ public class CloudMessageService extends FirebaseMessagingService {
     private static int SubTopics = 32;
 
     private ExoPlayer Player;
+    private Semaphore Waiter = new Semaphore(1);
 
     private DefaultTrackSelector TrackSelector;
     private DefaultLoadControl LoadControl;
@@ -95,15 +98,24 @@ public class CloudMessageService extends FirebaseMessagingService {
 
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
-                    } else if (Type.equals("play")) {
+                    } else if (Type.equals("play") && ChatActivity.Instances.containsKey(Data.get("chat"))) {
 
                         final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
                         if(Data.get("text") != null) {
                             if (Active) {
                                 if (CurrentSettings.MusicInChats) {
-                                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
-                                    Player.setPlayWhenReady(true);
+                                    try
+                                    {
+                                        Waiter.acquire();
+                                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
+                                        Player.setPlayWhenReady(true);
+                                        Waiter.release();
+                                    }
+                                    catch (InterruptedException e)
+                                    {
+                                    }
                                 }
+
                                 Chat.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -176,11 +188,24 @@ public class CloudMessageService extends FirebaseMessagingService {
     }
 
     public void StopMusic(){
-        if(Player != null) {
-            Player.setPlayWhenReady(false);
-            Player.stop();
-            Player.seekTo(Long.MAX_VALUE);
-        }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(Player != null) {
+                    try
+                    {
+                        Waiter.acquire();
+                        Player.setPlayWhenReady(false);
+                        Player.stop();
+                        Player.seekTo(Long.MAX_VALUE);
+                        Waiter.release();
+                    }
+                    catch (InterruptedException e)
+                    {
+                    }
+                }
+            }
+        });
     }
 
     public static void Sub(final String ChatId)

@@ -54,7 +54,7 @@ public class ChatActivity extends AppCompatActivity {
         MusicPlayer = new MusicPlayerFragment();
         SetChatFragment(null);
 
-        DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
+        /*DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
 
         Query DataQuery = Database.child("chat").child(CurrentChat).child("data");
         ValueEventListener listener = new ValueEventListener() {
@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
 
-        DataQuery.addValueEventListener(listener);
+        DataQuery.addValueEventListener(listener);*/
     }
 
     public void ReloadChatViews(){

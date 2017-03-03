@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     android:gravity="bottom">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        app:srcCompat="@drawable/oie_transparent"
-        android:id="@+id/userdp"
-        android:layout_weight="0"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_margin="8dp"
-        android:visibility="gone" />
-
     <TextView
         android:text="TextView"
         android:layout_width="wrap_content"

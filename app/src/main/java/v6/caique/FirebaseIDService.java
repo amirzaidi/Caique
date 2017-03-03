@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseIDService extends FirebaseInstanceIdService {
     private static final String TAG = "FirebaseIDService";
-    public static AtomicInteger msgId = new AtomicInteger(0);
+    public static AtomicInteger msgId = new AtomicInteger(1);
 
     @Override
     public void onCreate() {
