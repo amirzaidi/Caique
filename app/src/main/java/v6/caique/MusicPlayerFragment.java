@@ -72,12 +72,30 @@ public class MusicPlayerFragment extends Fragment {
         super.onResume();
     }
 
+    private int Visibility = View.VISIBLE;
+    public void SetSubbed(boolean Subbed)
+    {
+        if (Subbed)
+        {
+            Visibility = View.VISIBLE;
+        }
+        else
+        {
+            Visibility = View.GONE;
+        }
+
+        if (getView() != null)
+        {
+            getView().findViewById(R.id.music_frame).setVisibility(Visibility);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         RootView = inflater.inflate(R.layout.fragment_music_player, container, false);
+        RootView.findViewById(R.id.music_frame).setVisibility(Visibility);
 
         setHasOptionsMenu(true);
 

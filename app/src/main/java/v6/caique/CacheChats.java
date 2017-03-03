@@ -68,6 +68,16 @@ public class CacheChats {
                     StartListen(ChatId);
                     UpdateMainActivity();
 
+                    if (ChatActivity.Instances.containsKey(ChatId))
+                    {
+                        ChatActivity.Instances.get(ChatId).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ChatActivity.Instances.get(ChatId).SetSubbed(true);
+                            }
+                        });
+                    }
+
                     AsyncTask.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -78,13 +88,24 @@ public class CacheChats {
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    //Impossible
+                    //Impossible for now
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     Subs.remove(dataSnapshot.getKey());
                     UpdateMainActivity();
+
+                    final String ChatId = dataSnapshot.getKey();
+                    if (ChatActivity.Instances.containsKey(ChatId))
+                    {
+                        ChatActivity.Instances.get(ChatId).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ChatActivity.Instances.get(ChatId).SetSubbed(false);
+                            }
+                        });
+                    }
                 }
 
                 @Override

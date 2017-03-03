@@ -13,8 +13,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -32,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
 
 public class CloudMessageService extends FirebaseMessagingService {
@@ -77,7 +81,6 @@ public class CloudMessageService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        final FirebaseMessaging Instance = FirebaseMessaging.getInstance();
 
         Log.d(TAG, "Message Id: " + remoteMessage.getMessageId());
         final Map<String, String> Data = remoteMessage.getData();
@@ -106,9 +109,15 @@ public class CloudMessageService extends FirebaseMessagingService {
                                 if (CurrentSettings.MusicInChats) {
                                     try
                                     {
+                                        if (Player.getPlayWhenReady())
+                                        {
+                                            StopMusic();
+                                        }
+
                                         Waiter.acquire();
                                         Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
                                         Player.setPlayWhenReady(true);
+                                        Thread.sleep(300);
                                         Waiter.release();
                                     }
                                     catch (InterruptedException e)
@@ -196,7 +205,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                         Waiter.acquire();
                         Player.setPlayWhenReady(false);
                         Player.stop();
-                        Player.seekTo(Long.MAX_VALUE);
+                        Thread.sleep(300);
                         Waiter.release();
                     }
                     catch (InterruptedException e)

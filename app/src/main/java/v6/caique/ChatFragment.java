@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,8 +62,6 @@ public class ChatFragment extends Fragment {
             CacheChats.StartListen(((ChatActivity) getActivity()).CurrentChat);
         }
 
-        LoadChatBottom();
-
         Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
         MessageWindow.setAdapter(Adapter);
         scrollMyListViewToBottom();
@@ -114,20 +113,22 @@ public class ChatFragment extends Fragment {
 
     }
 
-    private void LoadChatBottom(){
+    public void SetSubbed(boolean Subbed){
         LinearLayout Bottom = (LinearLayout) RootView.findViewById(R.id.ChatBottom);
-        if(CacheChats.Subs.contains(((ChatActivity)getActivity()).CurrentChat)){
+        if(Subbed){
 
             TextInputEditText Typer = new TextInputEditText(this.getContext());
             Typer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
             Typer.setEms(10);
-            Typer.setId(R.id.editChatText);
+            //Typer.setId(R.id.editChatText);
             Typer.setHint("Type your message...");
+            Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+            Typer.setPadding(12, 8, 12, 8);
 
             Button SendButton = new Button(this.getContext());
             SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
             SendButton.setText("Send");
-            SendButton.setId(R.id.sendButton);
+            //SendButton.setId(R.id.sendButton);
             SendButton.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     SendMessage();
@@ -137,12 +138,14 @@ public class ChatFragment extends Fragment {
             Bottom.removeAllViews();
             Bottom.addView(Typer);
             Bottom.addView(SendButton);
+
+            setHasOptionsMenu(true);
         }
         else{
             Button SubButton = new Button(this.getContext());
             SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             SubButton.setText("Subscribe to chat");
-            SubButton.setId(R.id.subButton);
+            //SubButton.setId(R.id.subButton);
             SubButton.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     SubToChat();
@@ -151,43 +154,19 @@ public class ChatFragment extends Fragment {
 
             Bottom.removeAllViews();
             Bottom.addView(SubButton);
+
+            setHasOptionsMenu(false);
         }
     }
 
     private void SubToChat(){
-        HashMap<String, Object> NewChat = new HashMap<>();
-        NewChat.put(((ChatActivity)getActivity()).CurrentChat, true);
-
-        FirebaseDatabase.getInstance().getReference("user/" + MainActivity.Instance.sharedPref.getString("gid", null) + "/member").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                CacheChats.StartListen(((ChatActivity) getActivity()).CurrentChat);
-                LoadChatBottom();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        DatabaseReference Database = FirebaseDatabase.getInstance().getReference("user/" + MainActivity.Instance.sharedPref.getString("gid", null) + "/member");
-        Database.updateChildren(NewChat);
+        String ChatId = ((ChatActivity) getActivity()).CurrentChat;
+        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
+                .addData("type", "joinchat")
+                .addData("text", ChatId)
+                .build());
     }
 
     @Override
@@ -198,7 +177,6 @@ public class ChatFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onChatFragmentInteraction(Uri uri);
-
         void onMusicPlayerFragmentInteraction(Uri uri);
     }
 

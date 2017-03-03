@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,7 +53,7 @@ public class ExploreFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        RootView =inflater.inflate(R.layout.fragment_explore, container, false);
+        RootView = inflater.inflate(R.layout.fragment_explore, container, false);
 
         ListView ChatList = (ListView) RootView.findViewById(R.id.ChatList);
         Adapter = new ExploreAdapter(this.getActivity());

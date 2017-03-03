@@ -1,10 +1,14 @@
 package v6.caique;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,31 +51,18 @@ public class ChatActivity extends AppCompatActivity {
 
         Instances.put(CurrentChat, this);
 
-        //NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        //notificationManager.cancel(CurrentChat.hashCode());
-
         ChatWindow = new ChatFragment();
         MusicPlayer = new MusicPlayerFragment();
+
         SetChatFragment(null);
+    }
 
-        /*DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
-
-        Query DataQuery = Database.child("chat").child(CurrentChat).child("data");
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                String Title = (String) Data.get("title");
-
-                ChatActivity.Instances.get(CurrentChat).setTitle(Title);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-
-        DataQuery.addValueEventListener(listener);*/
+    public void SetSubbed(boolean Subbed) {
+        if (ChatWindow != null)
+        {
+            ChatWindow.SetSubbed(Subbed);
+            MusicPlayer.SetSubbed(Subbed);
+        }
     }
 
     public void ReloadChatViews(){
@@ -141,8 +132,13 @@ public class ChatActivity extends AppCompatActivity {
                         .build());
             }
         });
+    }
 
-
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        SetSubbed(CacheChats.Subs.contains(CurrentChat));
     }
 
     public void SkipSong(View view){

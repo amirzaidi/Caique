@@ -7,66 +7,67 @@
     <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/music_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <EditText
+                android:id="@+id/editText2"
                 android:layout_width="299dp"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Music to add"
+                android:layout_weight="1.17"
                 android:ems="10"
-                android:id="@+id/editText2"
-                android:layout_weight="1.17" />
+                android:hint="Music to add"
+                android:inputType="text" />
 
             <Button
-                android:text=""
+                android:id="@+id/button3"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="30dp"
                 android:layout_height="34dp"
-                android:id="@+id/button3"
+                android:layout_marginRight="7dp"
+                android:layout_marginTop="30dp"
+                android:layout_weight="0.33"
                 android:background="@null"
                 android:drawableTop="@drawable/ic_add_song"
                 android:onClick="AddMusic"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="7dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_weight="0.33" />
+                android:text="" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:weightSum="1">
 
             <TextView
-                android:text=""
+                android:id="@+id/CurrentSong"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
-                android:id="@+id/CurrentSong"
                 android:layout_gravity="bottom"
-                android:layout_weight="0.99" />
+                android:layout_weight="0.99"
+                android:text="" />
 
             <Button
-                android:text="Skip"
+                android:id="@+id/SkipButton"
                 android:layout_width="wrap_content"
                 android:layout_height="64dp"
-                android:id="@+id/SkipButton"
                 android:layout_gravity="bottom"
-                android:onClick="SkipSong"/>
+                android:onClick="SkipSong"
+                android:text="Skip" />
         </LinearLayout>
 
         <ListView
+            android:id="@+id/SongQueue"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/SongQueue" />
+            android:layout_height="match_parent" />
     </LinearLayout>
 
 </FrameLayout>
