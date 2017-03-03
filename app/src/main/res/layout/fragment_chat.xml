@@ -27,12 +27,11 @@
 
             <EditText
                 android:id="@+id/editText"
-                android:layout_width="154dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:ems="10"
                 android:hint="Type your message here..."
                 android:inputType="textCapSentences"
                 android:selectAllOnFocus="false" />
