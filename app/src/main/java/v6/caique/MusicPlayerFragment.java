@@ -48,7 +48,6 @@ public class MusicPlayerFragment extends Fragment {
 
     public void ReloadViews()
     {
-
         Songs.clear();
         ArrayList<String> PlaylistTemp = ((ChatActivity)getActivity()).Playlist;
         if(PlaylistTemp != null) {

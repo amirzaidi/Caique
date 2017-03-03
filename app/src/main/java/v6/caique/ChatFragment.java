@@ -78,11 +78,14 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    private LinearLayout Bottom;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         RootView = inflater.inflate(R.layout.fragment_chat, container, false);
+        Bottom = (LinearLayout) RootView.findViewById(R.id.ChatBottom);
 
         setHasOptionsMenu(true);
         MessageWindow = (ListView) RootView.findViewById(R.id.ChatList);
@@ -97,6 +100,8 @@ public class ChatFragment extends Fragment {
         List = (ListView) RootView.findViewById(R.id.ChatList);
         List.setSelection(Adapter.getCount() - 1);
         List.setDivider(null);
+
+        SetSubbed(((ChatActivity)getActivity()).isSubbed());
 
         return RootView;
     }
@@ -141,10 +146,9 @@ public class ChatFragment extends Fragment {
     }
 
     public void SetSubbed(boolean Subbed){
-        LinearLayout Bottom = (LinearLayout) RootView.findViewById(R.id.ChatBottom);
         if(Subbed){
 
-            TextInputEditText Typer = new TextInputEditText(this.getContext());
+            TextInputEditText Typer = new TextInputEditText(getContext());
             Typer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
             Typer.setEms(10);
             Typer.setId(R.id.editChatText);
@@ -169,7 +173,7 @@ public class ChatFragment extends Fragment {
             setHasOptionsMenu(true);
         }
         else{
-            Button SubButton = new Button(this.getContext());
+            Button SubButton = new Button(Bottom.getContext());
             SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             SubButton.setText("Subscribe to chat");
             //SubButton.setId(R.id.subButton);

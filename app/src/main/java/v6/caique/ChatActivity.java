@@ -65,6 +65,10 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    public void SetSubbed() {
+        SetSubbed(CacheChats.Subs.contains(CurrentChat));
+    }
+
     public void ReloadChatViews(){
         if(ChatWindow.isVisible()) {
             ChatWindow.ReloadViews();
@@ -138,7 +142,12 @@ public class ChatActivity extends AppCompatActivity {
     public void onResume()
     {
         super.onResume();
-        SetSubbed(CacheChats.Subs.contains(CurrentChat));
+        //SetSubbed(CacheChats.Subs.contains(CurrentChat));
+    }
+
+    public boolean isSubbed()
+    {
+        return CacheChats.Subs.contains(CurrentChat);
     }
 
     public void SkipSong(View view){
@@ -179,6 +188,7 @@ public class ChatActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_chat, MusicPlayer)
                 .commit();
+
     }
 
     public void SetChatFragment(MenuItem item)
