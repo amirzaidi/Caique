@@ -7,9 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
-import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,9 +34,11 @@ public class ExploreFragment extends Fragment {
 
     public static HashMap<String, ChatStructure> Chats = new HashMap<>();
     public static ArrayList<String> ChatIDs = new ArrayList<>();
+    public static ArrayList<String> Tags = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
-    private ExploreAdapter Adapter;
+    private ExploreAdapter ChatsAdapter;
+    private TagsAdapter TagsAdapter;
     private View RootView;
     private DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
 
@@ -56,40 +58,88 @@ public class ExploreFragment extends Fragment {
         RootView = inflater.inflate(R.layout.fragment_explore, container, false);
 
         ListView ChatList = (ListView) RootView.findViewById(R.id.ChatList);
-        Adapter = new ExploreAdapter(this.getActivity());
-        ChatList.setAdapter(Adapter);
+        ChatsAdapter = new ExploreAdapter(this.getActivity());
+        ChatList.setAdapter(ChatsAdapter);
 
-        final Query DataQuery = Database.child("chat").limitToFirst(10);
-        final ValueEventListener listener = new ValueEventListener() {
+        ListView TagList = (ListView) RootView.findViewById(R.id.Tags);
+        TagsAdapter = new TagsAdapter(this.getActivity());
+        TagList.setAdapter(TagsAdapter);
+
+        Database.child("tags").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
                 for(Map.Entry<String, Object> entry : Data.entrySet()){
-
-                    ChatStructure Chat = new ChatStructure();
-                    Chat.ID = entry.getKey();
-                    Chats.put(entry.getKey(), Chat);
-                    ChatIDs.add(entry.getKey());
+                    Tags.add(entry.getKey());
                 }
-                GetChatData();
+                ReloadTagViews();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
-        };
+        });
 
-        DataQuery.addValueEventListener(listener);
+        Button Search = (Button) RootView.findViewById(R.id.SearchButton);
+        Search.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoadChats();
+            }
+        });
 
         return RootView;
     }
 
     private void ReloadViews(String s){
-        Adapter.notifyDataSetChanged();
+        ChatsAdapter.notifyDataSetChanged();
 
         if(Chats.get(s).DataQuery != null) {
             Chats.get(s).DataQuery.removeEventListener(Chats.get(s).DataListener);
         }
+    }
+
+    private void ReloadTagViews(){
+        TagsAdapter.Tags.clear();
+        TagsAdapter.notifyDataSetChanged();
+    }
+
+    public void LoadChats(){
+
+        ChatIDs.clear();
+        Chats.clear();
+
+        Integer Iterator = 0;
+        for(String s: Tags){
+            if(TagsAdapter.Tags.get(Iterator).isChecked()){
+
+                Query DataQuery = Database.child("tags").child(s);
+                ValueEventListener listener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                        for(Map.Entry<String, Object> entry : Data.entrySet()){
+
+                            if(!Chats.containsKey(entry.getKey())) {
+                                ChatStructure Chat = new ChatStructure();
+                                Chat.ID = entry.getKey();
+                                Chats.put(entry.getKey(), Chat);
+                                ChatIDs.add(entry.getKey());
+                            }
+                        }
+                        GetChatData();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                };
+
+                DataQuery.addValueEventListener(listener);
+            }
+            Iterator++;
+        }
+
     }
 
     private void GetChatData(){
