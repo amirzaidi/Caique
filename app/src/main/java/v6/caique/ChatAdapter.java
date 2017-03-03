@@ -67,7 +67,7 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
             if (position != 0)
             {
                 CacheChats.MessageStructure Previous = Chat.Messages.get(position - 1);
-                if (Data.Sender.equals(Previous.Sender) && Math.round((double)Previous.Date / 60) == Math.round((double)Data.Date / 60))
+                if (Data.Sender.equals(Previous.Sender) && Math.floor((double)Previous.Date / 60) == Math.floor((double)Data.Date / 60))
                 {
                     HidePic = true;
                 }
