@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity
 
     public static MainActivity Instance;
     private SubscribedFragment Subs;
-    private SharedPreferences sharedPref;
+    public SharedPreferences sharedPref;
 
     private static void RelogFirebase()
     {

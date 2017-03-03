@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item type="id" name="editChatText"></item>string>
+    <item type="id" name="sendButton"></item>string>
+    <item type="id" name="subButton"></item>string>
+</resources>
