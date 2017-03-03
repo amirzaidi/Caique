@@ -4,6 +4,7 @@
 
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:weightSum="1"
         android:layout_height="match_parent"
@@ -12,34 +13,37 @@
         android:gravity="bottom">
 
         <ListView
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
             android:id="@+id/ChatList"
-            android:layout_weight="0.92" />
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:transcriptMode="normal" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:weightSum="1">
 
             <EditText
+                android:id="@+id/editText"
                 android:layout_width="154dp"
                 android:layout_height="match_parent"
-                android:inputType="textPersonName"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
                 android:ems="10"
-                android:id="@+id/editText"
                 android:hint="Type your message here..."
-                android:layout_weight="0.75"
+                android:inputType="textCapSentences"
                 android:selectAllOnFocus="false" />
 
             <Button
-                android:text="Send"
+                android:id="@+id/SendButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/SendButton"
-                android:layout_weight="0.24"
-                android:onClick="SendMessage" />
+                android:layout_weight="0"
+                android:onClick="SendMessage"
+                android:text="Send" />
 
         </LinearLayout>
 

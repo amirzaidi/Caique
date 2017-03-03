@@ -4,25 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_alignParentBottom="true"
     android:gravity="bottom">
 
     <TextView
-        android:text="TextView"
+        android:id="@+id/messageItemSender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/messageItemSender"
-        android:textSize="16dp"
         android:paddingBottom="8dp"
         android:paddingLeft="8dp"
-        android:paddingTop="8dp" />
+        android:paddingTop="8dp"
+        android:text="TextView"
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/messageItem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:layout_weight="1"
-        android:textSize="16dp"
-        android:textColor="?android:attr/textColorPrimary">
-    </TextView>
+        android:padding="8dp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16dp"></TextView>
 </LinearLayout>
