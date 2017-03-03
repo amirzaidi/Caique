@@ -83,13 +83,11 @@ public class ExploreFragment extends Fragment {
         return RootView;
     }
 
-    private void ReloadViews(){
+    private void ReloadViews(String s){
         Adapter.notifyDataSetChanged();
 
-        for(String s: ChatIDs)  {
-            if(Chats.get(s).DataQuery != null) {
-                Chats.get(s).DataQuery.removeEventListener(Chats.get(s).DataListener);
-            }
+        if(Chats.get(s).DataQuery != null) {
+            Chats.get(s).DataQuery.removeEventListener(Chats.get(s).DataListener);
         }
     }
 
@@ -102,7 +100,7 @@ public class ExploreFragment extends Fragment {
                     HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
                     Chats.get(s).Title = (String) Data.get("title");
                     Chats.get(s).Tags = (ArrayList<String>) Data.get("tags");
-                    ReloadViews();
+                    ReloadViews(s);
                 }
 
                 @Override
@@ -111,7 +109,9 @@ public class ExploreFragment extends Fragment {
             };
 
             Chats.get(s).DataQuery.addValueEventListener(Chats.get(s).DataListener);
+
         }
+
     }
 
     @Override

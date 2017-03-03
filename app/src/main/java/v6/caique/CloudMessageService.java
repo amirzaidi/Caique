@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.Semaphore;
 
 public class CloudMessageService extends FirebaseMessagingService {
@@ -101,6 +100,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     } else if (Type.equals("play") && ChatActivity.Instances.containsKey(Data.get("chat"))) {
 
                         final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+
                         if(Data.get("text") != null) {
                             if (Active) {
                                 if (CurrentSettings.MusicInChats) {
@@ -120,6 +120,8 @@ public class CloudMessageService extends FirebaseMessagingService {
                                     @Override
                                     public void run() {
                                         Chat.setTitle("Playing: " + Data.get("text"));
+                                        Chat.CurrentSong = Data.get("text");
+                                        Chat.MusicPlayer.SetCurrentlyPlaying(Data.get("text"));
                                         if (Chat.Playlist.size() > 0) {
                                             Chat.RemoveFromQueue();
                                             Chat.ReloadSongViews();
@@ -132,12 +134,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                             }
                         }
 
-                        Chat.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Chat.CurrentSong = Data.get("text");
-                            }
-                        });
                     } else if(Type.equals("mqueue")){
 
                         ArrayList<String> PrePlaylist = new ArrayList<>();
@@ -164,15 +160,18 @@ public class CloudMessageService extends FirebaseMessagingService {
                             Playlist.add(s);
                         }
                         final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
-                        Chat.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Chat.Playlist = Playlist;
-                                if(Chat.Playlist.size() > 0) {
-                                    Chat.ReloadSongViews();
+
+                        if(Chat != null) {
+                            Chat.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Chat.Playlist = Playlist;
+                                    if (Chat.Playlist.size() > 0) {
+                                        Chat.ReloadSongViews();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
                 else

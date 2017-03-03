@@ -26,7 +26,6 @@ public class MusicPlayerFragment extends Fragment {
         public String SongName;
         public String Chat;
         public int Index;
-        public Boolean IsFile = false;
     }
 
     public static ArrayList<SongStructure> Songs = new ArrayList<>();
@@ -49,7 +48,6 @@ public class MusicPlayerFragment extends Fragment {
 
     public void ReloadViews()
     {
-        SetCurrentlyPlaying();
 
         Songs.clear();
         ArrayList<String> PlaylistTemp = ((ChatActivity)getActivity()).Playlist;
@@ -94,12 +92,11 @@ public class MusicPlayerFragment extends Fragment {
             Songs.add(SongStruct);
         }
 
+        SetCurrentlyPlaying(((ChatActivity)getActivity()).CurrentSong);
 
         SongQueue = (ListView) RootView.findViewById(R.id.SongQueue);
         Adapter = new MusicAdapter(this.getActivity(), R.layout.song_queue_item);
         SongQueue.setAdapter(Adapter);
-
-        SetCurrentlyPlaying();
 
         return RootView;
     }
@@ -115,15 +112,16 @@ public class MusicPlayerFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    public void SetCurrentlyPlaying(){
-        TextView CurrentSong = (TextView) RootView.findViewById(R.id.CurrentSong);
-        Button SkipButton = (Button) RootView.findViewById(R.id.SkipButton);
-        CurrentSong.setText(((ChatActivity) getActivity()).CurrentSong);
-        if(((ChatActivity) getActivity()).CurrentSong == null){
-            SkipButton.setVisibility(View.INVISIBLE);
-        }
-        else{
-            SkipButton.setVisibility(View.VISIBLE);
+    public void SetCurrentlyPlaying(String SongPlaying){
+        if(getActivity() != null) {
+            TextView CurrentSong = (TextView) RootView.findViewById(R.id.CurrentSong);
+            Button SkipButton = (Button) RootView.findViewById(R.id.SkipButton);
+            CurrentSong.setText(SongPlaying);
+            if (SongPlaying == null) {
+                SkipButton.setVisibility(View.INVISIBLE);
+            } else {
+                SkipButton.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -158,13 +156,15 @@ public class MusicPlayerFragment extends Fragment {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                        .addData("chat", ChatId)
-                        .addData("type", "mqueue")
-                        .addData("text", "")
-                        .build());
+                if(getActivity() != null) {
+                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                            .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                            .addData("chat", ChatId)
+                            .addData("type", "mqueue")
+                            .addData("text", "")
+                            .build());
+                }
             }
         });
 

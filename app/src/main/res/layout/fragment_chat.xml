@@ -21,25 +21,10 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:id="@+id/ChatBottom">
 
-            <EditText
-                android:layout_width="154dp"
-                android:layout_height="match_parent"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/editText"
-                android:hint="Type your message here..."
-                android:layout_weight="0.75"
-                android:selectAllOnFocus="false" />
 
-            <Button
-                android:text="Send"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/SendButton"
-                android:layout_weight="0.24"
-                android:onClick="SendMessage" />
 
         </LinearLayout>
 
