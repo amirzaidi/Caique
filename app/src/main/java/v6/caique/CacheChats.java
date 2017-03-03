@@ -102,7 +102,7 @@ public class CacheChats {
         }
     }
 
-    private static void StartListen(final String ChatId)
+    public static void StartListen(final String ChatId)
     {
         if (!Loaded.containsKey(ChatId))
         {

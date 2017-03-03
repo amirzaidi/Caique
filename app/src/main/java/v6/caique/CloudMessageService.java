@@ -96,27 +96,36 @@ public class CloudMessageService extends FirebaseMessagingService {
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
                     } else if (Type.equals("play")) {
-                        if (Active) {
-                            if(CurrentSettings.MusicInChats) {
-                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
-                                Player.setPlayWhenReady(true);
-                            }
 
-                            final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
-                            Chat.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Chat.setTitle("Playing: " + Data.get("text"));
-                                    if(Chat.Playlist.size() > 0) {
-                                        Chat.RemoveFromQueue();
-                                        Chat.ReloadSongViews();
-
-                                    }
+                        final ChatActivity Chat = ChatActivity.Instances.get(Data.get("chat"));
+                        if(Data.get("text") != null) {
+                            if (Active) {
+                                if (CurrentSettings.MusicInChats) {
+                                    Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, ExtractorsFactory, null, null), true);
+                                    Player.setPlayWhenReady(true);
                                 }
-                            });
-                        } else {
-                            sendNotification(ChatId, "Playing: " + Data.get("text"));
+                                Chat.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Chat.setTitle("Playing: " + Data.get("text"));
+                                        if (Chat.Playlist.size() > 0) {
+                                            Chat.RemoveFromQueue();
+                                            Chat.ReloadSongViews();
+
+                                        }
+                                    }
+                                });
+                            } else {
+                                sendNotification(ChatId, "Playing: " + Data.get("text"));
+                            }
                         }
+
+                        Chat.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Chat.CurrentSong = Data.get("text");
+                            }
+                        });
                     } else if(Type.equals("mqueue")){
 
                         ArrayList<String> PrePlaylist = new ArrayList<>();

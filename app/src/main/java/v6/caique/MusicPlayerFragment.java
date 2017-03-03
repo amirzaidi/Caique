@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
@@ -47,6 +49,8 @@ public class MusicPlayerFragment extends Fragment {
 
     public void ReloadViews()
     {
+        SetCurrentlyPlaying();
+
         Songs.clear();
         ArrayList<String> PlaylistTemp = ((ChatActivity)getActivity()).Playlist;
         if(PlaylistTemp != null) {
@@ -95,6 +99,8 @@ public class MusicPlayerFragment extends Fragment {
         Adapter = new MusicAdapter(this.getActivity(), R.layout.song_queue_item);
         SongQueue.setAdapter(Adapter);
 
+        SetCurrentlyPlaying();
+
         return RootView;
     }
 
@@ -107,6 +113,18 @@ public class MusicPlayerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.music_player, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public void SetCurrentlyPlaying(){
+        TextView CurrentSong = (TextView) RootView.findViewById(R.id.CurrentSong);
+        Button SkipButton = (Button) RootView.findViewById(R.id.SkipButton);
+        CurrentSong.setText(((ChatActivity) getActivity()).CurrentSong);
+        if(((ChatActivity) getActivity()).CurrentSong == null){
+            SkipButton.setVisibility(View.INVISIBLE);
+        }
+        else{
+            SkipButton.setVisibility(View.VISIBLE);
+        }
     }
 
     public void SendMusic() {

@@ -26,6 +26,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatFragment ChatWindow;
     public MusicPlayerFragment MusicPlayer;
     public ArrayList<String> Playlist = new ArrayList<>();
+    public String CurrentSong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +143,22 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    public void SkipSong(View view){
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("chat", CurrentChat)
+                        .addData("type", "mskip")
+                        .addData("text", "")
+                        .build());
+            }
+        });
     }
 
     @Override

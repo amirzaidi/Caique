@@ -5,9 +5,9 @@
     tools:context="v6.caique.ExploreFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Explore!" />
-
+        android:id="@+id/ChatList" />
 </FrameLayout>

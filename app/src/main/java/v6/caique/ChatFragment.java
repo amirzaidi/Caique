@@ -46,7 +46,13 @@ public class ChatFragment extends Fragment {
 
         setHasOptionsMenu(true);
         MessageWindow = (ListView) RootView.findViewById(R.id.ChatList);
-        Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity)getActivity()).CurrentChat);
+        if(CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat) != null) {
+            Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
+        }
+        else{
+            CacheChats.StartListen(((ChatActivity) getActivity()).CurrentChat);
+            Adapter = new ChatAdapter(this.getActivity(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
+        }
         MessageWindow.setAdapter(Adapter);
         scrollMyListViewToBottom();
 
