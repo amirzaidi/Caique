@@ -54,7 +54,11 @@ public class ChatFragment extends Fragment {
     @Override
     public void onPause()
     {
-        SavedText = ((EditText) getView().findViewById(R.id.editChatText)).getText().toString();
+        EditText T = (EditText) getView().findViewById(R.id.editChatText);
+        if (T != null)
+        {
+            T.getText().toString();
+        }
 
         super.onPause();
     }
@@ -66,7 +70,11 @@ public class ChatFragment extends Fragment {
 
         if (SavedText != null)
         {
-            ((EditText) getView().findViewById(R.id.editChatText)).setText(SavedText);
+            EditText T = (EditText) getView().findViewById(R.id.editChatText);
+            if (T != null)
+            {
+                T.setText(SavedText);
+            }
         }
     }
 
