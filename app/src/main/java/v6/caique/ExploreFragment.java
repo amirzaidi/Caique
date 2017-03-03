@@ -18,6 +18,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,9 @@ public class ExploreFragment extends Fragment {
     private TagsAdapter TagsAdapter;
     private View RootView;
     private DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
+    private HashMap<String, Integer> TagRelevancy = new HashMap<>();
+    private ArrayList<String> CheckedTags = new ArrayList<>();
+    private Integer TagIteration = 0;
 
     public ExploreFragment() {
 
@@ -65,6 +70,7 @@ public class ExploreFragment extends Fragment {
         TagsAdapter = new TagsAdapter(this.getActivity());
         TagList.setAdapter(TagsAdapter);
 
+        Tags.clear();
         Database.child("tags").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -113,6 +119,10 @@ public class ExploreFragment extends Fragment {
         for(String s: Tags){
             if(TagsAdapter.Tags.get(Iterator).isChecked()){
 
+                if(!CheckedTags.contains(TagsAdapter.Tags.get(Iterator))){
+                    CheckedTags.add(TagsAdapter.Tags.get(Iterator).getText().toString());
+                }
+
                 Query DataQuery = Database.child("tags").child(s);
                 ValueEventListener listener = new ValueEventListener() {
                     @Override
@@ -120,14 +130,21 @@ public class ExploreFragment extends Fragment {
                         HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
                         for(Map.Entry<String, Object> entry : Data.entrySet()){
 
-                            if(!Chats.containsKey(entry.getKey())) {
-                                ChatStructure Chat = new ChatStructure();
-                                Chat.ID = entry.getKey();
-                                Chats.put(entry.getKey(), Chat);
-                                ChatIDs.add(entry.getKey());
+                            if(!TagRelevancy.containsKey(entry.getKey())) {
+                                TagRelevancy.put(entry.getKey(), 1);
+                            }
+                            else {
+                                TagRelevancy.put(entry.getKey(), TagRelevancy.get(entry.getKey()) + 1);
                             }
                         }
-                        GetChatData();
+
+                        TagIteration++;
+                        if(TagIteration == CheckedTags.size()){
+                            TagIteration = 0;
+                            CheckedTags.clear();
+                            PrepareRelevancy();
+                        }
+
                     }
 
                     @Override
@@ -137,9 +154,32 @@ public class ExploreFragment extends Fragment {
 
                 DataQuery.addValueEventListener(listener);
             }
+
             Iterator++;
+
         }
 
+    }
+
+    private void PrepareRelevancy(){
+
+        Object[] obj = TagRelevancy.entrySet().toArray();
+        Arrays.sort(obj, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Map.Entry<String, Integer>) o2).getValue()
+                        .compareTo(((Map.Entry<String, Integer>) o1).getValue());
+            }
+        });
+
+        TagRelevancy.clear();
+        for(Object o: obj){
+            ChatStructure Chat = new ChatStructure();
+            Chat.ID = ((Map.Entry<String, Integer>) o).getKey();
+            Chats.put(((Map.Entry<String, Integer>) o).getKey(), Chat);
+            ChatIDs.add(((Map.Entry<String, Integer>) o).getKey());
+        }
+
+        GetChatData();
     }
 
     private void GetChatData(){
