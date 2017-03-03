@@ -14,20 +14,21 @@
         <ListView
             android:id="@+id/Tags"
             android:layout_width="match_parent"
-            android:layout_height="135dp" />
+            android:layout_height="0dp"
+            android:layout_weight="0.25"/>
 
         <Button
             android:id="@+id/SearchButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:layout_weight="0.03"
             android:text="Search" />
 
         <ListView
             android:id="@+id/ChatList"
             android:layout_width="match_parent"
-            android:layout_height="291dp"
-            android:layout_weight="0.75" />
+            android:layout_height="0dp"
+            android:layout_weight="0.6" />
     </LinearLayout>
 
 </FrameLayout>

@@ -32,9 +32,11 @@ public class TagsAdapter extends ArrayAdapter<String> {
         if (ExploreFragment.Tags.size() > position)
         {
             CheckBox Tag = (CheckBox) row.findViewById(R.id.checkBox);
-            Tag.setId(position);
-            Tag.setText(ExploreFragment.Tags.get(position));
-            Tags.add(Tag);
+            if(Tag != null) {
+                Tag.setId(position);
+                Tag.setText(ExploreFragment.Tags.get(position));
+                Tags.add(Tag);
+            }
         }
 
         return row;
