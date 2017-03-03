@@ -52,15 +52,12 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
         if (Chat.Messages.size() > position)
         {
-            //final CircleImageView imageView = (CircleImageView) row.findViewById(R.id.userdp);
             final ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
             CacheChats.MessageStructure Data = Chat.Messages.get(position);
             Message.setText(Data.Content);
-
-            int Dp56 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getContext().getResources().getDisplayMetrics());
 
             Boolean HidePic = false;
 
@@ -84,7 +81,7 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
 
                 MessageSender.setVisibility(VISIBLE);
                 MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " [" + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "]");
-                imageView.getLayoutParams().height = Dp56;
+                imageView.getLayoutParams().height = imageView.getLayoutParams().width;
 
                 imageView.setImageDrawable(null);
 
