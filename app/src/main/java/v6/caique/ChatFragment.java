@@ -119,13 +119,13 @@ public class ChatFragment extends Fragment {
         if(CacheChats.Subs.contains(((ChatActivity)getActivity()).CurrentChat)){
 
             TextInputEditText Typer = new TextInputEditText(this.getContext());
-            Typer.setLayoutParams(new ViewGroup.LayoutParams((int) getResources().getDimension(R.dimen.text_writer_width), ViewGroup.LayoutParams.MATCH_PARENT));
+            Typer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
             Typer.setEms(10);
             Typer.setId(R.id.editChatText);
             Typer.setHint("Type your message...");
 
             Button SendButton = new Button(this.getContext());
-            SendButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
             SendButton.setText("Send");
             SendButton.setId(R.id.sendButton);
             SendButton.setOnClickListener(new Button.OnClickListener() {
