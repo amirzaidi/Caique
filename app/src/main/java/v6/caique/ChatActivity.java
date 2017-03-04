@@ -102,8 +102,8 @@ public class ChatActivity extends AppCompatActivity {
     }*/
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         Active = true;
 
         if (CloudMessageService.Instance != null)
@@ -145,17 +145,18 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         Active = false;
-
-        if (CloudMessageService.Instance != null)
-        {
-            CloudMessageService.Instance.StopMusic();
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Active = false;
+
+        if (CloudMessageService.Instance != null)
+        {
+            CloudMessageService.Instance.StopMusic(CurrentChat);
+        }
+
         Instances.remove(CurrentChat);
     }
 

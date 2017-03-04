@@ -33,6 +33,7 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import static com.google.android.exoplayer2.ExoPlayer.STATE_IDLE;
+import static com.google.android.exoplayer2.ExoPlayer.STATE_READY;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "CloudMessageService";
@@ -151,6 +152,8 @@ public class CloudMessageService extends FirebaseMessagingService {
                                         Chat.ReloadSongViews();
                                     }
                                 });
+
+                                StartMusic(ChatId);
                             } else {
                                 sendNotification(ChatId, "♫ " + Title + " ♫");
                             }
@@ -182,9 +185,10 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
+    private static String LastChat;
     public void StartMusic(final String Chat) {
-        if (CurrentSettings.MusicInChats) {
-
+        if (CurrentSettings.MusicInChats && (!Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
+            LastChat = Chat;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -202,25 +206,28 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
-    public void StopMusic(){
+    public void StopMusic(final String Chat){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (Player != null) {
+                //if (Player != null) {
                     try {
                         Waiter.acquire();
 
-                        Player.setPlayWhenReady(false);
-                        Player.stop();
-                        Player.seekTo(0);
-                        while (Player.getPlaybackState() != STATE_IDLE) {
-                            Thread.sleep(25);
+                        //Player.setPlayWhenReady(false);
+                        if (Chat.equals(LastChat))
+                        {
+                            Player.stop();
+                            //Player.seekTo(0);
+                            while (Player.getPlaybackState() != STATE_IDLE) {
+                                Thread.sleep(25);
+                            }
                         }
 
                         Waiter.release();
                     } catch (InterruptedException e) {
                     }
-                }
+                //}
             }
         }).start();
     }
