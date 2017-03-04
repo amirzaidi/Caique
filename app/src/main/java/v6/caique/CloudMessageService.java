@@ -93,7 +93,7 @@ public class CloudMessageService extends FirebaseMessagingService {
 
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
-                    } else if (Type.equals("play") && ChatActivity.Instances.containsKey(ChatId)) {
+                    } else if ((Type.equals("start") || Type.equals("play")) && ChatActivity.Instances.containsKey(ChatId)) {
 
                         final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
 
@@ -153,7 +153,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                                     }
                                 });
 
-                                StartMusic(ChatId);
+                                StartMusic(ChatId, Type.equals("start"));
                             } else {
                                 sendNotification(ChatId, "♫ " + Title + " ♫");
                             }
@@ -186,8 +186,8 @@ public class CloudMessageService extends FirebaseMessagingService {
     }
 
     private static String LastChat;
-    public void StartMusic(final String Chat) {
-        if (CurrentSettings.MusicInChats && (!Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
+    public void StartMusic(final String Chat, boolean Force) {
+        if (CurrentSettings.MusicInChats && (Force || !Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
             LastChat = Chat;
             new Thread(new Runnable() {
                 @Override
@@ -205,6 +205,11 @@ public class CloudMessageService extends FirebaseMessagingService {
             }).start();
         }
     }
+
+    public void StartMusic(String Chat) {
+        StartMusic(Chat, false);
+    }
+
 
     public void StopMusic(final String Chat){
         new Thread(new Runnable() {
