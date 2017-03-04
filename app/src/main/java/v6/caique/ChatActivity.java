@@ -142,12 +142,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        Active = false;
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         Active = false;
