@@ -56,6 +56,10 @@
             android:label="@string/title_activity_settings"></activity>
         -->
         <activity android:name=".SettingsActivity" />
+        <activity
+            android:name=".NewChatActivity"
+            android:label="@string/title_activity_new_chat"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"></activity>
     </application>
 
 </manifest>

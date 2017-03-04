@@ -6,8 +6,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -112,8 +116,6 @@ public class ChatFragment extends Fragment {
     }
 
     public void SendMessage() {
-        String Date = String.valueOf(System.currentTimeMillis() / 1000);
-
         EditText Input = (EditText) getView().findViewById(R.id.editChatText);
         String Text = Input.getText().toString().trim();
 
@@ -130,7 +132,7 @@ public class ChatFragment extends Fragment {
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
                 .addData("type", "text")
-                .addData("date", Date)
+                .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
                 .addData("text", Text)
                 .build());
 
@@ -143,12 +145,44 @@ public class ChatFragment extends Fragment {
         if(Subbed){
 
             TextInputEditText Typer = new TextInputEditText(getContext());
-            Typer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
-            Typer.setEms(10);
+            Typer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+            Typer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             Typer.setId(R.id.editChatText);
             Typer.setHint("Type your message...");
             Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-            Typer.setPadding(12, 8, 12, 8);
+            Typer.setPadding(16, 36, 16, 36);
+            Typer.setGravity(Gravity.CENTER_VERTICAL);
+            Typer.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String Text = s.toString().trim();
+                    if (Text.length() != 0 && s.charAt(s.length() - 1) == ' ')
+                    {
+                        if(Text.length() > 1024){
+                            Text = Text.substring(0, 1021) + "...";
+                        }
+
+                        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
+                                .addData("type", "typing")
+                                .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                                .addData("text", Text)
+                                .build());
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
 
             Button SendButton = new Button(this.getContext());
             SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));

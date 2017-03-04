@@ -3,6 +3,7 @@ package v6.caique;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.Date;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -83,7 +86,8 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
             {
                 CacheChats.MessageStructure Msg = Chat.Messages.getLast();
                 TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
-                descTextView.setText(CacheChats.Name(Msg.Sender, "Unknown") + ": " + Msg.Content);
+
+                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender, "Unknown") + ", " + DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L)) + ")");
             }
 
             row.setOnClickListener(new View.OnClickListener() {

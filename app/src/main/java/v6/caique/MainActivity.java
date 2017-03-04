@@ -230,7 +230,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void CreateChat(View view) {
-        Intent newActivity = new Intent(this, SendServerMessage.class);
+        //Intent newActivity = new Intent(this, SendServerMessage.class);
+        Intent newActivity = new Intent(this, NewChatActivity.class);
         startActivity(newActivity);
     }
 

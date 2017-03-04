@@ -63,28 +63,41 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
             CacheChats.MessageStructure Data = Chat.Messages.get(position);
             Message.setText(Data.Content);
 
+            Boolean HideName = false;
             Boolean HidePic = false;
 
             if (position != 0)
             {
                 CacheChats.MessageStructure Previous = Chat.Messages.get(position - 1);
-                if (Data.Sender.equals(Previous.Sender) && Math.floor((double)Previous.Date / 60) == Math.floor((double)Data.Date / 60))
+                if (Data.Sender.equals(Previous.Sender))
                 {
                     HidePic = true;
+
+                    if (Math.floor((double)Previous.Date / 60) == Math.floor((double)Data.Date / 60))
+                    {
+                        HideName = true;
+                    }
                 }
             }
 
-            if (HidePic)
+            if (HideName)
             {
                 MessageSender.setVisibility(GONE);
+            }
+            else {
+                Date d = new Date(Data.Date * 1000L);
+
+                MessageSender.setVisibility(VISIBLE);
+                MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " at " + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "");
+            }
+
+            if (HidePic) {
+                imageView.setVisibility(INVISIBLE);
                 imageView.getLayoutParams().height = 0;
             }
             else
             {
-                Date d = new Date(Data.Date*1000L);
-
-                MessageSender.setVisibility(VISIBLE);
-                MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " [" + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "]");
+                imageView.setVisibility(VISIBLE);
                 imageView.getLayoutParams().height = imageView.getLayoutParams().width;
 
                 final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Data.Sender);

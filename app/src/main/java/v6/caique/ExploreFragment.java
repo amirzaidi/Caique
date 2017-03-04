@@ -71,7 +71,7 @@ public class ExploreFragment extends Fragment {
         TagList.setAdapter(TagsAdapter);
 
         Tags.clear();
-        Database.child("tags").addValueEventListener(new ValueEventListener() {
+        Database.child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();

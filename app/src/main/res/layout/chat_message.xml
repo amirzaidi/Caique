@@ -5,19 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
+    android:baselineAligned="false"
     android:gravity="bottom"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:weightSum="1"
-    android:baselineAligned="false">
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:weightSum="1">
 
     <ImageView
         android:id="@+id/userdp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="top"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom"
         android:layout_marginBottom="4dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="12dp"
         android:layout_marginTop="4dp"
         android:layout_weight="0"
         android:elevation="1dp" />
@@ -37,9 +37,9 @@
             android:layout_height="wrap_content"
             android:elevation="1dp"
             android:paddingBottom="4dp"
-            android:paddingTop="8dp"
             android:text="Name"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/messageItem"
