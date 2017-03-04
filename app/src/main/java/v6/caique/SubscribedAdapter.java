@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -51,18 +52,31 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
             imageView.setImageDrawable(null);
 
             final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ChatId);
-            storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                @Override
-                public void onSuccess(StorageMetadata storageMetadata) {
-                    Glide.with(context)
-                            .using(new FirebaseImageLoader())
-                            .load(storageRef)
-                            .centerCrop()
-                            .bitmapTransform(new CropCircleTransformation(context))
-                            .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
-                            .into(imageView);
-                }
-            });
+            try
+            {
+                storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        try {
+                            Glide.with(context)
+                                    .using(new FirebaseImageLoader())
+                                    .load(storageRef)
+                                    .centerCrop()
+                                    .bitmapTransform(new CropCircleTransformation(context))
+                                    .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                    .into(imageView);
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+
+            }
 
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
             nameTextView.setText(Chat.Title);

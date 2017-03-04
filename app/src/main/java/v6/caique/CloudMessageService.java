@@ -7,16 +7,12 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -32,11 +28,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Executor;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
 
 import static com.google.android.exoplayer2.ExoPlayer.STATE_IDLE;
@@ -46,7 +39,7 @@ public class CloudMessageService extends FirebaseMessagingService {
 
     private static int SubTopics = 32;
 
-    private ExoPlayer Player;
+    private static ExoPlayer Player;
     private Semaphore Waiter = new Semaphore(1);
 
     private DefaultTrackSelector TrackSelector;
@@ -69,6 +62,13 @@ public class CloudMessageService extends FirebaseMessagingService {
         TrackSelector = new DefaultTrackSelector();
         LoadControl = new DefaultLoadControl(new DefaultAllocator(false, 8 * 1024), 500, 1000, 500, 500);
         ExtractorsFactory = new DefaultExtractorsFactory();
+
+        if (Player != null)
+        {
+            Player.setPlayWhenReady(false);
+            Player.stop();
+            Player.seekTo(0);
+        }
 
         Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
 
