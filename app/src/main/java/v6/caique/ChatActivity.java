@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,11 +39,12 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Bundle b = getIntent().getExtras();
-        if (b == null|| !b.containsKey("chat")){
+        if (b == null || !b.containsKey("chat")){
             this.finish();
         }
 
         CurrentChat = b.getString("chat");
+        Log.d("ChatStartParam", CurrentChat);
 
         if (Instances.containsKey(CurrentChat))
         {
@@ -104,18 +106,18 @@ public class ChatActivity extends AppCompatActivity {
         super.onStart();
         Active = true;
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                        .addData("chat", CurrentChat)
-                        .addData("type", "mplaying")
-                        .addData("text", "")
-                        .build());
-            }
-        });
+        if (CloudMessageService.Instance != null)
+        {
+            CloudMessageService.Instance.StartMusic(CurrentChat);
+        }
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", CurrentChat)
+                .addData("type", "mplaying")
+                .addData("text", "")
+                .build());
     }
 
     public boolean isSubbed()
@@ -144,7 +146,8 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         Active = false;
 
-        if(CloudMessageService.Instance != null) {
+        if (CloudMessageService.Instance != null)
+        {
             CloudMessageService.Instance.StopMusic();
         }
     }
@@ -161,7 +164,6 @@ public class ChatActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_chat, MusicPlayer)
                 .commit();
-
     }
 
     public void SetChatFragment(MenuItem item)

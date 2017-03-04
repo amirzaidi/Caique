@@ -37,8 +37,6 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View row, ViewGroup parent) {
 
-        Log.d("Position", position + " ");
-
         if (row == null) {
             row = vi.inflate(R.layout.list_item_chat, null);
         }

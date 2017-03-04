@@ -40,12 +40,12 @@ public class CloudMessageService extends FirebaseMessagingService {
     private static int SubTopics = 32;
 
     private static ExoPlayer Player;
-    private Semaphore Waiter = new Semaphore(1);
+    private static Semaphore Waiter = new Semaphore(1);
 
-    private DefaultTrackSelector TrackSelector;
-    private DefaultLoadControl LoadControl;
-    private DefaultDataSourceFactory SourceFactory;
-    private DefaultExtractorsFactory ExtractorsFactory;
+    private static DefaultTrackSelector TrackSelector;
+    private static DefaultLoadControl LoadControl;
+    private static DefaultDataSourceFactory SourceFactory;
+    private static DefaultExtractorsFactory ExtractorsFactory;
 
     public static CloudMessageService Instance;
 
@@ -58,19 +58,15 @@ public class CloudMessageService extends FirebaseMessagingService {
     @Override
     public void onCreate()
     {
-        SourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "Caique"));
-        TrackSelector = new DefaultTrackSelector();
-        LoadControl = new DefaultLoadControl(new DefaultAllocator(false, 8 * 1024), 500, 1000, 500, 500);
-        ExtractorsFactory = new DefaultExtractorsFactory();
-
-        if (Player != null)
+        if (Player == null)
         {
-            Player.setPlayWhenReady(false);
-            Player.stop();
-            Player.seekTo(0);
-        }
+            SourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "Caique"));
+            TrackSelector = new DefaultTrackSelector();
+            LoadControl = new DefaultLoadControl(new DefaultAllocator(false, 8 * 1024), 500, 1000, 500, 500);
+            ExtractorsFactory = new DefaultExtractorsFactory();
 
-        Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+            Player = ExoPlayerFactory.newSimpleInstance(this, TrackSelector, LoadControl);
+        }
 
         Log.d(TAG, "New Instance");
     }
@@ -155,34 +151,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                                         Chat.ReloadSongViews();
                                     }
                                 });
-
-                                if (CurrentSettings.MusicInChats && !Title.isEmpty()) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try
-                                            {
-                                                Waiter.acquire();
-
-                                                Player.setPlayWhenReady(false);
-                                                Player.stop();
-                                                Player.seekTo(0);
-                                                while (Player.getPlaybackState() != STATE_IDLE)
-                                                {
-                                                    Thread.sleep(25);
-                                                }
-
-                                                Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Data.get("chat")), SourceFactory, new DefaultExtractorsFactory(), null, null));
-                                                Player.setPlayWhenReady(true);
-
-                                                Waiter.release();
-                                            }
-                                            catch (InterruptedException e)
-                                            {
-                                            }
-                                        }
-                                    }).start();
-                                }
                             } else {
                                 sendNotification(ChatId, "♫ " + Title + " ♫");
                             }
@@ -198,7 +166,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     Unsub(ChatId);
                 }
             }
-            else if (Data.get("text").equals("reg"))
+            else if (Data.containsKey("type") && Data.get("type").equals("reg"))
             {
                 FirebaseMessaging fm = FirebaseMessaging.getInstance();
                 fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
@@ -214,31 +182,47 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
     }
 
+    public void StartMusic(final String Chat) {
+        if (CurrentSettings.MusicInChats) {
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Waiter.acquire();
+
+                        Player.prepare(new ExtractorMediaSource(Uri.parse("http://77.169.50.118:80/" + Chat), SourceFactory, new DefaultExtractorsFactory(), null, null));
+                        Player.setPlayWhenReady(true);
+
+                        Waiter.release();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }).start();
+        }
+    }
+
     public void StopMusic(){
-        AsyncTask.execute(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                if(Player != null) {
-                    try
-                    {
+                if (Player != null) {
+                    try {
                         Waiter.acquire();
 
                         Player.setPlayWhenReady(false);
                         Player.stop();
                         Player.seekTo(0);
-                        while (Player.getPlaybackState() != STATE_IDLE)
-                        {
+                        while (Player.getPlaybackState() != STATE_IDLE) {
                             Thread.sleep(25);
                         }
 
                         Waiter.release();
-                    }
-                    catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                     }
                 }
             }
-        });
+        }).start();
     }
 
     public static void Sub(final String ChatId)
@@ -291,6 +275,7 @@ public class CloudMessageService extends FirebaseMessagingService {
         else
         {
             intent = new Intent(this, ChatActivity.class).putExtra("chat", Chat);
+            Log.d("NotificationIntent", Chat);
             Chat = CacheChats.Loaded.get(Chat).Title;
         }
 
