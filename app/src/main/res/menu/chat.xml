@@ -2,11 +2,13 @@
 <menu
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+
     <item
         android:id="@+id/action_name"
         android:icon="@drawable/ic_music_button"
         android:title="Music button"
         app:showAsAction="always"
-        android:orderInCategory="0"
+        android:orderInCategory="3"
         android:onClick="SetMusicPlayerFragment"/>
 </menu>

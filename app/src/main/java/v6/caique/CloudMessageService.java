@@ -33,7 +33,6 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import static com.google.android.exoplayer2.ExoPlayer.STATE_IDLE;
-import static com.google.android.exoplayer2.ExoPlayer.STATE_READY;
 
 public class CloudMessageService extends FirebaseMessagingService {
     private static final String TAG = "CloudMessageService";

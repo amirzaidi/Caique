@@ -1,22 +1,14 @@
 package v6.caique;
 
-import android.content.Context;
+import android.app.ActionBar;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -29,6 +21,7 @@ public class ChatActivity extends AppCompatActivity {
     public boolean Active;
     protected String CurrentChat = null;
     private ChatFragment ChatWindow;
+    private ChatInfoFragment ChatInfo;
     public MusicPlayerFragment MusicPlayer;
     public ArrayList<String> Playlist = new ArrayList<>();
     public String CurrentSong;
@@ -37,6 +30,11 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+                actionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar_chat);
 
         Bundle b = getIntent().getExtras();
         if (b == null || !b.containsKey("chat")){
@@ -54,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         Instances.put(CurrentChat, this);
 
         ChatWindow = new ChatFragment();
+        ChatInfo = new ChatInfoFragment();
         MusicPlayer = new MusicPlayerFragment();
 
         SetChatFragment(null);
@@ -61,11 +60,26 @@ public class ChatActivity extends AppCompatActivity {
         setTitle(CacheChats.Name(CurrentChat, "Caique"));
     }
 
+    @Override
+    public void onBackPressed(){
+        if(!ChatWindow.isVisible()){
+
+            FragmentManager manager = getSupportFragmentManager();
+            manager.beginTransaction()
+                    .replace(R.id.activity_chat, ChatWindow)
+                    .commit();
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
+
     public void SetSubbed(boolean Subbed) {
         if (ChatWindow != null)
         {
             ChatWindow.SetSubbed(Subbed);
             MusicPlayer.SetSubbed(Subbed);
+            ChatInfo.SetButton(Subbed);
         }
     }
 
@@ -165,6 +179,12 @@ public class ChatActivity extends AppCompatActivity {
     {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_chat, ChatWindow)
+                .commit();
+    }
+
+    public void SetInfoFragment(View view){
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.activity_chat, ChatInfo)
                 .commit();
     }
 }
