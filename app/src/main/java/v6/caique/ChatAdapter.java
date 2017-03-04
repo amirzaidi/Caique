@@ -55,6 +55,8 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         if (Chat.Messages.size() > position)
         {
             final ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
+            imageView.setImageDrawable(null);
+
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
@@ -84,8 +86,6 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
                 MessageSender.setVisibility(VISIBLE);
                 MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " [" + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "]");
                 imageView.getLayoutParams().height = imageView.getLayoutParams().width;
-
-                imageView.setImageDrawable(null);
 
                 final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Data.Sender);
                 try {

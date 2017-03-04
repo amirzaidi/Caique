@@ -164,17 +164,15 @@ public class MainActivity extends AppCompatActivity
             if (Acc.getIdToken() != null) {
                 FirebaseMessaging fm = FirebaseMessaging.getInstance();
 
-                for (int i = 0; i < 3; i++)
-                {
-                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                            .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                            .addData("type", "reg")
-                            .addData("text", Acc.getIdToken())
-                            .build());
-                }
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("type", "reg")
+                        .addData("text", Acc.getIdToken())
+                        .build());
 
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("gid", Acc.getId());
+                editor.putString("gidtoken", Acc.getIdToken());
                 editor.commit();
 
                 CacheChats.Restart(Acc.getId());

@@ -25,16 +25,5 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-
-        if (MainActivity.Instance != null)
-        {
-            FirebaseMessaging fm = FirebaseMessaging.getInstance();
-            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                    .addData("type", "reg")
-                    .addData("text", MainActivity.Instance.sharedPref.getString("gid", ""))
-                    .build());
-        }
-
     }
 }

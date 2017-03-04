@@ -198,6 +198,15 @@ public class CloudMessageService extends FirebaseMessagingService {
                     Unsub(ChatId);
                 }
             }
+            else if (Data.get("text").equals("reg"))
+            {
+                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                        .addData("type", "reg")
+                        .addData("text", MainActivity.Instance.sharedPref.getString("gidtoken", ""))
+                        .build());
+            }
             else
             {
                 sendNotification(null, Data.toString());
