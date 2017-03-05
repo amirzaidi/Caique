@@ -64,11 +64,12 @@ public class FavoritesAdapter extends ArrayAdapter<String>{
                 TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
                 nameTextView.setText(Chat.Title);
                 descTextView.setText("");
-                if(Chat.Messages.get(Chat.Messages.size() - 1).Content.length() > 100) {
-                    descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content.substring(0, 97) + "...");
-                }
-                else{
-                    descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content);
+                if(Chat.Messages.size() > 0) {
+                    if (Chat.Messages.get(Chat.Messages.size() - 1).Content.length() > 100) {
+                        descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content.substring(0, 97) + "...");
+                    } else {
+                        descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content);
+                    }
                 }
             }
 

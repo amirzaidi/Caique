@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
         else if (id == R.id.nav_invite_people) {
-            Intent newActivity = new Intent(this, PictureActivity.class);
+            Intent newActivity = new Intent(this, InviteActivity.class);
             startActivity(newActivity);
         }
         else if (id == R.id.nav_music_library) {
