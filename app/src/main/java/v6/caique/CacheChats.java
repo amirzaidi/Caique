@@ -106,6 +106,13 @@ public class CacheChats {
                             }
                         });
                     }
+
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            CloudMessageService.Unsub(ChatId);
+                        }
+                    });
                 }
 
                 @Override

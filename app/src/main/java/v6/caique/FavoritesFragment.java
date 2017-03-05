@@ -7,10 +7,20 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FavoritesFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private View RootView;
+    private FavoritesAdapter Adapter;
+
+    public static HashMap<String, CacheChats.ChatStructure> FavoriteChats = new HashMap<>();
+    public static ArrayList<String> ChatIDs = new ArrayList<>();
 
     public FavoritesFragment() {
     }
@@ -23,8 +33,23 @@ public class FavoritesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorites, container, false);
+
+        RootView = inflater.inflate(R.layout.fragment_favorites, container, false);
+
+        FavoriteChats.clear();
+        ChatIDs.clear();
+        for(Map.Entry<String, CacheChats.ChatStructure> Chat: CacheChats.Loaded.entrySet()){
+            if(MainActivity.Instance.sharedPref.contains(Chat.getKey())){
+                FavoriteChats.put(Chat.getKey(), Chat.getValue());
+                ChatIDs.add(Chat.getKey());
+            }
+        }
+
+        ListView FavoritesList = (ListView) RootView.findViewById(R.id.FavoritesList);
+        Adapter = new FavoritesAdapter(this.getContext());
+        FavoritesList.setAdapter(Adapter);
+
+        return RootView;
     }
 
     @Override

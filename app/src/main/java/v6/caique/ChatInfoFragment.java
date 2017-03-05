@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
@@ -41,8 +43,27 @@ public class ChatInfoFragment extends Fragment {
         LinearLayout MainFrame = (LinearLayout) RootView.findViewById(R.id.mainframe);
         if(Subbed){
 
+            Switch FavSwitch = new Switch(this.getContext());
+
+            if(MainActivity.Instance.sharedPref.contains(((ChatActivity)getActivity()).CurrentChat)){
+                FavSwitch.setChecked(true);
+            }
+            else{
+                FavSwitch.setChecked(false);
+            }
+
+            FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            FavSwitch.setText("Favorite chat");
+            FavSwitch.setPadding(0,(int) getResources().getDimension(R.dimen.fab_margin),0, (int) getResources().getDimension(R.dimen.fab_margin));
+            FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    SetFavorite(isChecked);
+                }
+            });
+
             Button UnsubButton = new Button(this.getContext());
-            UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
+            UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             UnsubButton.setText("Unsubscribe from chat");
             UnsubButton.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
@@ -50,6 +71,7 @@ public class ChatInfoFragment extends Fragment {
                 }
             });
 
+            MainFrame.addView(FavSwitch);
             MainFrame.addView(UnsubButton);
         }
         else{
@@ -63,6 +85,15 @@ public class ChatInfoFragment extends Fragment {
             });
 
             MainFrame.addView(SubButton);
+        }
+    }
+
+    private void SetFavorite(boolean Checked){
+        if(Checked){
+            MainActivity.Instance.sharedPref.edit().putBoolean(((ChatActivity)getActivity()).CurrentChat, Checked).apply();
+        }
+        else{
+            MainActivity.Instance.sharedPref.edit().remove(((ChatActivity)getActivity()).CurrentChat).apply();
         }
     }
 
