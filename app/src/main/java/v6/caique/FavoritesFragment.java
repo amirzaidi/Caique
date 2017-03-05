@@ -31,10 +31,8 @@ public class FavoritesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        RootView = inflater.inflate(R.layout.fragment_favorites, container, false);
+    public void onResume(){
+        super.onResume();
 
         FavoriteChats.clear();
         ChatIDs.clear();
@@ -48,7 +46,13 @@ public class FavoritesFragment extends Fragment {
         ListView FavoritesList = (ListView) RootView.findViewById(R.id.FavoritesList);
         Adapter = new FavoritesAdapter(this.getContext());
         FavoritesList.setAdapter(Adapter);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        RootView = inflater.inflate(R.layout.fragment_favorites, container, false);
         return RootView;
     }
 
