@@ -236,16 +236,19 @@ public class CacheChats {
 
     public static void FilterSubs()
     {
-        for (String ChatId : Loaded.keySet())
-        {
-            if (!Subs.contains(ChatId))
-            {
-                ChatStructure Chat = Loaded.remove(ChatId);
+        try {
+            for (String ChatId : Loaded.keySet()) {
+                if (!Subs.contains(ChatId)) {
+                    ChatStructure Chat = Loaded.remove(ChatId);
 
-                Chat.DataQuery.removeEventListener(Chat.DataListener);
-                Chat.MessageQuery.removeEventListener(Chat.MessageListener);
-                Chat.RankQuery.removeEventListener(Chat.RankListener);
+                    Chat.DataQuery.removeEventListener(Chat.DataListener);
+                    Chat.MessageQuery.removeEventListener(Chat.MessageListener);
+                    Chat.RankQuery.removeEventListener(Chat.RankListener);
+                }
             }
+        }
+        catch (Exception e){
+
         }
     }
 

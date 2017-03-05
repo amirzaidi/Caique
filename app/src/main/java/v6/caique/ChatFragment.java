@@ -142,79 +142,79 @@ public class ChatFragment extends Fragment {
     }
 
     public void SetSubbed(boolean Subbed){
-        if(Subbed){
+        if(this.getContext() != null) {
+            if (Subbed) {
 
-            TextInputEditText Typer = new TextInputEditText(getContext());
-            Typer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
-            Typer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            Typer.setId(R.id.editChatText);
-            Typer.setHint("Type your message...");
-            Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-            Typer.setPadding(16, 36, 16, 36);
-            Typer.setGravity(Gravity.CENTER_VERTICAL);
-            Typer.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                TextInputEditText Typer = new TextInputEditText(getContext());
+                Typer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+                Typer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                Typer.setId(R.id.editChatText);
+                Typer.setHint("Type your message...");
+                Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                Typer.setPadding(16, 36, 16, 36);
+                Typer.setGravity(Gravity.CENTER_VERTICAL);
+                Typer.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    String Text = s.toString().trim();
-                    if (Text.length() != 0 && s.charAt(s.length() - 1) == ' ')
-                    {
-                        if(Text.length() > 1024){
-                            Text = Text.substring(0, 1021) + "...";
-                        }
-
-                        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
-                                .addData("type", "typing")
-                                .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
-                                .addData("text", Text)
-                                .build());
                     }
-                }
 
-                @Override
-                public void afterTextChanged(Editable s) {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        String Text = s.toString().trim();
+                        if (Text.length() != 0 && s.charAt(s.length() - 1) == ' ') {
+                            if (Text.length() > 1024) {
+                                Text = Text.substring(0, 1021) + "...";
+                            }
 
-                }
-            });
+                            FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                                    .addData("chat", ((ChatActivity) getActivity()).CurrentChat)
+                                    .addData("type", "typing")
+                                    .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                                    .addData("text", Text)
+                                    .build());
+                        }
+                    }
 
-            Button SendButton = new Button(this.getContext());
-            SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
-            SendButton.setText("Send");
-            //SendButton.setId(R.id.sendButton);
-            SendButton.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    SendMessage();
-                }
-            });
+                    @Override
+                    public void afterTextChanged(Editable s) {
 
-            Bottom.removeAllViews();
-            Bottom.addView(Typer);
-            Bottom.addView(SendButton);
+                    }
+                });
 
-            setHasOptionsMenu(true);
-        }
-        else{
-            Button SubButton = new Button(Bottom.getContext());
-            SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            SubButton.setText("Subscribe to chat");
-            //SubButton.setId(R.id.subButton);
-            SubButton.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    SubToChat();
-                }
-            });
+                Button SendButton = new Button(this.getContext());
+                SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
+                SendButton.setText("Send");
+                //SendButton.setId(R.id.sendButton);
+                SendButton.setOnClickListener(new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        SendMessage();
+                    }
+                });
 
-            Bottom.removeAllViews();
-            Bottom.addView(SubButton);
+                Bottom.removeAllViews();
+                Bottom.addView(Typer);
+                Bottom.addView(SendButton);
 
-            setHasOptionsMenu(false);
+                setHasOptionsMenu(true);
+            } else {
+                Button SubButton = new Button(Bottom.getContext());
+                SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                SubButton.setText("Subscribe to chat");
+                //SubButton.setId(R.id.subButton);
+                SubButton.setOnClickListener(new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        SubToChat();
+                    }
+                });
+
+                Bottom.removeAllViews();
+                Bottom.addView(SubButton);
+
+                setHasOptionsMenu(false);
+            }
         }
     }
 

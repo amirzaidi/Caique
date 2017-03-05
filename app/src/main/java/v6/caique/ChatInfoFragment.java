@@ -40,51 +40,52 @@ public class ChatInfoFragment extends Fragment {
 
     public void SetButton(boolean Subbed){
 
-        LinearLayout MainFrame = (LinearLayout) RootView.findViewById(R.id.mainframe);
-        if(Subbed){
+        if(this.getContext() != null) {
 
-            Switch FavSwitch = new Switch(this.getContext());
+            LinearLayout MainFrame = (LinearLayout) RootView.findViewById(R.id.mainframe);
+            if (Subbed) {
 
-            if(MainActivity.Instance.sharedPref.contains(((ChatActivity)getActivity()).CurrentChat)){
-                FavSwitch.setChecked(true);
+                Switch FavSwitch = new Switch(this.getContext());
+
+                if (MainActivity.Instance.sharedPref.contains(((ChatActivity) getActivity()).CurrentChat)) {
+                    FavSwitch.setChecked(true);
+                } else {
+                    FavSwitch.setChecked(false);
+                }
+
+                FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                FavSwitch.setText("Favorite chat");
+                FavSwitch.setPadding(0, (int) getResources().getDimension(R.dimen.fab_margin), 0, (int) getResources().getDimension(R.dimen.fab_margin));
+                FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        SetFavorite(isChecked);
+                    }
+                });
+
+                Button UnsubButton = new Button(this.getContext());
+                UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                UnsubButton.setText("Unsubscribe from chat");
+                UnsubButton.setOnClickListener(new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        UnsubFromChat();
+                    }
+                });
+
+                MainFrame.addView(FavSwitch);
+                MainFrame.addView(UnsubButton);
+            } else {
+                Button SubButton = new Button(this.getContext());
+                SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                SubButton.setText("Subscribe to chat");
+                SubButton.setOnClickListener(new Button.OnClickListener() {
+                    public void onClick(View v) {
+                        SubToChat();
+                    }
+                });
+
+                MainFrame.addView(SubButton);
             }
-            else{
-                FavSwitch.setChecked(false);
-            }
-
-            FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            FavSwitch.setText("Favorite chat");
-            FavSwitch.setPadding(0,(int) getResources().getDimension(R.dimen.fab_margin),0, (int) getResources().getDimension(R.dimen.fab_margin));
-            FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    SetFavorite(isChecked);
-                }
-            });
-
-            Button UnsubButton = new Button(this.getContext());
-            UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            UnsubButton.setText("Unsubscribe from chat");
-            UnsubButton.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    UnsubFromChat();
-                }
-            });
-
-            MainFrame.addView(FavSwitch);
-            MainFrame.addView(UnsubButton);
-        }
-        else{
-            Button SubButton = new Button(this.getContext());
-            SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            SubButton.setText("Subscribe to chat");
-            SubButton.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    SubToChat();
-                }
-            });
-
-            MainFrame.addView(SubButton);
         }
     }
 
@@ -98,6 +99,7 @@ public class ChatInfoFragment extends Fragment {
     }
 
     private void SubToChat(){
+        ((LinearLayout) RootView.findViewById(R.id.mainframe)).removeAllViews();
         String ChatId = ((ChatActivity) getActivity()).CurrentChat;
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
@@ -108,6 +110,11 @@ public class ChatInfoFragment extends Fragment {
     }
 
     private void UnsubFromChat(){
+        ((LinearLayout) RootView.findViewById(R.id.mainframe)).removeAllViews();
+        if(MainActivity.Instance.sharedPref.contains(((ChatActivity)getActivity()).CurrentChat)) {
+            MainActivity.Instance.sharedPref.edit().remove(((ChatActivity)getActivity()).CurrentChat).apply();
+        }
+
         String ChatId = ((ChatActivity) getActivity()).CurrentChat;
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
