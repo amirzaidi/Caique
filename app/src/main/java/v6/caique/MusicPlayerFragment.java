@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,11 +29,16 @@ public class MusicPlayerFragment extends Fragment {
     }
 
     public static ArrayList<SongStructure> Songs = new ArrayList<>();
+    public static ArrayList<String> SelectionUrls = new ArrayList<>();
+    public static ArrayList<String> SelectionNames = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
     public MusicAdapter Adapter;
+    public SongAdapter SelectionAdapter;
+
     private View RootView;
     private ListView SongQueue;
+    private ListView SongList;
     private String ChatId = new String();
 
     public MusicPlayerFragment() {
@@ -63,6 +69,30 @@ public class MusicPlayerFragment extends Fragment {
             }
         }
         Adapter.notifyDataSetChanged();
+    }
+
+    public void ReloadSelectionViews(){
+        ListView Songs = (ListView) RootView.findViewById(R.id.SongSelection);
+        ListView PlayListView = (ListView) RootView.findViewById(R.id.SongQueue);
+
+        if(SelectionUrls.size() > 0){
+            Songs.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen.song_selection)));
+            PlayListView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.5f));
+        }
+        else{
+            Songs.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
+            PlayListView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        }
+
+        if(SelectionAdapter == null && SelectionUrls.size() > 0){
+            SongList = (ListView) RootView.findViewById(R.id.SongSelection);
+            SelectionAdapter = new SongAdapter(this.getActivity(), ((ChatActivity)getActivity()).CurrentChat);
+            SongList.setAdapter(SelectionAdapter);
+        }else if(SelectionAdapter != null){
+            SelectionAdapter.notifyDataSetChanged();
+        }
+
+
     }
 
     @Override
@@ -110,6 +140,12 @@ public class MusicPlayerFragment extends Fragment {
 
         SetCurrentlyPlaying();
 
+        if(SelectionUrls.size() > 0) {
+            SongList = (ListView) RootView.findViewById(R.id.SongSelection);
+            SelectionAdapter = new SongAdapter(this.getActivity(), ((ChatActivity)getActivity()).CurrentChat);
+            SongList.setAdapter(SelectionAdapter);
+        }
+
         SongQueue = (ListView) RootView.findViewById(R.id.SongQueue);
         Adapter = new MusicAdapter(this.getActivity(), R.layout.song_queue_item);
         SongQueue.setAdapter(Adapter);
@@ -149,10 +185,7 @@ public class MusicPlayerFragment extends Fragment {
         EditText Input = (EditText) RootView.findViewById(R.id.editText2);
         String Text = Input.getText().toString().trim();
 
-        if(Text.length() > 1024){
-            Text =  Text.substring(0, 1021) + "...";
-        }
-        else if (Text.length() == 0)
+        if (Text.length() == 0)
         {
             return;
         }
@@ -161,24 +194,35 @@ public class MusicPlayerFragment extends Fragment {
         fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
                 .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
                 .addData("chat", ChatId)
-                .addData("type", "madd")
-                .addData("date", Date)
-                .addData("text", Text)
-                .build());
-
-        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", ChatId)
                 .addData("type", "msearch")
                 .addData("date", Date)
                 .addData("text", Text)
                 .build());
 
-        //TODO: Switch to msearch
-
         Log.d("SendMessageToServer", "Music message sent " + Text);
         Input.setText("");
 
+        SelectionUrls.clear();
+        SelectionNames.clear();
+        ReloadSelectionViews();
+
+    }
+
+    public void SelectMusic(String Song){
+        String Date = String.valueOf(System.currentTimeMillis() / 1000);
+
+        FirebaseMessaging fm = FirebaseMessaging.getInstance();
+        fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", ChatId)
+                .addData("type", "madd")
+                .addData("date", Date)
+                .addData("text", Song)
+                .build());
+
+        SelectionUrls.clear();
+        SelectionNames.clear();
+        ReloadSelectionViews();
     }
 
     @Override

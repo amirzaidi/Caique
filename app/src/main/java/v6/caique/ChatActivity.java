@@ -26,6 +26,9 @@ public class ChatActivity extends AppCompatActivity {
     public ArrayList<String> Playlist = new ArrayList<>();
     public String CurrentSong;
 
+    public static ArrayList<String> SelectionUrls = new ArrayList<>();
+    public static ArrayList<String> SelectionNames = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +95,15 @@ public class ChatActivity extends AppCompatActivity {
     public void ReloadSongViews(){
         if(MusicPlayer.isVisible()) {
             MusicPlayer.ReloadViews();
+        }
+    }
+
+    public void ReloadSongSelectionViews(){
+        if(MusicPlayer.isVisible()){
+
+            MusicPlayer.SelectionUrls = SelectionUrls;
+            MusicPlayer.SelectionNames =  SelectionNames;
+            MusicPlayer.ReloadSelectionViews();
         }
     }
 

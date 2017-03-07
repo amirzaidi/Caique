@@ -94,6 +94,47 @@ public class CloudMessageService extends FirebaseMessagingService {
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
                     }
+                    else if(Type.equals("mres")){
+
+                        try {
+
+                            final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
+
+                            if (Active) {
+
+                                JSONArray Songs = new JSONArray(Data.get("r"));
+                                final ArrayList<String> SongUrls = new ArrayList<>();
+                                final ArrayList<String> SongNames = new ArrayList<>();
+
+                                for (int i = 0; i < Songs.length(); i++){
+
+                                    String SongName = Songs.getJSONObject(i).getString("name");
+                                    String SongUrl = Songs.getJSONObject(i).getString("url");
+
+                                    SongUrls.add(SongUrl);
+                                    SongNames.add(SongName);
+                                }
+
+                                if(Chat.MusicPlayer != null && Chat.MusicPlayer.isVisible()) {
+                                    Chat.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            ChatActivity.SelectionUrls = SongUrls;
+                                            ChatActivity.SelectionNames = SongNames;
+                                            Chat.ReloadSongSelectionViews();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Log.d("JSONMainPlaying", e.getMessage());
+                        }
+                    }
+                    else if ((Type.equals("start") || Type.equals("play")) && ChatActivity.Instances.containsKey(ChatId)) {
+                    }
                     else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId))
                     {
                         CacheChats.MessageStructure Preview = new CacheChats.MessageStructure();
