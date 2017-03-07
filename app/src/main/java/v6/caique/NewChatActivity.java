@@ -81,23 +81,27 @@ public class NewChatActivity extends Activity {
     public void Send(View Caller)
     {
         EditText t = (EditText) findViewById(R.id.newChatTitle);
-        JSONObject Obj = new JSONObject();
-        try
+        String text = t.getText().toString().trim();
+        if (text.length() > 2)
         {
-            Obj.put("title", t.getText().toString());
-            Obj.put("tags", new JSONArray(Tags));
-        }
-        catch (JSONException e)
-        {
-            Log.d("newChat", e.getMessage());
-        }
+            JSONObject Obj = new JSONObject();
+            try
+            {
+                Obj.put("title", text);
+                Obj.put("tags", new JSONArray(Tags));
+            }
+            catch (JSONException e)
+            {
+                Log.d("newChat", e.getMessage());
+            }
 
-        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("type", "newchat")
-                .addData("text", Obj.toString())
-                .build());
+            FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                    .addData("type", "newchat")
+                    .addData("text", Obj.toString())
+                    .build());
 
-        finish();
+            finish();
+        }
     }
 }
