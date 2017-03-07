@@ -25,10 +25,13 @@ import android.widget.ListView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
+
 public class ChatFragment extends Fragment {
 
     private ChatFragment.OnFragmentInteractionListener mListener;
     public ChatAdapter Adapter;
+    public ChatTypingAdapter TypingAdapter;
     private ListView MessageWindow;
     private View RootView;
     private ListView List;
@@ -41,9 +44,17 @@ public class ChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public void ReloadViews()
+    public void ReloadViews(boolean Normal, boolean Typing)
     {
-        Adapter.notifyDataSetChanged();
+        if (Normal)
+        {
+            Adapter.notifyDataSetChanged();
+        }
+
+        if (Typing)
+        {
+            TypingAdapter.Refill();
+        }
     }
 
     private String SavedText;
@@ -86,13 +97,17 @@ public class ChatFragment extends Fragment {
 
         setHasOptionsMenu(true);
         MessageWindow = (ListView) RootView.findViewById(R.id.ChatList);
+        ListView MessageTypingWindow = (ListView) RootView.findViewById(R.id.ChatTyping);
 
         if(CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat) == null) {
             CacheChats.StartListen(((ChatActivity) getActivity()).CurrentChat);
         }
 
-        Adapter = new ChatAdapter(this.getContext(), R.layout.chat_message, ((ChatActivity) getActivity()).CurrentChat);
+        String Chat = ((ChatActivity) getActivity()).CurrentChat;
+        Adapter = new ChatAdapter(getContext(), R.layout.chat_message, Chat);
+        TypingAdapter = new ChatTypingAdapter(getContext(), R.layout.chat_message, Chat, new ArrayList<CacheChats.MessageStructure>());
         MessageWindow.setAdapter(Adapter);
+        MessageTypingWindow.setAdapter(TypingAdapter);
 
         List = (ListView) RootView.findViewById(R.id.ChatList);
         List.setSelection(Adapter.getCount() - 1);

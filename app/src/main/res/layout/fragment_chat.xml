@@ -2,7 +2,6 @@
 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_chat"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
@@ -18,9 +17,16 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:dividerHeight="0dp"
-        android:paddingBottom="4dp"
         android:paddingTop="4dp"
         android:transcriptMode="normal" />
+
+    <ListView
+        android:id="@+id/ChatTyping"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:clipToPadding="false"
+        android:paddingBottom="4dp" />
 
     <LinearLayout
         android:id="@+id/ChatBottom"

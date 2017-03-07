@@ -83,9 +83,9 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    public void ReloadChatViews(){
+    public void ReloadChatViews(boolean Normal, boolean Typing){
         if(ChatWindow.isVisible()) {
-            ChatWindow.ReloadViews();
+            ChatWindow.ReloadViews(Normal, Typing);
         }
     }
 

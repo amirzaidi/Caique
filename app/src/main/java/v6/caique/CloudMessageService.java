@@ -88,12 +88,31 @@ public class CloudMessageService extends FirebaseMessagingService {
                 if (CacheChats.Subs.contains(ChatId)) {
 
                     String Type = Data.get("type");
-                    boolean Active = ChatActivity.Instances.containsKey(ChatId) && ChatActivity.Instances.get(ChatId).Active;
+                    boolean ChatOpen = ChatActivity.Instances.containsKey(ChatId);
+                    boolean Active = ChatOpen && ChatActivity.Instances.get(ChatId).Active;
 
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
-                    } else if ((Type.equals("start") || Type.equals("play")) && ChatActivity.Instances.containsKey(ChatId)) {
+                    }
+                    else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId))
+                    {
+                        CacheChats.MessageStructure Preview = new CacheChats.MessageStructure();
+                        Preview.Date = Long.parseLong(Data.get("date"));
+                        Preview.Content = Data.get("text");
+                        Preview.IsFile = false;
+                        Preview.Sender = Data.get("sender");
 
+                        CacheChats.Loaded.get(ChatId).Typing.put(Preview.Sender, Preview);
+                        final ChatActivity Act = ChatActivity.Instances.get(ChatId);
+                        Act.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Act.ReloadChatViews(false, true);
+                            }
+                        });
+                    }
+                    else if ((Type.equals("start") || Type.equals("play")) && ChatOpen)
+                    {
                         final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
 
                         if (Data.get("text") == null || Data.get("text").isEmpty())

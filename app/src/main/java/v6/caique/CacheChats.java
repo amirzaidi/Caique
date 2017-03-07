@@ -32,6 +32,7 @@ public class CacheChats {
         public String Title = "";
         public ArrayList<String> Tags = new ArrayList<>();
         public LinkedList<MessageStructure> Messages = new LinkedList<>();
+        public HashMap<String, MessageStructure> Typing = new HashMap<>();
         public HashMap<String, Integer> Ranks = new HashMap<>();
     }
 
@@ -172,6 +173,11 @@ public class CacheChats {
                     Name(Message.Sender, null);
                     Chat.Messages.addLast(Message);
 
+                    if (Chat.Typing.containsKey(Message.Sender))
+                    {
+                        Chat.Typing.remove(Message.Sender);
+                    }
+
                     UpdateChatDisplay(ChatId);
                 }
 
@@ -307,7 +313,7 @@ public class CacheChats {
             {
                 if (ChatActivity.Instances.containsKey(ChatId))
                 {
-                    ChatActivity.Instances.get(ChatId).ReloadChatViews();
+                    ChatActivity.Instances.get(ChatId).ReloadChatViews(true, true);
                 }
             }
         }
