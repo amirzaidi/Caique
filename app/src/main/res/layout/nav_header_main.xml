@@ -13,13 +13,10 @@
     >
 
     <ImageView
-        android:contentDescription="@string/desc"
-        app:srcCompat="@drawable/oie_transparent"
-        android:id="@+id/Testface"
-        android:background="#fff"
+        android:id="@+id/userdp"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:onClick="GoToPicture" />
+        android:onClick="ChooseDP" />
         
 
     <TextView
