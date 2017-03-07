@@ -46,7 +46,16 @@ class ChatTypingAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
     public void Refill()
     {
         List.clear();
-        List.addAll(CacheChats.Loaded.get(ChatId).Typing.values());
+
+        long unixTime = System.currentTimeMillis() / 1000L;
+        for (CacheChats.MessageStructure Data : CacheChats.Loaded.get(ChatId).Typing.values())
+        {
+            if (Data.Date >= unixTime - 5)
+            {
+                List.add(Data);
+            }
+        }
+
         this.notifyDataSetChanged();
     }
 
@@ -62,24 +71,20 @@ class ChatTypingAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         if (Chat.Typing.size() > position)
         {
             CacheChats.MessageStructure Data = (CacheChats.MessageStructure) Chat.Typing.values().toArray()[position];
-            long unixTime = System.currentTimeMillis() / 1000L;
 
-            if (Data.Date >= unixTime - 5)
-            {
-                TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
-                TextView Message = (TextView) row.findViewById(R.id.messageItem);
+            TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
+            TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
-                Message.setText(Data.Content);
+            Message.setText(Data.Content);
 
-                MessageSender.setVisibility(VISIBLE);
-                MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " is typing..");
+            MessageSender.setVisibility(VISIBLE);
+            MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " is typing..");
 
-                ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
-                imageView.setImageDrawable(null);
-                imageView.setVisibility(INVISIBLE);
-                imageView.getLayoutParams().height = 0;
-                imageView.requestLayout();
-            }
+            ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
+            imageView.setImageDrawable(null);
+            imageView.setVisibility(INVISIBLE);
+            imageView.getLayoutParams().height = 0;
+            imageView.requestLayout();
         }
 
         return row;

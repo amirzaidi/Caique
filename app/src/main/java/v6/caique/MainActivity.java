@@ -44,6 +44,9 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class MainActivity extends AppCompatActivity
@@ -66,6 +69,27 @@ public class MainActivity extends AppCompatActivity
     static
     {
         RelogFirebase();
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                for (final ChatActivity act : ChatActivity.Instances.values())
+                {
+                    act.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                act.ReloadChatViews(false, true);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.d("AutoTypingRemover", e.getMessage());
+                            }
+                        }
+                    });
+                }
+            }
+        }, 0, 5000);
     }
 
     @Override

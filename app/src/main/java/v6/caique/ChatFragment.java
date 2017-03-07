@@ -4,6 +4,8 @@ package v6.caique;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.renderscript.ScriptGroup;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -26,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 public class ChatFragment extends Fragment {
 
@@ -159,13 +162,12 @@ public class ChatFragment extends Fragment {
     public void SetSubbed(boolean Subbed){
         if(this.getContext() != null) {
             if (Subbed) {
-
-                TextInputEditText Typer = new TextInputEditText(getContext());
+                EditText Typer = new EditText(getContext());
                 Typer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
                 Typer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                 Typer.setId(R.id.editChatText);
                 Typer.setHint("Type your message...");
-                Typer.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                Typer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
                 Typer.setPadding(16, 36, 16, 36);
                 Typer.setGravity(Gravity.CENTER_VERTICAL);
                 Typer.addTextChangedListener(new TextWatcher() {
