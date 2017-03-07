@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
@@ -120,17 +122,26 @@ public class MainActivity extends AppCompatActivity
                     .build();
 
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            startActivityForResult(signInIntent, 1);
+            startActivityForResult(signInIntent, 1010);
         }
 
         DownloadPicture();
-
     }
 
     public void DownloadPicture() {
 
         NavigationView NavView = (NavigationView) findViewById(R.id.nav_view);
         View NavHeader = NavView.getHeaderView(0);
+        if (sharedPref.contains("gid"))
+        {
+            TextView Name = (TextView) findViewById(R.id.nav_username);
+            if (Name != null)
+            {
+                Name.setText(CacheChats.Name(sharedPref.getString("gid", ""), "Loading.."));
+                ((TextView) findViewById(R.id.nav_email)).setText(sharedPref.getString("mail", ""));
+            }
+        }
+
         final ImageView Picture = (ImageView) NavHeader.findViewById(R.id.userdp);
         Picture.setImageDrawable(null);
 
@@ -156,45 +167,19 @@ public class MainActivity extends AppCompatActivity
             });
         }
         catch(Exception e){
-
         }
 
         Picture.requestLayout();
     }
 
     public void ChooseDP(View view) {
-
-        Intent Gal = new Intent();
-        Gal.setType("image/*");
-        Gal.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(Gal, "Select Picture"), 1);
-    }
-
-    public String getPath(Uri uri) {
-        // just some safety built in
-        if( uri == null ) {
-            // TODO perform some logging or show user feedback
-            return null;
-        }
-        // try to retrieve the image from the media store first
-        // this will only work for images selected from gallery
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
-        if( cursor != null ){
-            int column_index = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String path = cursor.getString(column_index);
-            cursor.close();
-            return path;
-        }
-        // this is our fallback here
-        return uri.getPath();
+        startActivityForResult(Intent.createChooser(new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT), "Select Picture"), 420);
     }
 
     public void ReloadViews()
     {
         Subs.Adapter.notifyDataSetChanged();
+        DownloadPicture();
     }
 
     private void SetSubscribedFragment()
@@ -234,72 +219,54 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if(result != null) {
-            if (requestCode != 1 || !result.isSuccess()) {
-                this.finish();
-            }
-        }
-
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
+        if (requestCode == 420)
+        {
+            if (resultCode == RESULT_OK) {
                 Uri selectedImageUri = data.getData();
                 StorageMetadata metadata = new StorageMetadata.Builder()
                         .setContentType("image/jpeg")
                         .build();
                 StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users");
-                UploadTask uploadTask = storageRef.child(MainActivity.Instance.sharedPref.getString("gid", null)).putFile(selectedImageUri, metadata);
-                uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    }
-                }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                final UploadTask uploadTask = storageRef.child(MainActivity.Instance.sharedPref.getString("gid", "")).putFile(selectedImageUri, metadata);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Handle successful uploads on complete
                         DownloadPicture();
                     }
                 });
-                return;
             }
         }
-
-        try {
-            GoogleSignInAccount Acc = result.getSignInAccount();
-
-            if (Acc.getIdToken() != null) {
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                        .addData("type", "reg")
-                        .addData("text", Acc.getIdToken())
-                        .build());
-
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("gid", Acc.getId());
-                editor.putString("gidtoken", Acc.getIdToken());
-                editor.commit();
-
-                CacheChats.Restart(Acc.getId());
-            }
-        }
-        catch (NullPointerException Ex)
+        else if (requestCode == 1010)
         {
-            Log.d("GSO", "Failed getting token");
+            try {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (result == null || !result.isSuccess()) {
+                    this.finish();
+                }
+
+                GoogleSignInAccount Acc = result.getSignInAccount();
+
+                if (Acc.getIdToken() != null) {
+                    FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                            .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                            .addData("type", "reg")
+                            .addData("text", Acc.getIdToken())
+                            .build());
+
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("gid", Acc.getId());
+                    editor.putString("gidtoken", Acc.getIdToken());
+                    editor.putString("mail", Acc.getEmail());
+                    editor.commit();
+
+                    CacheChats.Restart(Acc.getId());
+                    DownloadPicture();
+                }
+            }
+            catch (NullPointerException Ex)
+            {
+                Log.d("GSO", "Failed getting token");
+            }
         }
     }
 
@@ -362,10 +329,5 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-    }
-
-    public void GoToPicture(View view) {
-        Intent GoToPicture = new Intent (this, PictureActivity.class);
-        startActivity(GoToPicture);
     }
 }

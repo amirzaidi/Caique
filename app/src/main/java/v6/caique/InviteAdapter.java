@@ -30,9 +30,8 @@ public class InviteAdapter extends ArrayAdapter<String> {
         if (InviteActivity.ContactNumbers.size() > position)
         {
             TextView DisplayName = (TextView) row.findViewById(R.id.DisplayName);
-            DisplayName.setText(InviteActivity.Contacts.get(InviteActivity.ContactNumbers.get(position)));
+            DisplayName.setText(InviteActivity.ContactNames.get(position));
 
-            row.setClickable(true);
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

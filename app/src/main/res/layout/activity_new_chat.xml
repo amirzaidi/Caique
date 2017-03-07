@@ -32,7 +32,7 @@
         android:id="@+id/TagSelect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="vertical"></LinearLayout>
 
     <Button
         android:id="@+id/SubmitNewChat"
