@@ -70,7 +70,7 @@ class ChatTypingAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
         if (Chat.Typing.size() > position)
         {
-            CacheChats.MessageStructure Data = (CacheChats.MessageStructure) Chat.Typing.values().toArray()[position];
+            CacheChats.MessageStructure Data = List.get(position);
 
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
