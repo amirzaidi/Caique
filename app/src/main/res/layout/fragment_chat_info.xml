@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,9 +7,48 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <LinearLayout
-        android:id="@+id/mainframe"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/mainframe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/chat_dp"
+                android:layout_width="match_parent"
+                android:layout_height="175dp"
+                android:layout_weight="2.43"
+                android:onClick="ChooseDP"/>
+
+            <EditText
+                android:id="@+id/title_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.43"
+                android:ems="10"
+                android:inputType="textMultiLine"
+                android:maxLength="32" />
+
+            <LinearLayout
+                android:id="@+id/tags"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2.43"
+                android:orientation="vertical"></LinearLayout>
+
+            <Button
+                android:id="@+id/update_chat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.43"
+                android:onClick="UpdateChat"
+                android:text="Update Chat" />
+        </LinearLayout>
+    </ScrollView>
+
 </FrameLayout>

@@ -195,7 +195,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                                         Chat.CurrentSong = Title;
                                         if (!Title.isEmpty())
                                         {
-                                            Chat.setTitle("Playing " + Title);
+                                            Chat.SetTitle("Playing: " + Title);
                                         }
 
                                         Chat.MusicPlayer.SetCurrentlyPlaying();

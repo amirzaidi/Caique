@@ -1,22 +1,46 @@
 package v6.caique;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChatInfoFragment extends Fragment {
 
     private View RootView;
+    private HashMap<String, Boolean> Tags = new HashMap<>();
 
     public ChatInfoFragment() {
 
@@ -33,7 +57,10 @@ public class ChatInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         RootView =inflater.inflate(R.layout.fragment_chat_info, container, false);
 
-        SetButton(((ChatActivity)getActivity()).isSubbed());
+        SetDP();
+        SetTags();
+        SetTitle();
+        SetButton(((ChatActivity) getActivity()).isSubbed());
 
         return RootView;
     }
@@ -89,6 +116,88 @@ public class ChatInfoFragment extends Fragment {
         }
     }
 
+    public void SetDP(){
+        final ImageView Picture = (ImageView) RootView.findViewById(R.id.chat_dp);
+        Picture.setImageDrawable(null);
+
+        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ((ChatActivity)getActivity()).CurrentChat);
+        try {
+            storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    try {
+                        Glide.with(getContext())
+                                .using(new FirebaseImageLoader())
+                                .load(storageRef)
+                                .centerCrop()
+                                .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                .into(Picture);
+                    }
+                    catch (Exception x)
+                    {
+                    }
+                }
+            });
+        }
+        catch(Exception e){
+        }
+
+        Picture.requestLayout();
+    }
+
+    public void SetTitle(){
+        EditText Title = (EditText) RootView.findViewById(R.id.title_input);
+        Title.setText(CacheChats.Loaded.get(((ChatActivity)getActivity()).CurrentChat).Title);
+    }
+
+    public void SetTags(){
+        FirebaseDatabase.getInstance().getReference().child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+
+                        final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        final LinearLayout TagsView = (LinearLayout) RootView.findViewById(R.id.tags);
+
+                        @Override
+                        public void run() {
+                            HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                            for (final String t : Data.keySet()) {
+                                Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
+                                View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
+                                CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
+                                Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
+                                if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
+                                    Box.setChecked(true);
+                                } else {
+                                    Box.setChecked(false);
+                                }
+                                Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                        if (isChecked) {
+                                            Tags.put(t, true);
+                                        } else {
+                                            Tags.put(t, false);
+                                        }
+                                    }
+                                });
+
+                                TagsView.addView(Inflated);
+                            }
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
     private void SetFavorite(boolean Checked){
         if(Checked){
             MainActivity.Instance.sharedPref.edit().putBoolean(((ChatActivity)getActivity()).CurrentChat, Checked).apply();
@@ -96,6 +205,46 @@ public class ChatInfoFragment extends Fragment {
         else{
             MainActivity.Instance.sharedPref.edit().remove(((ChatActivity)getActivity()).CurrentChat).apply();
         }
+    }
+
+    public void SendUpdate() {
+        ArrayList<String> EnabledTags = new ArrayList<>();
+
+        for(Map.Entry<String, Boolean> entry: Tags.entrySet()){
+            if(entry.getValue()){
+                EnabledTags.add(entry.getKey());
+            }
+        }
+
+        EditText Input = (EditText) RootView.findViewById(R.id.title_input);
+        String Text = Input.getText().toString().trim();
+
+        if (Text.length() == 0)
+        {
+            Input.setText(CacheChats.Loaded.get(((ChatActivity)getActivity()).CurrentChat).Title);
+            Text = CacheChats.Loaded.get(((ChatActivity)getActivity()).CurrentChat).Title;
+        }
+
+        JSONObject UpdateObject = new JSONObject();
+        JSONArray TagsArray = new JSONArray();
+
+        try {
+            for(String s: EnabledTags){
+                TagsArray.put(s);
+            }
+            UpdateObject.put("title", Text);
+            UpdateObject.put("tags", TagsArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
+                .addData("type", "update")
+                .addData("text", UpdateObject.toString())
+                .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                .build());
     }
 
     private void SubToChat(){
@@ -123,6 +272,5 @@ public class ChatInfoFragment extends Fragment {
                 .addData("text", ChatId)
                 .build());
     }
-
 
 }
