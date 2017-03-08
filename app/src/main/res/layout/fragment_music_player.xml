@@ -68,14 +68,13 @@
         <ListView
             android:id="@+id/SongQueue"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <ListView
             android:id="@+id/SongSelection"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            tools:visibility="visible" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

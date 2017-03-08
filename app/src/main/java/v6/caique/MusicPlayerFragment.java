@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -72,27 +71,9 @@ public class MusicPlayerFragment extends Fragment {
     }
 
     public void ReloadSelectionViews(){
-        ListView Songs = (ListView) RootView.findViewById(R.id.SongSelection);
-        ListView PlayListView = (ListView) RootView.findViewById(R.id.SongQueue);
-
-        if(SelectionUrls.size() > 0){
-            Songs.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen.song_selection)));
-            PlayListView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.5f));
-        }
-        else{
-            Songs.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
-            PlayListView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        }
-
-        if(SelectionAdapter == null && SelectionUrls.size() > 0){
-            SongList = (ListView) RootView.findViewById(R.id.SongSelection);
-            SelectionAdapter = new SongAdapter(this.getActivity(), ((ChatActivity)getActivity()).CurrentChat);
-            SongList.setAdapter(SelectionAdapter);
-        }else if(SelectionAdapter != null){
-            SelectionAdapter.notifyDataSetChanged();
-        }
-
-
+        SongList = (ListView) RootView.findViewById(R.id.SongSelection);
+        SelectionAdapter = new SongAdapter(this.getActivity(), ((ChatActivity)getActivity()).CurrentChat);
+        SongList.setAdapter(SelectionAdapter);
     }
 
     @Override
