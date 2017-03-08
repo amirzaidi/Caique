@@ -3,6 +3,7 @@ package v6.caique;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.Date;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -46,33 +49,46 @@ public class FavoritesAdapter extends ArrayAdapter<String>{
             imageView.setImageDrawable(null);
 
             final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ChatId);
-            storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                @Override
-                public void onSuccess(StorageMetadata storageMetadata) {
-                    Glide.with(context)
-                            .using(new FirebaseImageLoader())
-                            .load(storageRef)
-                            .centerCrop()
-                            .bitmapTransform(new CropCircleTransformation(context))
-                            .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
-                            .into(imageView);
-                }
-            });
-
-            if(Chat != null) {
-                TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
-                TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
-                nameTextView.setText(Chat.Title);
-                descTextView.setText("");
-                if(Chat.Messages.size() > 0) {
-                    if (Chat.Messages.get(Chat.Messages.size() - 1).Content.length() > 100) {
-                        descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content.substring(0, 97) + "...");
-                    } else {
-                        descTextView.setText(Chat.Messages.get(Chat.Messages.size() - 1).Content);
+            try
+            {
+                storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                    @Override
+                    public void onSuccess(StorageMetadata storageMetadata) {
+                        try {
+                            Glide.with(context)
+                                    .using(new FirebaseImageLoader())
+                                    .load(storageRef)
+                                    .centerCrop()
+                                    .bitmapTransform(new CropCircleTransformation(context))
+                                    .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                    .into(imageView);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                     }
-                }
+                });
+            }
+            catch (Exception e)
+            {
             }
 
+            TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
+            nameTextView.setText(Chat.Title);
+
+            if (Chat.Messages.size() != 0)
+            {
+                CacheChats.MessageStructure Msg = Chat.Messages.getLast();
+                TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
+
+                String DateTime = DateFormat.getDateFormat(context).format(new Date(Msg.Date * 1000L));
+                if (DateTime.equals(DateFormat.getDateFormat(context).format(new Date())))
+                {
+                    DateTime = DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L));
+                }
+
+                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender) + ", " + DateTime + ")");
+            }
 
             row.setOnClickListener(new View.OnClickListener() {
                 @Override

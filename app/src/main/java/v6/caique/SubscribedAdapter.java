@@ -85,7 +85,13 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
                 CacheChats.MessageStructure Msg = Chat.Messages.getLast();
                 TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
 
-                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender) + ", " + DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L)) + ")");
+                String DateTime = DateFormat.getDateFormat(context).format(new Date(Msg.Date * 1000L));
+                if (DateTime.equals(DateFormat.getDateFormat(context).format(new Date())))
+                {
+                    DateTime = DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L));
+                }
+
+                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender) + ", " + DateTime + ")");
             }
 
             row.setOnClickListener(new View.OnClickListener() {
