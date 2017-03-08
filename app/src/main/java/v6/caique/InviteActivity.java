@@ -61,5 +61,4 @@ public class InviteActivity extends AppCompatActivity {
         Adapter = new InviteAdapter(this);
         ((ListView) findViewById(R.id.ContactsList)).setAdapter(Adapter);
     }
-
 }
