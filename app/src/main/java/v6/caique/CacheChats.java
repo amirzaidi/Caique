@@ -142,10 +142,13 @@ public class CacheChats {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                    Chat.Title = (String) Data.get("title");
-                    Chat.Tags = (ArrayList<String>) Data.get("tags");
+                    if (Data != null)
+                    {
+                        Chat.Title = (String) Data.get("title");
+                        Chat.Tags = (ArrayList<String>) Data.get("tags");
 
-                    UpdateChatDisplay(ChatId);
+                        UpdateChatDisplay(ChatId);
+                    }
                 }
 
                 @Override

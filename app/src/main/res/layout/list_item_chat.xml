@@ -24,19 +24,19 @@
         android:layout_weight="1">
 
         <TextView
-            android:text="Name"
+            android:id="@+id/itemname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/itemname"
-            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            android:text="Chat"
             android:textColor="?android:attr/textColorPrimary"
-            android:paddingBottom="2dp" />
+            android:textSize="16sp" />
 
         <TextView
-            android:text="Description"
+            android:id="@+id/itemdesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/itemdesc"
+            android:text="No messages yet"
             android:textSize="16sp" />
 
     </LinearLayout>

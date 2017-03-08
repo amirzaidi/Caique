@@ -323,10 +323,10 @@ public class MainActivity extends AppCompatActivity
             Intent newActivity = new Intent(this, InviteActivity.class);
             startActivity(newActivity);
         }
-        else if (id == R.id.nav_music_library) {
+        /*else if (id == R.id.nav_music_library) {
             Intent newActivity = new Intent(this, PictureActivity.class);
             startActivity(newActivity);
-        }
+        }*/
         else if (id == R.id.nav_settings) {
             Intent newActivity = new Intent(this, SettingsActivity.class);
             startActivity(newActivity);

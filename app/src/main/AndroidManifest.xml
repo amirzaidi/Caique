@@ -46,7 +46,6 @@
         <activity
             android:name=".ChatActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".PictureActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"

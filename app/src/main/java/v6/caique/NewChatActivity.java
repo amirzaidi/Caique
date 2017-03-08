@@ -2,13 +2,11 @@ package v6.caique;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
@@ -82,7 +80,7 @@ public class NewChatActivity extends Activity {
     {
         EditText t = (EditText) findViewById(R.id.newChatTitle);
         String text = t.getText().toString().trim();
-        if (text.length() > 2)
+        if (Tags.size() > 0 && text.length() > 2)
         {
             JSONObject Obj = new JSONObject();
             try

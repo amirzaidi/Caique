@@ -94,8 +94,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     if (Type.equals("text") && !Active) {
                         sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
                     }
-                    else if(Type.equals("mres")){
-
+                    else if (Type.equals("mres") && ChatOpen){
                         try {
 
                             final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
@@ -132,8 +131,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                         {
                             Log.d("JSONMainPlaying", e.getMessage());
                         }
-                    }
-                    else if ((Type.equals("start") || Type.equals("play")) && ChatActivity.Instances.containsKey(ChatId)) {
                     }
                     else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId))
                     {
