@@ -145,7 +145,16 @@ public class CacheChats {
                     if (Data != null)
                     {
                         Chat.Title = (String) Data.get("title");
-                        Chat.Tags = (ArrayList<String>) Data.get("tags");
+                        Chat.Tags = new ArrayList<>();
+
+                        ArrayList<String> Tags = (ArrayList<String>) Data.get("tags");
+                        for (String Tag : Tags)
+                        {
+                            if (Tag != null)
+                            {
+                                Chat.Tags.add(Tag);
+                            }
+                        }
 
                         UpdateChatDisplay(ChatId);
                     }
@@ -173,7 +182,7 @@ public class CacheChats {
                     Message.Content = (String) snapshotValue.get("text");
                     Message.IsFile = !"text".equals(snapshotValue.get("type"));
 
-                    Name(Message.Sender, null);
+                    Name(Message.Sender);
                     Chat.Messages.addLast(Message);
 
                     if (Chat.Typing.containsKey(Message.Sender))
@@ -207,21 +216,21 @@ public class CacheChats {
             Chat.RankListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Name(dataSnapshot.getKey(), null);
+                    Name(dataSnapshot.getKey());
                     Chat.Ranks.put(dataSnapshot.getKey(), (int)dataSnapshot.getValue());
                     UpdateChatDisplay(ChatId);
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Name(dataSnapshot.getKey(), null);
+                    Name(dataSnapshot.getKey());
                     Chat.Ranks.put(dataSnapshot.getKey(), (int)dataSnapshot.getValue());
                     UpdateChatDisplay(ChatId);
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Name(dataSnapshot.getKey(), null);
+                    Name(dataSnapshot.getKey());
                     Chat.Ranks.remove(dataSnapshot.getKey());
                     UpdateChatDisplay(ChatId);
                 }
@@ -261,7 +270,7 @@ public class CacheChats {
         }
     }
 
-    public static String Name(final String Id, String Replacement)
+    public static String Name(final String Id)
     {
         if (!Names.containsKey(Id))
         {
@@ -280,13 +289,13 @@ public class CacheChats {
                 }
             });
 
-            return Replacement;
+            return Id;
         }
 
         String Name = Names.get(Id);
         if (Name == null)
         {
-            Name = Replacement;
+            Name = Id;
         }
 
         return Name;
@@ -310,7 +319,8 @@ public class CacheChats {
     {
         if (MainActivity.Instance != null)
         {
-            MainActivity.Instance.ReloadViews();
+            MainActivity.Instance.Subs.Adapter.notifyDataSetChanged();
+            MainActivity.Instance.Explore.ReloadChats();
 
             for (String ChatId : ChatIds)
             {

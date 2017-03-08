@@ -88,7 +88,7 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
                 Date d = new Date(Data.Date * 1000L);
 
                 MessageSender.setVisibility(VISIBLE);
-                MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " at " + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "");
+                MessageSender.setText(CacheChats.Name(Data.Sender) + " at " + DateFormat.getTimeFormat(context).format(d) + " " + DateFormat.getDateFormat(context).format(d) + "");
             }
 
             if (HidePic) {

@@ -78,7 +78,7 @@ class ChatTypingAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
             Message.setText(Data.Content);
 
             MessageSender.setVisibility(VISIBLE);
-            MessageSender.setText(CacheChats.Name(Data.Sender, "Unknown") + " is typing..");
+            MessageSender.setText(CacheChats.Name(Data.Sender) + " is typing..");
 
             ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
             imageView.setImageDrawable(null);

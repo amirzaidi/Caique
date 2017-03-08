@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity
         FavoritesFragment.OnFragmentInteractionListener {
 
     public static MainActivity Instance;
-    private SubscribedFragment Subs;
+    public SubscribedFragment Subs;
+    public ExploreFragment Explore;
     public SharedPreferences sharedPref;
 
     private static void RelogFirebase()
@@ -120,6 +121,8 @@ public class MainActivity extends AppCompatActivity
         Subs = new SubscribedFragment();
         SetSubscribedFragment();
 
+        Explore = new ExploreFragment();
+
         RelogFirebase();
 
         sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
@@ -161,7 +164,7 @@ public class MainActivity extends AppCompatActivity
             TextView Name = (TextView) findViewById(R.id.nav_username);
             if (Name != null)
             {
-                Name.setText(CacheChats.Name(sharedPref.getString("gid", ""), "Loading.."));
+                Name.setText(CacheChats.Name(sharedPref.getString("gid", "")));
                 ((TextView) findViewById(R.id.nav_email)).setText(sharedPref.getString("mail", ""));
             }
         }
@@ -200,12 +203,6 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(Intent.createChooser(new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT), "Select Picture"), 420);
     }
 
-    public void ReloadViews()
-    {
-        Subs.Adapter.notifyDataSetChanged();
-        DownloadPicture();
-    }
-
     private void SetSubscribedFragment()
     {
         getSupportFragmentManager().beginTransaction()
@@ -219,20 +216,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed(){
         if(!Subs.Active){
-            Subs.Active = true;
-
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction()
-                    .replace(R.id.mainframe, Subs)
-                    .commit();
-
-            CacheChats.FilterSubs();
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+            SetSubscribedFragment();
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setCheckedItem(R.id.nav_chats);
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         }
         else{
             super.onBackPressed();
@@ -294,12 +284,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        Subs.Active = false;
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         FragmentManager manager = getSupportFragmentManager();
 
@@ -309,7 +299,7 @@ public class MainActivity extends AppCompatActivity
         }
         else if (id == R.id.nav_explore) {
             manager.beginTransaction()
-                .replace(R.id.mainframe, new ExploreFragment())
+                .replace(R.id.mainframe, Explore)
                 .commit();
             drawer.closeDrawer(GravityCompat.START);
         }
@@ -323,17 +313,9 @@ public class MainActivity extends AppCompatActivity
             Intent newActivity = new Intent(this, InviteActivity.class);
             startActivity(newActivity);
         }
-        /*else if (id == R.id.nav_music_library) {
-            Intent newActivity = new Intent(this, PictureActivity.class);
-            startActivity(newActivity);
-        }*/
         else if (id == R.id.nav_settings) {
             Intent newActivity = new Intent(this, SettingsActivity.class);
             startActivity(newActivity);
-        }
-
-        if(id != R.id.nav_chats){
-            Subs.Active = false;
         }
 
         return true;

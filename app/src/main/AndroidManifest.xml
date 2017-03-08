@@ -42,7 +42,6 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".SendServerMessage" />
         <activity
             android:name=".ChatActivity"
             android:windowSoftInputMode="adjustResize" />

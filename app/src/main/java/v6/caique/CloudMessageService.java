@@ -92,7 +92,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                     boolean Active = ChatOpen && ChatActivity.Instances.get(ChatId).Active;
 
                     if (Type.equals("text") && !Active) {
-                        sendNotification(ChatId, CacheChats.Name(Data.get("sender"), "Unknown") + ": " + Data.get("text"));
+                        sendNotification(ChatId, CacheChats.Name(Data.get("sender")) + ": " + Data.get("text"));
                     }
                     else if (Type.equals("mres") && ChatOpen){
                         try {
@@ -159,7 +159,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                                 Chat.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Chat.setTitle(CacheChats.Name(ChatId, "Caique"));
                                         Chat.CurrentSong = "";
                                         Chat.MusicPlayer.SetCurrentlyPlaying();
                                         Chat.Playlist.clear();
@@ -194,11 +193,7 @@ public class CloudMessageService extends FirebaseMessagingService {
                                     @Override
                                     public void run() {
                                         Chat.CurrentSong = Title;
-                                        if (Title.isEmpty())
-                                        {
-                                            Chat.setTitle(CacheChats.Name(ChatId, "Caique"));
-                                        }
-                                        else
+                                        if (!Title.isEmpty())
                                         {
                                             Chat.setTitle("Playing " + Title);
                                         }
@@ -238,7 +233,30 @@ public class CloudMessageService extends FirebaseMessagingService {
                 }
                 else if (Data.get("type").equals("tagres"))
                 {
-                    
+                    try
+                    {
+                        JSONArray Chats = new JSONArray(Data.get("r"));
+                        MainActivity.Instance.Explore.Chats.clear();
+
+                        for (int i = 0; i < Chats.length(); i++)
+                        {
+                            String ChatId = Chats.getString(i);
+                            CacheChats.StartListen(ChatId);
+                            MainActivity.Instance.Explore.Chats.add(ChatId);
+                        }
+
+                        MainActivity.Instance.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainActivity.Instance.Explore.ReloadChats();
+                            }
+                        });
+
+                    }
+                    catch (JSONException e)
+                    {
+                        Log.d("JsonExceptionTagres", e.getMessage());
+                    }
                 }
             }
             else

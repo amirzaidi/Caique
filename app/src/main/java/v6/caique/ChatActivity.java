@@ -60,7 +60,10 @@ public class ChatActivity extends AppCompatActivity {
 
         SetChatFragment(null);
 
-        setTitle(CacheChats.Name(CurrentChat, "Caique"));
+        if (CacheChats.Loaded.containsKey(CurrentChat))
+        {
+            setTitle(CacheChats.Loaded.get(CurrentChat).Title);
+        }
     }
 
     @Override

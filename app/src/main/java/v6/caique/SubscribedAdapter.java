@@ -69,14 +69,12 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
                         }
                         catch (Exception e)
                         {
-
                         }
                     }
                 });
             }
             catch (Exception e)
             {
-
             }
 
             TextView nameTextView = (TextView) row.findViewById(R.id.itemname);
@@ -87,7 +85,7 @@ public class SubscribedAdapter extends ArrayAdapter<String> {
                 CacheChats.MessageStructure Msg = Chat.Messages.getLast();
                 TextView descTextView = (TextView) row.findViewById(R.id.itemdesc);
 
-                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender, "Unknown") + ", " + DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L)) + ")");
+                descTextView.setText(Msg.Content + " (" + CacheChats.Name(Msg.Sender) + ", " + DateFormat.getTimeFormat(context).format(new Date(Msg.Date * 1000L)) + ")");
             }
 
             row.setOnClickListener(new View.OnClickListener() {
