@@ -1,10 +1,21 @@
 package v6.caique;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +27,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class SettingsActivity extends AppCompatActivity {
-    private Context CurrentContext = this;
+    public SharedPreferences sharedPref;
+    public static boolean Music = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,84 +37,43 @@ public class SettingsActivity extends AppCompatActivity {
 
         final Switch MusicSwitch = (Switch)findViewById(R.id.playMusic);
 
-        if(CurrentSettings.MusicInChats == true){
-            MusicSwitch.setChecked(true);
-        }
-        else{
-            MusicSwitch.setChecked(false);
-        }
+        sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
+        Music = sharedPref.getBoolean("music", true);
+        MusicSwitch.setChecked(Music);
 
         MusicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SetJSONSettings(MusicSwitch.isChecked(), CurrentContext);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("music", MusicSwitch.isChecked());
+                editor.commit();
             }
         });
     }
 
-    private void SetJSONSettings(boolean NewSwitchValue, Context context){
-        try {
-            CurrentSettings.JSONSettings.put("PlayMusic", NewSwitchValue);
-            CreateSettingsFile(CurrentSettings.JSONSettings, context);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+    public void askWipe(View view)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Are you sure?");
 
-    public void GetSettings(Context context){
-
-        String json = new String();
-        StringBuilder text = new StringBuilder();
-        File f = new File(context.getCacheDir()+ "/Settings.json");
-
-        if(f.isFile()){
-            BufferedReader br;
-            try {
-                br = new BufferedReader(new FileReader(f));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    text.append(line);
-                    text.append('\n');
-                }
-                br.close();
-                json = text.toString();
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ((ActivityManager)getSystemService(ACTIVITY_SERVICE)).clearApplicationUserData();
+                MainActivity.Instance.finish();
+                finish();
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else{
-            CreateSettingsFile(null, context);
-        }
+        });
 
-        try {
-            CurrentSettings.JSONSettings = new JSONObject(json);
-            boolean PlayMusic = CurrentSettings.JSONSettings.getBoolean("PlayMusic");
-            CurrentSettings.MusicInChats = PlayMusic;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-    private void CreateSettingsFile(JSONObject JSONSettings, Context context){
-        try {
-            File file = new File(context.getCacheDir(), "Settings.json");
-            FileWriter writer = new FileWriter(file);
-            if(JSONSettings != null){
-                writer.append(JSONSettings.toString());
-            }
-            else {
-                writer.append(
-                        "{\n" +
-                                "\"PlayMusic\": true\n" +
-                                "}");
-            }
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        builder.show();
     }
 
     public Context getContext(){

@@ -268,7 +268,7 @@ public class CloudMessageService extends FirebaseMessagingService {
 
     private static String LastChat;
     public void StartMusic(final String Chat, boolean Force) {
-        if (CurrentSettings.MusicInChats && (Force || !Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
+        if (SettingsActivity.Music && (Force || !Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
             LastChat = Chat;
             new Thread(new Runnable() {
                 @Override

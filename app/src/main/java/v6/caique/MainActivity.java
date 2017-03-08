@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
 
         RelogFirebase();
 
-        sharedPref = this.getSharedPreferences("caique", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
         if (sharedPref.contains("gid"))
         {
             CacheChats.Restart(sharedPref.getString("gid", null));
@@ -312,6 +312,7 @@ public class MainActivity extends AppCompatActivity
 
                     CacheChats.Restart(Acc.getId());
                     DownloadPicture();
+                    ReloadNavbar();
                 }
             }
             catch (NullPointerException Ex)
@@ -360,12 +361,6 @@ public class MainActivity extends AppCompatActivity
     public void CreateChat(View view) {
         Intent newActivity = new Intent(this, NewChatActivity.class);
         startActivity(newActivity);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        new SettingsActivity().GetSettings(this);
     }
 
     @Override
