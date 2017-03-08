@@ -272,6 +272,11 @@ public class CacheChats {
 
     public static String Name(final String Id)
     {
+        if (Id == null)
+        {
+            return "";
+        }
+
         if (!Names.containsKey(Id))
         {
             Names.put(Id, null);

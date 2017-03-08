@@ -16,7 +16,8 @@
         android:id="@+id/userdp"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="32dp"
         android:onClick="ChooseDP" />
 
 
@@ -24,7 +25,11 @@
         android:id="@+id/nav_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing" />
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:onClick="changeName"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/nav_email"
