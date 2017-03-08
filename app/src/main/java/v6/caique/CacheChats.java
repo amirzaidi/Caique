@@ -280,6 +280,12 @@ public class CacheChats {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Names.put(Id, (String) dataSnapshot.getValue());
+
+                    if (Id == GID && MainActivity.Instance != null)
+                    {
+                        MainActivity.Instance.ReloadNavbar();
+                    }
+
                     UpdateAllChats();
                 }
 

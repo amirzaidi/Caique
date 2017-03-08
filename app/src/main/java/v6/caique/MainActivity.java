@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -153,23 +154,24 @@ public class MainActivity extends AppCompatActivity
         }
 
         DownloadPicture();
+        ReloadNavbar();
+    }
+
+    public void ReloadNavbar()
+    {
+        NavigationView NavView = (NavigationView) findViewById(R.id.nav_view);
+        TextView Name = (TextView) NavView.getHeaderView(0).findViewById(R.id.nav_username);
+        if (Name != null && sharedPref.contains("gid"))
+        {
+            Name.setText(CacheChats.Name(sharedPref.getString("gid", null)));
+            ((TextView) NavView.getHeaderView(0).findViewById(R.id.nav_email)).setText(sharedPref.getString("mail", ""));
+        }
     }
 
     public void DownloadPicture() {
 
         NavigationView NavView = (NavigationView) findViewById(R.id.nav_view);
-        View NavHeader = NavView.getHeaderView(0);
-        if (sharedPref.contains("gid"))
-        {
-            TextView Name = (TextView) findViewById(R.id.nav_username);
-            if (Name != null)
-            {
-                Name.setText(CacheChats.Name(sharedPref.getString("gid", "")));
-                ((TextView) findViewById(R.id.nav_email)).setText(sharedPref.getString("mail", ""));
-            }
-        }
-
-        final ImageView Picture = (ImageView) NavHeader.findViewById(R.id.userdp);
+        final ImageView Picture = (ImageView) NavView.getHeaderView(0).findViewById(R.id.userdp);
         Picture.setImageDrawable(null);
 
         final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + MainActivity.Instance.sharedPref.getString("gid", null));
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed(){
-        if(!Subs.Active){
+        if (!Subs.Active){
             SetSubscribedFragment();
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -286,7 +288,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         Subs.Active = false;
@@ -322,7 +323,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void CreateChat(View view) {
-        //Intent newActivity = new Intent(this, SendServerMessage.class);
         Intent newActivity = new Intent(this, NewChatActivity.class);
         startActivity(newActivity);
     }

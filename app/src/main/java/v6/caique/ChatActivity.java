@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -90,6 +91,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void ReloadChatViews(boolean Normal, boolean Typing){
+        this.setTitle(CacheChats.Loaded.get(CurrentChat).Title);
+
         if(ChatWindow.isVisible()) {
             ChatWindow.ReloadViews(Normal, Typing);
         }
@@ -117,18 +120,6 @@ public class ChatActivity extends AppCompatActivity {
     public void AddMusic(View view){
         MusicPlayer.SendMusic();
     }
-
-    /*public void RemoveFromQueue(){
-        Playlist.remove(0);
-        ArrayList<String> PlaylistTemp = new ArrayList<>();
-        for(String Song: Playlist){
-            PlaylistTemp.add(Song);
-        }
-        Playlist.clear();
-        for(String Song: PlaylistTemp){
-            Playlist.add(Song);
-        }
-    }*/
 
     @Override
     protected void onResume() {
