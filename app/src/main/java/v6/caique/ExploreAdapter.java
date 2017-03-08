@@ -18,15 +18,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class ExploreAdapter extends ArrayAdapter<String>{
     private LayoutInflater vi;
     private Context context;
 
-    public ExploreAdapter(Context c)
+    public ExploreAdapter(Context c, ArrayList<String> ChatIDs)
     {
-        super(c, R.layout.list_item_chat, ExploreFragment.ChatIDs);
+        super(c, R.layout.list_item_chat, ChatIDs);
         vi = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         context = c;
     }
@@ -38,10 +40,10 @@ public class ExploreAdapter extends ArrayAdapter<String>{
             row = vi.inflate(R.layout.list_item_chat, null);
         }
 
-        if (ExploreFragment.Chats.size() > position)
+        if (getCount() > position)
         {
-            final String ChatId = ExploreFragment.ChatIDs.get(position);
-            final ExploreFragment.ChatStructure Chat = ExploreFragment.Chats.get(ChatId);
+            final String ChatId = getItem(position);
+            final CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
 
             final ImageView imageView = (ImageView) row.findViewById(R.id.chatdp);
             imageView.setImageDrawable(null);

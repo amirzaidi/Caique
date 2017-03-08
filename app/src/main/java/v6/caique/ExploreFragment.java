@@ -4,10 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +20,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,28 +30,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExploreFragment extends Fragment {
-
-
-    public static class ChatStructure{
+    /*public static class ChatStructure{
         String ID;
         String Title;
         ArrayList<String> Tags;
         Query DataQuery;
         ValueEventListener DataListener;
-    }
+    }*/
 
-    public static HashMap<String, ChatStructure> Chats = new HashMap<>();
-    public static ArrayList<String> ChatIDs = new ArrayList<>();
-    public static ArrayList<String> Tags = new ArrayList<>();
+    //public static HashMap<String, ChatStructure> Chats = new HashMap<>();
+    private ArrayList<String> ChatIDs = new ArrayList<>();
+    private ArrayList<String> Tags = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
     private ExploreAdapter ChatsAdapter;
-    private TagsAdapter TagsAdapter;
     private View RootView;
-    private DatabaseReference Database = FirebaseDatabase.getInstance().getReference();
-    private HashMap<String, Integer> TagRelevancy = new HashMap<>();
-    private ArrayList<String> CheckedTags = new ArrayList<>();
-    private Integer TagIteration = 0;
 
     public ExploreFragment() {
 
@@ -62,23 +61,44 @@ public class ExploreFragment extends Fragment {
 
         RootView = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        ListView ChatList = (ListView) RootView.findViewById(R.id.ChatList);
-        ChatsAdapter = new ExploreAdapter(this.getActivity());
-        ChatList.setAdapter(ChatsAdapter);
+        //ListView ChatList = (ListView) RootView.findViewById(R.id.ChatList);
+        //ChatsAdapter = new ExploreAdapter(getActivity(), ChatIDs);
+        //ChatList.setAdapter(ChatsAdapter);
 
-        ListView TagList = (ListView) RootView.findViewById(R.id.Tags);
-        TagsAdapter = new TagsAdapter(this.getActivity());
-        TagList.setAdapter(TagsAdapter);
-
-        Tags.clear();
-        Database.child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                for(Map.Entry<String, Object> entry : Data.entrySet()){
-                    Tags.add(entry.getKey());
-                }
-                ReloadTagViews();
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                getActivity().runOnUiThread(new Runnable() {
+                    final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    final LinearLayout TagsList = (LinearLayout) getView().findViewById(R.id.TagsList);
+
+                    @Override
+                    public void run() {
+                        HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                        for(final String t : Data.keySet()){
+                            View Inflated = vi.inflate(R.layout.list_item_tag, TagsList, false);
+                            CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
+                            Box.setText(t.substring(0,1).toUpperCase() + t.substring(1).toLowerCase());
+                            Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                    if (isChecked && !Tags.contains(t))
+                                    {
+                                        Tags.add(t);
+                                    }
+                                    else if (!isChecked && Tags.contains(t))
+                                    {
+                                        Tags.remove(t);
+                                    }
+                                }
+                            });
+
+                            TagsList.addView(Inflated);
+
+                        }
+                    }
+                });
+
             }
 
             @Override
@@ -86,35 +106,20 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        Button Search = (Button) RootView.findViewById(R.id.SearchButton);
-        Search.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoadChats();
-            }
-        });
-
         return RootView;
     }
 
-    private void ReloadViews(String s){
-        ChatsAdapter.notifyDataSetChanged();
+    public void RequestTags(View Button){
 
-        if(Chats.get(s).DataQuery != null) {
-            Chats.get(s).DataQuery.removeEventListener(Chats.get(s).DataListener);
-        }
-    }
+        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                .addData("type", "searchtag")
+                .addData("text", TextUtils.join(",", Tags))
+                .build());
 
-    private void ReloadTagViews(){
-        TagsAdapter.Tags.clear();
-        TagsAdapter.notifyDataSetChanged();
-    }
 
-    public void LoadChats(){
-
-        ChatIDs.clear();
-        Chats.clear();
-
+        //Chats.clear();
+/*
         Integer Iterator = 0;
         for(String s: Tags){
             if(TagsAdapter.Tags.get(Iterator).isChecked()){
@@ -157,7 +162,7 @@ public class ExploreFragment extends Fragment {
 
             Iterator++;
 
-        }
+
 
     }
 
@@ -201,7 +206,7 @@ public class ExploreFragment extends Fragment {
 
             Chats.get(s).DataQuery.addValueEventListener(Chats.get(s).DataListener);
 
-        }
+        }}*/
 
     }
 
@@ -220,7 +225,7 @@ public class ExploreFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         ChatIDs.clear();
-        Chats.clear();
+        //Chats.clear();
         mListener = null;
     }
 

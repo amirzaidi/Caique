@@ -6,29 +6,39 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <ListView
-            android:id="@+id/Tags"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.25"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/SearchButton"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="0.03"
-            android:text="Search" />
 
-        <ListView
-            android:id="@+id/ChatList"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.6" />
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/TagsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"></LinearLayout>
+
+            <Button
+                android:id="@+id/SearchButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="RequestTags"
+                android:text="Search" />
+
+            <LinearLayout
+                android:id="@+id/ChatsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"></LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

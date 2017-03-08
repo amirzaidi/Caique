@@ -225,14 +225,21 @@ public class CloudMessageService extends FirebaseMessagingService {
                     Unsub(ChatId);
                 }
             }
-            else if (Data.containsKey("type") && Data.get("type").equals("reg"))
+            else if (Data.containsKey("type"))
             {
-                FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                        .addData("type", "reg")
-                        .addData("text", MainActivity.Instance.sharedPref.getString("gidtoken", ""))
-                        .build());
+                if (Data.get("type").equals("reg"))
+                {
+                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                    fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                            .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                            .addData("type", "reg")
+                            .addData("text", MainActivity.Instance.sharedPref.getString("gidtoken", ""))
+                            .build());
+                }
+                else if (Data.get("type").equals("tagres"))
+                {
+                    
+                }
             }
             else
             {
