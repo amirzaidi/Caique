@@ -20,20 +20,24 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="2.43">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/chat_dp"
                     android:layout_width="match_parent"
                     android:layout_height="175dp"
-                    android:layout_weight="2.43"
                     android:onClick="ChooseDP" />
 
-                <View
-                    android:layout_height="30dp"
-                    android:layout_width="30dp">
-                </View>
+                <Button
+                    android:layout_height="60dp"
+                    android:layout_width="60dp"
+                    android:paddingLeft="14dp"
+                    android:drawableStart="@drawable/ic_fullscreen"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:onClick="ShowFullDP">
+                </Button>
 
             </RelativeLayout>
 

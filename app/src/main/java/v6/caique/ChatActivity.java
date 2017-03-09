@@ -186,7 +186,7 @@ public class ChatActivity extends AppCompatActivity {
             V.post(new Runnable() {
                 @Override
                 public void run() {
-                    V.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 800));
+                    V.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen.full_dp_height)));
                     try {
                         ref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                             @Override
@@ -222,7 +222,7 @@ public class ChatActivity extends AppCompatActivity {
         {
             ChatWindow.SetSubbed(Subbed);
             MusicPlayer.SetSubbed(Subbed);
-            ChatInfo.SetButton(Subbed);
+            ChatInfo.SetButton();
             SetInfoListener();
         }
     }
@@ -256,6 +256,10 @@ public class ChatActivity extends AppCompatActivity {
 
     public void ChooseDP(View view) {
         startActivityForResult(Intent.createChooser(new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT), "Select Picture"), 420);
+    }
+
+    public void ShowFullDP(View view){
+        ChatInfo.ShowFullDP();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

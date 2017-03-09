@@ -2,8 +2,11 @@ package v6.caique;
 
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -60,50 +64,84 @@ public class ChatInfoFragment extends Fragment {
         SetDP();
         SetTags();
         SetTitle();
-        SetButton(((ChatActivity) getActivity()).isSubbed());
+        SetButton();
 
         return RootView;
     }
 
-    public void SetButton(boolean Subbed){
+    public void SetButton(){
 
         if(this.getContext() != null) {
 
             LinearLayout MainFrame = (LinearLayout) RootView.findViewById(R.id.mainframe);
-            if (Subbed) {
+            Switch FavSwitch = new Switch(this.getContext());
 
-                Switch FavSwitch = new Switch(this.getContext());
-
-                if (MainActivity.Instance.sharedPref.contains(((ChatActivity) getActivity()).CurrentChat)) {
-                    FavSwitch.setChecked(true);
-                } else {
-                    FavSwitch.setChecked(false);
-                }
-
-                FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                FavSwitch.setText("Favorite chat");
-                FavSwitch.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin), (int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin));
-                FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        SetFavorite(isChecked);
-                    }
-                });
-
-                Button UnsubButton = new Button(this.getContext());
-                UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                UnsubButton.setText("Unsubscribe from chat");
-                UnsubButton.setOnClickListener(new Button.OnClickListener() {
-                    public void onClick(View v) {
-                        UnsubFromChat();
-                        ((ChatActivity) getActivity()).SetChatFragment(null);
-                    }
-                });
-
-                MainFrame.addView(FavSwitch);
-                MainFrame.addView(UnsubButton);
+            if (MainActivity.Instance.sharedPref.contains(((ChatActivity) getActivity()).CurrentChat)) {
+                FavSwitch.setChecked(true);
+            } else {
+                FavSwitch.setChecked(false);
             }
+
+            FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            FavSwitch.setText("Favorite chat");
+            FavSwitch.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin), (int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin));
+            FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    SetFavorite(isChecked);
+                }
+            });
+
+            Button UnsubButton = new Button(this.getContext());
+            UnsubButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            UnsubButton.setText("Unsubscribe from chat");
+            UnsubButton.setOnClickListener(new Button.OnClickListener() {
+                public void onClick(View v) {
+                    UnsubFromChat();
+                    ((ChatActivity) getActivity()).SetChatFragment(null);
+                }
+            });
+
+            MainFrame.addView(FavSwitch);
+            MainFrame.addView(UnsubButton);
         }
+    }
+
+    public void ShowFullDP(){
+        final ImageView V = new ImageView(getContext());
+        final Context c = getContext();
+        final StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("chats/" + ((ChatActivity)getActivity()).CurrentChat);
+        V.post(new Runnable() {
+            @Override
+            public void run() {
+                V.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen.full_dp_height)));
+                try {
+                    ref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                        @Override
+                        public void onSuccess(StorageMetadata storageMetadata) {
+                            try {
+                                Glide.with(c)
+                                        .using(new FirebaseImageLoader())
+                                        .load(ref)
+                                        .fitCenter()
+                                        .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                        .into(V);
+                            } catch (Exception x) {
+                                Log.d("GlideChatAdapter", "Glide: " + x.getMessage());
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.d("ChatAdapter", "Glide: " + e.getMessage());
+                }
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        //builder.setTitle("Picture");
+        builder.setCustomTitle(null);
+        builder.setView(V);
+        builder.show();
     }
 
     public void SetDP(){
@@ -144,42 +182,40 @@ public class ChatInfoFragment extends Fragment {
         FirebaseDatabase.getInstance().getReference().child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                if(getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
 
-                        final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        final LinearLayout TagsView = (LinearLayout) RootView.findViewById(R.id.tags);
+                    final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    final LinearLayout TagsView = (LinearLayout) RootView.findViewById(R.id.tags);
 
-                        @Override
-                        public void run() {
-                            HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                            for (final String t : Data.keySet()) {
-                                Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
-                                View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
-                                CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
-                                Box.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), 0, (int) getResources().getDimension(R.dimen.appbar_padding_top), 0);
-                                Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
-                                if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
-                                    Box.setChecked(true);
-                                } else {
-                                    Box.setChecked(false);
-                                }
-                                Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                    @Override
-                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                        if (isChecked) {
-                                            Tags.put(t, true);
-                                        } else {
-                                            Tags.put(t, false);
-                                        }
-                                    }
-                                });
-
-                                TagsView.addView(Inflated);
+                    @Override
+                    public void run() {
+                        HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                        for (final String t : Data.keySet()) {
+                            Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
+                            View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
+                            CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
+                            Box.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), 0, (int) getResources().getDimension(R.dimen.appbar_padding_top), 0);
+                            Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
+                            if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
+                                Box.setChecked(true);
+                            } else {
+                                Box.setChecked(false);
                             }
+                            Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                    if (isChecked) {
+                                        Tags.put(t, true);
+                                    } else {
+                                        Tags.put(t, false);
+                                    }
+                                }
+                            });
+
+                            TagsView.addView(Inflated);
                         }
-                    });
-                }
+                    }
+                });
 
             }
 
@@ -251,6 +287,12 @@ public class ChatInfoFragment extends Fragment {
                 .addData("type", "leavechat")
                 .addData("text", ChatId)
                 .build());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SetDP();
     }
 
 }

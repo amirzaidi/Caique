@@ -10,4 +10,5 @@
 
     <dimen name="send_button_width">90dp</dimen>
     <dimen name="song_selection">150dp</dimen>
+    <dimen name="full_dp_height">300dp</dimen>dimen>
 </resources>
