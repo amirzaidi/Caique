@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="fill_horizontal"
-    android:clickable="true"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:background="?attr/colorPrimary"
+    android:minHeight="?attr/actionBarSize"
+    android:theme="?attr/actionBarTheme">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/title_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="54dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:fontFamily="sans-serif-light"
+        android:onClick="SetInfoFragment"
+        android:textColor="#FFFFFF"
+        android:paddingTop="16dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/TitleText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fontFamily="sans-serif-light"
-            android:onClick="SetInfoFragment"
-            android:paddingTop="13dp"
-            android:text="Caique"
-            android:textColor="#FFFFFF"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-    </LinearLayout>
-</RelativeLayout>
+</Toolbar>
