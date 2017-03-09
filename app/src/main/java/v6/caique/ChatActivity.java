@@ -77,9 +77,19 @@ public class ChatActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View ActionView = inflater.inflate(R.layout.actionbar_chat, null);
         Title = (TextView) ActionView.findViewById(R.id.title_text);
+        View ClickView = ActionView.findViewById(R.id.click_here);
+        ClickView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SetInfoFragment(null);
+            }
+        });
         SetTitle(CacheChats.Loaded.get(CurrentChat).Title);
 
         actionBar.setCustomView(ActionView);
+
+        android.support.v7.widget.Toolbar toolbar=(android.support.v7.widget.Toolbar) ActionView.getParent();
+        toolbar.setContentInsetsAbsolute(0,0);
 
         ChatWindow = new ChatFragment();
         ChatInfo = new ChatInfoFragment();
