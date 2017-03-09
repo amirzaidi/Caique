@@ -18,12 +18,24 @@
             android:orientation="vertical"
             android:weightSum="1">
 
-            <ImageView
-                android:id="@+id/chat_dp"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="175dp"
-                android:layout_weight="2.43"
-                android:onClick="ChooseDP"/>
+                android:layout_height="match_parent"
+                android:layout_weight="2.43">
+
+                <ImageView
+                    android:id="@+id/chat_dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="175dp"
+                    android:layout_weight="2.43"
+                    android:onClick="ChooseDP" />
+
+                <View
+                    android:layout_height="30dp"
+                    android:layout_width="30dp">
+                </View>
+
+            </RelativeLayout>
 
             <EditText
                 android:id="@+id/title_input"

@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -97,6 +98,9 @@ public class ChatActivity extends AppCompatActivity {
         if(CacheChats.Subs.contains(CurrentChat)) {
 
             View ClickView = InfoClickView.findViewById(R.id.click_here);
+            TypedValue outValue = new TypedValue();
+            this.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+            ClickView.setBackgroundResource(outValue.resourceId);
             ClickView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
