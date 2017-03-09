@@ -7,13 +7,20 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
@@ -70,19 +77,9 @@ public class ChatActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View ActionView = inflater.inflate(R.layout.actionbar_chat, null);
         Title = (TextView) ActionView.findViewById(R.id.title_text);
-        View ClickView = ActionView.findViewById(R.id.click_here);
-        ClickView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SetInfoFragment(null);
-            }
-        });
         SetTitle(CacheChats.Loaded.get(CurrentChat).Title);
 
         actionBar.setCustomView(ActionView);
-
-        android.support.v7.widget.Toolbar toolbar=(android.support.v7.widget.Toolbar) ActionView.getParent();
-        toolbar.setContentInsetsAbsolute(0,0);
 
         ChatWindow = new ChatFragment();
         ChatInfo = new ChatInfoFragment();
@@ -129,6 +126,48 @@ public class ChatActivity extends AppCompatActivity {
         }
         else{
             super.onBackPressed();
+        }
+    }
+
+    public void showDp(View view) {
+        ImageView chatV = (ImageView) view;
+        String Sender = (String) chatV.getTag(R.id.chatdp);
+        if (Sender != null) {
+            final ImageView V = new ImageView(this);
+            //V.setImageDrawable(chatV.getDrawable());
+            final Context c = this;
+            final StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Sender);
+            V.post(new Runnable() {
+                @Override
+                public void run() {
+                    V.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 800));
+                    try {
+                        ref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                            @Override
+                            public void onSuccess(StorageMetadata storageMetadata) {
+                                try {
+                                    Glide.with(c)
+                                            .using(new FirebaseImageLoader())
+                                            .load(ref)
+                                            .fitCenter()
+                                            .signature(new StringSignature(String.valueOf(storageMetadata.getCreationTimeMillis())))
+                                            .into(V);
+                                } catch (Exception x) {
+                                    Log.d("GlideChatAdapter", "Glide: " + x.getMessage());
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        Log.d("ChatAdapter", "Glide: " + e.getMessage());
+                    }
+                }
+            });
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            //builder.setTitle("Picture");
+            builder.setCustomTitle(null);
+            builder.setView(V);
+            builder.show();
         }
     }
 
