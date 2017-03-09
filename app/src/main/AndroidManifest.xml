@@ -63,6 +63,9 @@
             android:theme="@style/Theme.AppCompat.Dialog.Alert" />
         <activity android:name=".InviteActivity" />
 
+        <service
+            android:name=".QuickReply"
+            android:exported="false"></service>
     </application>
 
 </manifest>

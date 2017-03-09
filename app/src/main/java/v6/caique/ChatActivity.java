@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -53,31 +55,16 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
 
         Bundle b = getIntent().getExtras();
-        if (b == null || !b.containsKey("chat")){
-            this.finish();
+        if (!b.containsKey("chat"))
+        {
+            finish();
+            return;
         }
 
         CurrentChat = b.getString("chat");
         Log.d("ChatStartParam", CurrentChat);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (b.containsKey("reply"))
-        {
-            notificationManager.cancel(CurrentChat.hashCode());
-
-            FirebaseMessaging fm = FirebaseMessaging.getInstance();
-            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                    .addData("chat", CurrentChat)
-                    .addData("type", "text")
-                    .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
-                    .addData("text", b.getString("reply"))
-                    .build());
-        }
 
         if (Instances.containsKey(CurrentChat))
         {
@@ -86,6 +73,7 @@ public class ChatActivity extends AppCompatActivity {
 
         Instances.put(CurrentChat, this);
 
+        setContentView(R.layout.activity_chat);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                 actionBar.DISPLAY_SHOW_CUSTOM);

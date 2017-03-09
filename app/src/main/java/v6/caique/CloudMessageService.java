@@ -37,6 +37,7 @@ import java.util.concurrent.Semaphore;
 import static com.google.android.exoplayer2.ExoPlayer.STATE_IDLE;
 
 public class CloudMessageService extends FirebaseMessagingService {
+    public static final String Reply = "reply";
     private static final String TAG = "CloudMessageService";
 
     private static int SubTopics = 32;
@@ -92,9 +93,10 @@ public class CloudMessageService extends FirebaseMessagingService {
                     String Type = Data.get("type");
                     boolean ChatOpen = ChatActivity.Instances.containsKey(ChatId);
                     boolean Active = ChatOpen && ChatActivity.Instances.get(ChatId).Active;
+                    String Sender = Data.get("sender");
 
-                    if (Type.equals("text") && !Active) {
-                        sendNotification(ChatId, CacheChats.Name(Data.get("sender")) + ": " + Data.get("text"));
+                    if (Type.equals("text") && !Active && !Sender.equals(CacheChats.GID())) {
+                        sendNotification(ChatId, CacheChats.Name(Sender) + ": " + Data.get("text"));
                     }
                     else if (Type.equals("mres") && ChatOpen){
                         try {
@@ -134,11 +136,11 @@ public class CloudMessageService extends FirebaseMessagingService {
                             Log.d("JSONMainPlaying", e.getMessage());
                         }
                     }
-                    else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId))
+                    else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId) && MainActivity.Typing)
                     {
                         CacheChats.MessageStructure Preview = new CacheChats.MessageStructure();
-                        Preview.Sender = Data.get("sender");
-                        if (Preview.Sender != CacheChats.GID())
+                        Preview.Sender = Sender;
+                        if (!Preview.Sender.equals(CacheChats.GID()))
                         {
                             Preview.Date = Long.parseLong(Data.get("date"));
                             Preview.Content = Data.get("text");
@@ -367,11 +369,11 @@ public class CloudMessageService extends FirebaseMessagingService {
 
         NotificationCompat.Builder b = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText(text);
-                //.setAutoCancel(true)
-                //.setPriority(Notification.PRIORITY_HIGH)
-                //.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                //.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+                .setContentText(text)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 
         if (Chat == null)
         {
@@ -379,16 +381,13 @@ public class CloudMessageService extends FirebaseMessagingService {
         }
         else
         {
-            PendingIntent i = PendingIntent.getActivity(this, 1337, new Intent(this, ChatActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-            NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_reply, "Reply", i)
-                            .addRemoteInput(new RemoteInput.Builder("reply")
-                                    .setLabel("Reply")
-                                    .build())
-                            .build();
-
-            b = b//.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ChatActivity.class).putExtra("chat", Chat), 0))
-                .setContentTitle(Chat = CacheChats.Loaded.get(Chat).Title)
-                .addAction(action);
+            b = b.setContentTitle(CacheChats.Loaded.get(Chat).Title)
+                    .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ChatActivity.class).putExtra("chat", Chat), 0))
+                    .addAction(new NotificationCompat.Action.Builder(R.drawable.ic_reply, "Reply", PendingIntent.getService(this, 0, new Intent(this, QuickReply.class).putExtra("chat", Chat), 0)) // PendingIntent.getActivity(this, 0, startChat, 0)
+                        .addRemoteInput(new RemoteInput.Builder(Reply)
+                                .setLabel("Reply")
+                                .build())
+                        .build());
         }
 
         notificationManager.notify(Chat.hashCode(), b.build());

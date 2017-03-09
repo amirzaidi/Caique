@@ -24,6 +24,9 @@ public class InviteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invite);
 
+        Adapter = new InviteAdapter(this);
+        ((ListView) findViewById(R.id.ContactsList)).setAdapter(Adapter);
+
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_CONTACTS}, 1);
@@ -60,7 +63,7 @@ public class InviteActivity extends AppCompatActivity {
 
         cursor.moveToFirst();
         while (cursor.moveToNext()) {
-            String Number = cursor.getString(NumberColumn);
+            String Number = cursor.getString(NumberColumn).replace(" ", "").replace("-", "");
             if (!ContactNumbers.contains(Number))
             {
                 ContactNumbers.add(Number);
@@ -69,8 +72,6 @@ public class InviteActivity extends AppCompatActivity {
         }
 
         cursor.close();
-
-        Adapter = new InviteAdapter(this);
-        ((ListView) findViewById(R.id.ContactsList)).setAdapter(Adapter);
+        Adapter.notifyDataSetChanged();
     }
 }

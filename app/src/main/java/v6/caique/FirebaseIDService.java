@@ -17,7 +17,7 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Created instance!");
+        //Log.d(TAG, "Created instance!");
         //test
     }
 

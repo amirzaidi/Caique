@@ -174,20 +174,23 @@ public class ChatFragment extends Fragment {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        String Text = s.toString().trim();
-                        if (Text.length() != 0 && s.charAt(s.length() - 1) == ' ') {
-                            if (Text.length() > 1024) {
-                                Text = Text.substring(0, 1021) + "...";
-                            }
+                        if (MainActivity.Typing)
+                        {
+                            String Text = s.toString().trim();
+                            if (Text.length() != 0 && s.charAt(s.length() - 1) == ' ') {
+                                if (Text.length() > 1024) {
+                                    Text = Text.substring(0, 1021) + "...";
+                                }
 
-                            FirebaseMessaging fm = FirebaseMessaging.getInstance();
-                            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                                    .addData("chat", ((ChatActivity) getActivity()).CurrentChat)
-                                    .addData("type", "typing")
-                                    .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
-                                    .addData("text", Text)
-                                    .build());
+                                FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                                fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                                        .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                                        .addData("chat", ((ChatActivity) getActivity()).CurrentChat)
+                                        .addData("type", "typing")
+                                        .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                                        .addData("text", Text)
+                                        .build());
+                            }
                         }
                     }
 

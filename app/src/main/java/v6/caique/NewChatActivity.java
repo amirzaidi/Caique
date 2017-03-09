@@ -35,14 +35,13 @@ public class NewChatActivity extends Activity {
 
         final LinearLayout Group = (LinearLayout) findViewById(R.id.TagSelect);
 
-        FirebaseDatabase.getInstance().getReference().child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("tags").orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                        for(Map.Entry<String, Object> entry : Data.entrySet()){
+                        for(DataSnapshot entry : dataSnapshot.getChildren()){
                             String Name = entry.getKey();
                             ToggleButton Button = new ToggleButton(getBaseContext());
                             Button.setText(Name);
