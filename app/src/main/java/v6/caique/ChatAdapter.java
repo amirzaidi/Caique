@@ -1,10 +1,11 @@
 package v6.caique;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
-import java.util.concurrent.RejectedExecutionException;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -48,7 +48,7 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
 
         if (row == null)
         {
-            row = vi.inflate(R.layout.chat_message, parent, false);
+            row = vi.inflate(R.layout.list_item_message, parent, false);
         }
 
         CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);
@@ -56,11 +56,12 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
         {
             final ImageView imageView = (ImageView) row.findViewById(R.id.userdp);
             imageView.setImageDrawable(null);
+            imageView.setTag(R.id.chatdp, null);
 
             TextView MessageSender = (TextView) row.findViewById(R.id.messageItemSender);
             TextView Message = (TextView) row.findViewById(R.id.messageItem);
 
-            CacheChats.MessageStructure Data = Chat.Messages.get(position);
+            final CacheChats.MessageStructure Data = Chat.Messages.get(position);
             Message.setText(Data.Content);
 
             Boolean HideName = false;
@@ -100,12 +101,14 @@ class ChatAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
                 imageView.setVisibility(VISIBLE);
                 imageView.getLayoutParams().height = imageView.getLayoutParams().width;
 
+
                 final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + Data.Sender);
                 try {
                     storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                         @Override
                         public void onSuccess(StorageMetadata storageMetadata) {
                             try {
+                                imageView.setTag(R.id.chatdp, Data.Sender);
                                 Glide.with(context)
                                         .using(new FirebaseImageLoader())
                                         .load(storageRef)

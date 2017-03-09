@@ -2,8 +2,6 @@ package v6.caique;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,20 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
-import java.util.Date;
 
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
-
-import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -64,7 +50,7 @@ class ChatTypingAdapter extends ArrayAdapter<CacheChats.MessageStructure> {
 
         if (row == null)
         {
-            row = vi.inflate(R.layout.chat_message, parent, false);
+            row = vi.inflate(R.layout.list_item_message, parent, false);
         }
 
         CacheChats.ChatStructure Chat = CacheChats.Loaded.get(ChatId);

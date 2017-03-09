@@ -4,9 +4,6 @@ package v6.caique;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.renderscript.ScriptGroup;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
@@ -28,7 +25,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
-import java.util.Timer;
 
 public class ChatFragment extends Fragment {
 
@@ -107,8 +103,8 @@ public class ChatFragment extends Fragment {
         }
 
         String Chat = ((ChatActivity) getActivity()).CurrentChat;
-        Adapter = new ChatAdapter(getContext(), R.layout.chat_message, Chat);
-        TypingAdapter = new ChatTypingAdapter(getContext(), R.layout.chat_message, Chat, new ArrayList<CacheChats.MessageStructure>());
+        Adapter = new ChatAdapter(getContext(), R.layout.list_item_message, Chat);
+        TypingAdapter = new ChatTypingAdapter(getContext(), R.layout.list_item_message, Chat, new ArrayList<CacheChats.MessageStructure>());
         MessageWindow.setAdapter(Adapter);
         MessageTypingWindow.setAdapter(TypingAdapter);
 
@@ -204,7 +200,6 @@ public class ChatFragment extends Fragment {
                 Button SendButton = new Button(this.getContext());
                 SendButton.setLayoutParams(new LinearLayout.LayoutParams((int) getResources().getDimension(R.dimen.send_button_width), ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
                 SendButton.setText("Send");
-                //SendButton.setId(R.id.sendButton);
                 SendButton.setOnClickListener(new Button.OnClickListener() {
                     public void onClick(View v) {
                         SendMessage();
@@ -220,7 +215,6 @@ public class ChatFragment extends Fragment {
                 Button SubButton = new Button(Bottom.getContext());
                 SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 SubButton.setText("Subscribe to chat");
-                //SubButton.setId(R.id.subButton);
                 SubButton.setOnClickListener(new Button.OnClickListener() {
                     public void onClick(View v) {
                         SubToChat();
