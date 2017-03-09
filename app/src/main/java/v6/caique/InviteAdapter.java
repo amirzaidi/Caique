@@ -38,7 +38,7 @@ public class InviteAdapter extends ArrayAdapter<String> {
                     String number = InviteActivity.ContactNumbers.get(position);
                     Intent intent = new Intent(Intent.ACTION_SENDTO);
                     intent.setData(Uri.parse("smsto:" + Uri.encode(number)));
-                    intent.putExtra("sms_body", "Try out Caique! It's an awesome way to get in contact with people all over the world!");
+                    intent.putExtra("sms_body", "Try out Caique! It's an awesome way to get in contact with people all over the world! https://play.google.com/store/apps/details?id=v6.caique");
                     context.startActivity(intent);
                 }
             });

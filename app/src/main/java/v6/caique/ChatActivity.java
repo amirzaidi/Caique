@@ -1,6 +1,7 @@
 package v6.caique;
 
 import android.app.ActionBar;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -61,6 +62,22 @@ public class ChatActivity extends AppCompatActivity {
 
         CurrentChat = b.getString("chat");
         Log.d("ChatStartParam", CurrentChat);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (b.containsKey("reply"))
+        {
+            notificationManager.cancel(CurrentChat.hashCode());
+
+            FirebaseMessaging fm = FirebaseMessaging.getInstance();
+            fm.send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                    .addData("chat", CurrentChat)
+                    .addData("type", "text")
+                    .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                    .addData("text", b.getString("reply"))
+                    .build());
+        }
 
         if (Instances.containsKey(CurrentChat))
         {
@@ -206,6 +223,7 @@ public class ChatActivity extends AppCompatActivity {
             ChatWindow.SetSubbed(Subbed);
             MusicPlayer.SetSubbed(Subbed);
             ChatInfo.SetButton(Subbed);
+            SetInfoListener();
         }
     }
 
@@ -263,25 +281,9 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    public void SendMessage(View view) {
-        ChatWindow.SendMessage();
-    }
-
     public void AddMusic(View view){
         MusicPlayer.SendMusic();
     }
-
-    /*public void RemoveFromQueue(){
-        Playlist.remove(0);
-        ArrayList<String> PlaylistTemp = new ArrayList<>();
-        for(String Song: Playlist){
-            PlaylistTemp.add(Song);
-        }
-        Playlist.clear();
-        for(String Song: PlaylistTemp){
-            Playlist.add(Song);
-        }
-    }*/
 
     @Override
     protected void onResume() {

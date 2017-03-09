@@ -28,26 +28,34 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class SettingsActivity extends AppCompatActivity {
-    public SharedPreferences sharedPref;
-    public static boolean Music = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        final SharedPreferences sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
+
         final Switch MusicSwitch = (Switch)findViewById(R.id.playMusic);
+        final Switch TypingSwitch = (Switch)findViewById(R.id.displayTyping);
 
-        sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
-        Music = sharedPref.getBoolean("music", true);
-        MusicSwitch.setChecked(Music);
-
+        MusicSwitch.setChecked(MainActivity.Music);
         MusicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("music", MusicSwitch.isChecked());
+                editor.putBoolean("music", buttonView.isChecked());
+                editor.commit();
+            }
+        });
+
+        TypingSwitch.setChecked(MainActivity.Typing);
+        TypingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("typing", buttonView.isChecked());
                 editor.commit();
             }
         });

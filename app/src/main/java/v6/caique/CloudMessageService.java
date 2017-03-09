@@ -1,5 +1,6 @@
 package v6.caique;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -135,19 +137,22 @@ public class CloudMessageService extends FirebaseMessagingService {
                     else if (Type.equals("typing") && ChatOpen && CacheChats.Loaded.containsKey(ChatId))
                     {
                         CacheChats.MessageStructure Preview = new CacheChats.MessageStructure();
-                        Preview.Date = Long.parseLong(Data.get("date"));
-                        Preview.Content = Data.get("text");
-                        Preview.IsFile = false;
                         Preview.Sender = Data.get("sender");
+                        if (Preview.Sender != CacheChats.GID())
+                        {
+                            Preview.Date = Long.parseLong(Data.get("date"));
+                            Preview.Content = Data.get("text");
+                            Preview.IsFile = false;
 
-                        CacheChats.Loaded.get(ChatId).Typing.put(Preview.Sender, Preview);
-                        final ChatActivity Act = ChatActivity.Instances.get(ChatId);
-                        Act.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Act.ReloadChatViews(false, true);
-                            }
-                        });
+                            CacheChats.Loaded.get(ChatId).Typing.put(Preview.Sender, Preview);
+                            final ChatActivity Act = ChatActivity.Instances.get(ChatId);
+                            Act.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Act.ReloadChatViews(false, true);
+                                }
+                            });
+                        }
                     }
                     else if ((Type.equals("start") || Type.equals("play")) && ChatOpen)
                     {
@@ -268,7 +273,7 @@ public class CloudMessageService extends FirebaseMessagingService {
 
     private static String LastChat;
     public void StartMusic(final String Chat, boolean Force) {
-        if (SettingsActivity.Music && (Force || !Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
+        if (MainActivity.Music && (Force || !Chat.equals(LastChat) || Player.getPlaybackState() != 3)) {
             LastChat = Chat;
             new Thread(new Runnable() {
                 @Override
@@ -358,32 +363,34 @@ public class CloudMessageService extends FirebaseMessagingService {
 
     private void sendNotification(String Chat, String text) {
 
-        Intent intent;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentText(text);
+                //.setAutoCancel(true)
+                //.setPriority(Notification.PRIORITY_HIGH)
+                //.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 
         if (Chat == null)
         {
-            intent = new Intent(this, MainActivity.class);
-            Chat = "Log";
+            b = b.setContentTitle("Log");
         }
         else
         {
-            intent = new Intent(this, ChatActivity.class).putExtra("chat", Chat);
-            Log.d("NotificationIntent", Chat);
-            Chat = CacheChats.Loaded.get(Chat).Title;
+            PendingIntent i = PendingIntent.getActivity(this, 1337, new Intent(this, ChatActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+            NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_reply, "Reply", i)
+                            .addRemoteInput(new RemoteInput.Builder("reply")
+                                    .setLabel("Reply")
+                                    .build())
+                            .build();
+
+            b = b//.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ChatActivity.class).putExtra("chat", Chat), 0))
+                .setContentTitle(Chat = CacheChats.Loaded.get(Chat).Title)
+                .addAction(action);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(Chat.hashCode(), new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(Chat)
-                .setContentText(text)
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text)).build()
-        );
+        notificationManager.notify(Chat.hashCode(), b.build());
     }
 }

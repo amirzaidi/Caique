@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity
     public SubscribedFragment Subs;
     public ExploreFragment Explore;
     public SharedPreferences sharedPref;
+    public static boolean Music = true;
+    public static boolean Typing = true;
 
     private static void RelogFirebase()
     {
@@ -131,6 +133,9 @@ public class MainActivity extends AppCompatActivity
         RelogFirebase();
 
         sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
+        Music = sharedPref.getBoolean("music", true);
+        Typing = sharedPref.getBoolean("typing", true);
+
         if (sharedPref.contains("gid"))
         {
             CacheChats.Restart(sharedPref.getString("gid", null));
