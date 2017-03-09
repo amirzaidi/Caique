@@ -82,7 +82,7 @@ public class ChatInfoFragment extends Fragment {
 
                 FavSwitch.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 FavSwitch.setText("Favorite chat");
-                FavSwitch.setPadding(0, (int) getResources().getDimension(R.dimen.fab_margin), 0, (int) getResources().getDimension(R.dimen.fab_margin));
+                FavSwitch.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin), (int) getResources().getDimension(R.dimen.appbar_padding_top), (int) getResources().getDimension(R.dimen.fab_margin));
                 FavSwitch.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -96,6 +96,7 @@ public class ChatInfoFragment extends Fragment {
                 UnsubButton.setOnClickListener(new Button.OnClickListener() {
                     public void onClick(View v) {
                         UnsubFromChat();
+                        ((ChatActivity) getActivity()).SetChatFragment(null);
                     }
                 });
 
@@ -167,6 +168,7 @@ public class ChatInfoFragment extends Fragment {
                                 Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
                                 View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
                                 CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
+                                Box.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), 0, (int) getResources().getDimension(R.dimen.appbar_padding_top), 0);
                                 Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
                                 if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
                                     Box.setChecked(true);

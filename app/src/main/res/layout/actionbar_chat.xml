@@ -1,24 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/toolbar2"
-    android:layout_width="match_parent"
+<android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
     android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:minHeight="55dp"
     android:background="?attr/colorPrimary"
-    android:minHeight="?attr/actionBarSize"
-    android:theme="?attr/actionBarTheme">
+    android:contentInsetStart="0dp"
+    android:contentInsetLeft="0dp"
+    app:contentInsetLeft="0dp"
+    app:contentInsetStart="0dp"
+    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <TextView
-        android:id="@+id/title_text"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-light"
-        android:onClick="SetInfoFragment"
-        android:textColor="#FFFFFF"
-        android:paddingTop="16dp"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
 
-</Toolbar>
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-light"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="11dp"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/click_here"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+            android:onClick="SetInfoFragment">
+        </View>
+    </RelativeLayout>
+
+</android.support.v7.widget.Toolbar>
