@@ -56,7 +56,7 @@ public class QuickReply extends IntentService {
                         .setPriority(Notification.PRIORITY_HIGH)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentTitle(CacheChats.Loaded.get(Chat).Title)
-                        .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ChatActivity.class).putExtra("chat", Chat), 0))
+                        .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))
                         .setStyle(new NotificationCompat.BigTextStyle().bigText("Replied with " + text));
 
                 notificationManager.notify(Chat.hashCode(), c.build());

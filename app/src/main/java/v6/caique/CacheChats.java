@@ -160,11 +160,14 @@ public class CacheChats {
                         Chat.Tags = new ArrayList<>();
 
                         ArrayList<String> Tags = (ArrayList<String>) Data.get("tags");
-                        for (String Tag : Tags)
+                        if (Tags != null)
                         {
-                            if (Tag != null)
+                            for (String Tag : Tags)
                             {
-                                Chat.Tags.add(Tag);
+                                if (Tag != null)
+                                {
+                                    Chat.Tags.add(Tag);
+                                }
                             }
                         }
 

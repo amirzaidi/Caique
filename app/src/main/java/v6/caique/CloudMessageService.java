@@ -389,7 +389,7 @@ public class CloudMessageService extends FirebaseMessagingService {
         else
         {
             b = b.setContentTitle(CacheChats.Loaded.get(Chat).Title)
-                    .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ChatActivity.class).putExtra("chat", Chat), 0))
+                    .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))
                     .addAction(new NotificationCompat.Action.Builder(R.drawable.ic_reply, "Reply", PendingIntent.getService(this, 0, new Intent(this, QuickReply.class).putExtra("chat", Chat), 0)) // PendingIntent.getActivity(this, 0, startChat, 0)
                         .addRemoteInput(new RemoteInput.Builder(Reply)
                                 .setLabel("Reply")
