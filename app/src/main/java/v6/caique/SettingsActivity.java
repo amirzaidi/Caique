@@ -33,6 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        setTitle("Settings");
+
         final SharedPreferences sharedPref = getSharedPreferences("caique", Context.MODE_PRIVATE);
 
         final Switch MusicSwitch = (Switch)findViewById(R.id.playMusic);
@@ -46,17 +48,18 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("music", buttonView.isChecked());
                 editor.commit();
+                MainActivity.Music = isChecked;
             }
         });
 
         TypingSwitch.setChecked(MainActivity.Typing);
         TypingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("typing", buttonView.isChecked());
                 editor.commit();
+                MainActivity.Typing = isChecked;
             }
         });
 

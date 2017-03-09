@@ -27,7 +27,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="Play music in chats" />
+                android:layout_marginBottom="16dp"
+                android:text="Play music in chats"
+                android:textSize="18sp" />
 
             <Switch
                 android:id="@+id/displayTyping"
@@ -36,7 +38,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="Enable typing messages" />
+                android:layout_marginBottom="16dp"
+                android:text="Enable typing messages"
+                android:textSize="18sp" />
         </LinearLayout>
     </ScrollView>
 
@@ -46,5 +50,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:onClick="askWipe"
-        android:text="Logout" />
+        android:text="Logout &amp; Clear Data" />
 </RelativeLayout>
