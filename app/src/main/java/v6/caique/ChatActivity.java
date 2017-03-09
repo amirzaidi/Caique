@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
@@ -42,10 +43,10 @@ public class ChatActivity extends AppCompatActivity {
     public MusicPlayerFragment MusicPlayer;
     public ArrayList<String> Playlist = new ArrayList<>();
     public String CurrentSong;
-    private TextView Title;
 
     public static ArrayList<String> SelectionUrls = new ArrayList<>();
     public static ArrayList<String> SelectionNames = new ArrayList<>();
+    public View InfoClickView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,20 +76,14 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
 
         LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View ActionView = inflater.inflate(R.layout.actionbar_chat, null);
-        Title = (TextView) ActionView.findViewById(R.id.title_text);
-        View ClickView = ActionView.findViewById(R.id.click_here);
-        ClickView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SetInfoFragment(null);
-            }
-        });
+        InfoClickView = inflater.inflate(R.layout.actionbar_chat, null);
+
+        SetInfoListener();
         SetTitle(CacheChats.Loaded.get(CurrentChat).Title);
 
-        actionBar.setCustomView(ActionView);
+        actionBar.setCustomView(InfoClickView);
 
-        android.support.v7.widget.Toolbar toolbar=(android.support.v7.widget.Toolbar) ActionView.getParent();
+        android.support.v7.widget.Toolbar toolbar=(android.support.v7.widget.Toolbar) InfoClickView.getParent();
         toolbar.setContentInsetsAbsolute(0,0);
 
         ChatWindow = new ChatFragment();
@@ -96,15 +91,35 @@ public class ChatActivity extends AppCompatActivity {
         MusicPlayer = new MusicPlayerFragment();
 
         SetChatFragment(null);
+    }
 
-        if (CacheChats.Loaded.containsKey(CurrentChat))
-        {
-            SetTitle(CacheChats.Loaded.get(CurrentChat).Title);
+    public void SetInfoListener(){
+        if(CacheChats.Subs.contains(CurrentChat)) {
+
+            View ClickView = InfoClickView.findViewById(R.id.click_here);
+            ClickView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SetInfoFragment(null);
+                }
+            });
+        }
+        else{
+
+            View ClickView = InfoClickView.findViewById(R.id.click_here);
+            ClickView.setBackground(null);
+            ClickView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(ChatActivity.Instances.get(CurrentChat), "You need to be subscribed to do this!",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
     public void SetTitle(String NewTitle){
-        Title.setText(NewTitle);
+        ((TextView)InfoClickView.findViewById(R.id.title_text)).setText(NewTitle);
     }
 
     @Override
@@ -191,8 +206,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void ReloadChatViews(boolean Normal, boolean Typing){
-        SetTitle(CacheChats.Loaded.get(CurrentChat).Title);
-
         if(ChatWindow.isVisible()) {
             ChatWindow.ReloadViews(Normal, Typing);
         }

@@ -66,6 +66,9 @@ public class CacheChats {
                     final String ChatId = dataSnapshot.getKey();
 
                     Subs.add(ChatId);
+                    if(ChatActivity.Instances.get(dataSnapshot.getKey()) != null && ChatActivity.Instances.get(dataSnapshot.getKey()).Active){
+                        ChatActivity.Instances.get(dataSnapshot.getKey()).SetInfoListener();
+                    }
                     StartListen(ChatId);
                     UpdateMainActivity();
 
@@ -95,6 +98,10 @@ public class CacheChats {
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     Subs.remove(dataSnapshot.getKey());
+                    if(ChatActivity.Instances.get(dataSnapshot.getKey()) != null && ChatActivity.Instances.get(dataSnapshot.getKey()).Active){
+                        ChatActivity.Instances.get(dataSnapshot.getKey()).SetInfoListener();
+                    }
+
                     UpdateMainActivity();
 
                     final String ChatId = dataSnapshot.getKey();

@@ -102,17 +102,6 @@ public class ChatInfoFragment extends Fragment {
 
                 MainFrame.addView(FavSwitch);
                 MainFrame.addView(UnsubButton);
-            } else {
-                Button SubButton = new Button(this.getContext());
-                SubButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                SubButton.setText("Subscribe to chat");
-                SubButton.setOnClickListener(new Button.OnClickListener() {
-                    public void onClick(View v) {
-                        SubToChat();
-                    }
-                });
-
-                MainFrame.addView(SubButton);
             }
         }
     }
@@ -246,17 +235,6 @@ public class ChatInfoFragment extends Fragment {
                 .addData("type", "update")
                 .addData("text", UpdateObject.toString())
                 .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
-                .build());
-    }
-
-    private void SubToChat(){
-        ((LinearLayout) RootView.findViewById(R.id.mainframe)).removeAllViews();
-        String ChatId = ((ChatActivity) getActivity()).CurrentChat;
-        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", ChatId)
-                .addData("type", "joinchat")
-                .addData("text", ChatId)
                 .build());
     }
 
