@@ -182,40 +182,42 @@ public class ChatInfoFragment extends Fragment {
         FirebaseDatabase.getInstance().getReference().child("tags").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                getActivity().runOnUiThread(new Runnable() {
+                if(getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
 
-                    final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    final LinearLayout TagsView = (LinearLayout) RootView.findViewById(R.id.tags);
+                        final LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        final LinearLayout TagsView = (LinearLayout) RootView.findViewById(R.id.tags);
 
-                    @Override
-                    public void run() {
-                        HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
-                        for (final String t : Data.keySet()) {
-                            Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
-                            View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
-                            CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
-                            Box.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), 0, (int) getResources().getDimension(R.dimen.appbar_padding_top), 0);
-                            Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
-                            if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
-                                Box.setChecked(true);
-                            } else {
-                                Box.setChecked(false);
-                            }
-                            Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                @Override
-                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if (isChecked) {
-                                        Tags.put(t, true);
-                                    } else {
-                                        Tags.put(t, false);
-                                    }
+                        @Override
+                        public void run() {
+                            HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                            for (final String t : Data.keySet()) {
+                                Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
+                                View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
+                                CheckBox Box = (CheckBox) Inflated.findViewById(R.id.checkBox);
+                                Box.setPadding((int) getResources().getDimension(R.dimen.appbar_padding_top), 0, (int) getResources().getDimension(R.dimen.appbar_padding_top), 0);
+                                Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
+                                if (CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t)) {
+                                    Box.setChecked(true);
+                                } else {
+                                    Box.setChecked(false);
                                 }
-                            });
+                                Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                        if (isChecked) {
+                                            Tags.put(t, true);
+                                        } else {
+                                            Tags.put(t, false);
+                                        }
+                                    }
+                                });
 
-                            TagsView.addView(Inflated);
+                                TagsView.addView(Inflated);
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
             }
 

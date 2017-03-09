@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.constraint.solver.Cache;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +31,6 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -65,31 +62,30 @@ public class ExploreFragment extends Fragment {
         FirebaseDatabase.getInstance().getReference().child("tags").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String t = dataSnapshot.getKey();
+                if (getActivity() != null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String t = dataSnapshot.getKey();
 
-                        View row = inflater.inflate(R.layout.list_item_tag, TagsList, false);
-                        CheckBox Box = (CheckBox) row.findViewById(R.id.checkBox);
-                        Box.setText(t.substring(0,1).toUpperCase() + t.substring(1).toLowerCase());
-                        Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                if (isChecked && !Tags.contains(t))
-                                {
-                                    Tags.add(t);
+                            View row = inflater.inflate(R.layout.list_item_tag, TagsList, false);
+                            CheckBox Box = (CheckBox) row.findViewById(R.id.checkBox);
+                            Box.setText(t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase());
+                            Box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                    if (isChecked && !Tags.contains(t)) {
+                                        Tags.add(t);
+                                    } else if (!isChecked && Tags.contains(t)) {
+                                        Tags.remove(t);
+                                    }
                                 }
-                                else if (!isChecked && Tags.contains(t))
-                                {
-                                    Tags.remove(t);
-                                }
-                            }
-                        });
+                            });
 
-                        TagsList.addView(row);
-                    }
-                });
+                            TagsList.addView(row);
+                        }
+                    });
+                }
             }
 
             @Override
