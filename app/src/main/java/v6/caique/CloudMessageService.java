@@ -238,6 +238,13 @@ public class CloudMessageService extends FirebaseMessagingService {
                             .addData("text", MainActivity.Instance.sharedPref.getString("gidtoken", ""))
                             .build());
                 }
+                else if (Data.get("type").equals("regcomplete"))
+                {
+                    if (MainActivity.Instance != null)
+                    {
+                        MainActivity.Instance.DownloadPicture();
+                    }
+                }
                 else if (Data.get("type").equals("tagres"))
                 {
                     try

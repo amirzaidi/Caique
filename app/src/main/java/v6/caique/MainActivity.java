@@ -54,6 +54,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -186,9 +187,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView NavView = (NavigationView) findViewById(R.id.nav_view);
         final ImageView Picture = (ImageView) NavView.getHeaderView(0).findViewById(R.id.userdp);
-        Picture.setImageDrawable(null);
 
-        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + MainActivity.Instance.sharedPref.getString("gid", null));
+        final StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://firebase-caique.appspot.com").child("users/" + sharedPref.getString("gid", null));
         try {
             storageRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                 @Override
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity
         catch(Exception e){
         }
 
-        Picture.requestLayout();
+        //Picture.requestLayout();
     }
 
     public void ChooseDP(View view) {
