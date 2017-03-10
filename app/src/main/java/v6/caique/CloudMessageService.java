@@ -158,67 +158,65 @@ public class CloudMessageService extends FirebaseMessagingService {
                     }
                     else if ((Type.equals("start") || Type.equals("play")) && ChatOpen)
                     {
-                        final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
+                        if(CacheChats.Subs.contains(ChatId)) {
+                            final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
 
-                        if (Data.get("text") == null || Data.get("text").isEmpty())
-                        {
-                            if (Active) {
-                                Chat.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Chat.CurrentSong = "";
-                                        Chat.MusicPlayer.SetCurrentlyPlaying();
-                                        Chat.Playlist.clear();
-                                        Chat.ReloadSongViews();
-                                    }
-                                });
-                            }
-
-                            return;
-                        }
-
-                        try {
-                            JSONObject ParseMain = new JSONObject(Data.get("text"));
-                            JSONObject Playing = ParseMain.getJSONObject("Playing");
-                            String mTitle = "";
-                            if (!Playing.isNull("name"))
-                            {
-                                mTitle = Playing.get("name").toString();
-                            }
-
-                            final String Title = mTitle;
-
-                            if (Active) {
-                                final ArrayList<String> NewPlaylist = new ArrayList<>();
-                                JSONArray Array = ParseMain.getJSONArray("Titles");
-
-                                for (int i = 0; i < Array.length(); i++){
-                                    NewPlaylist.add(Array.getString(i));
+                            if (Data.get("text") == null || Data.get("text").isEmpty()) {
+                                if (Active) {
+                                    Chat.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Chat.CurrentSong = "";
+                                            Chat.MusicPlayer.SetCurrentlyPlaying();
+                                            Chat.Playlist.clear();
+                                            Chat.ReloadSongViews();
+                                            Chat.SetTitle(CacheChats.Loaded.get(ChatId).Title);
+                                        }
+                                    });
                                 }
 
-                                Chat.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Chat.CurrentSong = Title;
-                                        if (!Title.isEmpty())
-                                        {
-                                            Chat.SetTitle("Playing: " + Title);
-                                        }
-
-                                        Chat.MusicPlayer.SetCurrentlyPlaying();
-                                        Chat.Playlist = NewPlaylist;
-                                        Chat.ReloadSongViews();
-                                    }
-                                });
-
-                                StartMusic(ChatId, Type.equals("start"));
-                            } else {
-                                sendNotification(ChatId, "♫ " + Title + " ♫");
+                                return;
                             }
-                        }
-                        catch (JSONException e)
-                        {
-                            Log.d("JSONMainPlaying", e.getMessage());
+
+                            try {
+                                JSONObject ParseMain = new JSONObject(Data.get("text"));
+                                JSONObject Playing = ParseMain.getJSONObject("Playing");
+                                String mTitle = "";
+                                if (!Playing.isNull("name")) {
+                                    mTitle = Playing.get("name").toString();
+                                }
+
+                                final String Title = mTitle;
+
+                                if (Active) {
+                                    final ArrayList<String> NewPlaylist = new ArrayList<>();
+                                    JSONArray Array = ParseMain.getJSONArray("Titles");
+
+                                    for (int i = 0; i < Array.length(); i++) {
+                                        NewPlaylist.add(Array.getString(i));
+                                    }
+
+                                    Chat.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Chat.CurrentSong = Title;
+                                            if (!Title.isEmpty()) {
+                                                Chat.SetTitle("Playing: " + Title);
+                                            }
+
+                                            Chat.MusicPlayer.SetCurrentlyPlaying();
+                                            Chat.Playlist = NewPlaylist;
+                                            Chat.ReloadSongViews();
+                                        }
+                                    });
+
+                                    StartMusic(ChatId, Type.equals("start"));
+                                } else {
+                                    sendNotification(ChatId, "♫ " + Title + " ♫");
+                                }
+                            } catch (JSONException e) {
+                                Log.d("JSONMainPlaying", e.getMessage());
+                            }
                         }
                     }
                 }

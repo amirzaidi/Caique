@@ -191,6 +191,8 @@ public class ChatInfoFragment extends Fragment {
                         @Override
                         public void run() {
                             HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
+                            TagsView.removeAllViews();
+
                             for (final String t : Data.keySet()) {
                                 Tags.put(t, CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Tags.contains(t));
                                 View Inflated = vi.inflate(R.layout.list_item_tag, TagsView, false);
@@ -245,35 +247,45 @@ public class ChatInfoFragment extends Fragment {
             }
         }
 
-        EditText Input = (EditText) RootView.findViewById(R.id.title_input);
-        String Text = Input.getText().toString().trim();
+        if(EnabledTags.size() != 0) {
 
-        if (Text.length() == 0)
-        {
-            Input.setText(CacheChats.Loaded.get(((ChatActivity)getActivity()).CurrentChat).Title);
-            Text = CacheChats.Loaded.get(((ChatActivity)getActivity()).CurrentChat).Title;
-        }
+            EditText Input = (EditText) RootView.findViewById(R.id.title_input);
+            String Text = Input.getText().toString().trim();
 
-        JSONObject UpdateObject = new JSONObject();
-        JSONArray TagsArray = new JSONArray();
-
-        try {
-            for(String s: EnabledTags){
-                TagsArray.put(s);
+            if (Text.length() == 0) {
+                Input.setText(CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Title);
+                Text = CacheChats.Loaded.get(((ChatActivity) getActivity()).CurrentChat).Title;
             }
-            UpdateObject.put("title", Text);
-            UpdateObject.put("tags", TagsArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
-                .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
-                .addData("chat", ((ChatActivity)getActivity()).CurrentChat)
-                .addData("type", "update")
-                .addData("text", UpdateObject.toString())
-                .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
-                .build());
+            if (((ChatActivity) getActivity()).CurrentSong == null || (((ChatActivity) getActivity()).CurrentSong).isEmpty()) {
+                ((ChatActivity) getActivity()).SetTitle(Text);
+            }
+
+            JSONObject UpdateObject = new JSONObject();
+            JSONArray TagsArray = new JSONArray();
+
+            try {
+                for (String s : EnabledTags) {
+                    TagsArray.put(s);
+                }
+                UpdateObject.put("title", Text);
+                UpdateObject.put("tags", TagsArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(getString(R.string.gcm_defaultSenderId) + "@gcm.googleapis.com")
+                    .setMessageId(Integer.toString(FirebaseIDService.msgId.incrementAndGet()))
+                    .addData("chat", ((ChatActivity) getActivity()).CurrentChat)
+                    .addData("type", "update")
+                    .addData("text", UpdateObject.toString())
+                    .addData("date", String.valueOf(System.currentTimeMillis() / 1000))
+                    .build());
+        }
+        else{
+            SetTitle();
+            SetTags();
+        }
     }
 
     private void UnsubFromChat(){
