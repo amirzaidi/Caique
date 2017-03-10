@@ -190,6 +190,7 @@ public class ChatInfoFragment extends Fragment {
 
                         @Override
                         public void run() {
+                            TagsView.removeAllViews();
                             HashMap<String, Object> Data = (HashMap<String, Object>) dataSnapshot.getValue();
                             TagsView.removeAllViews();
 

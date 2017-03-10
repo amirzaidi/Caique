@@ -158,7 +158,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                     }
                     else if ((Type.equals("start") || Type.equals("play")) && ChatOpen)
                     {
-                        if(CacheChats.Subs.contains(ChatId)) {
                             final ChatActivity Chat = ChatActivity.Instances.get(ChatId);
 
                             if (Data.get("text") == null || Data.get("text").isEmpty()) {
@@ -217,7 +216,6 @@ public class CloudMessageService extends FirebaseMessagingService {
                             } catch (JSONException e) {
                                 Log.d("JSONMainPlaying", e.getMessage());
                             }
-                        }
                     }
                 }
                 else
